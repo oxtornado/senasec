@@ -22,5 +22,13 @@
         "telefono": "3144406238",
         "contrasena": "prueba",
         "face_token": "98e8c2ad42b010642a3a2bf9b19a0844"
+    },
+    "daniel@gmail.com": {
+        "username": "daniel",
+        "email": "daniel@gmail.com",
+        "rol": "instructor",
+        "telefono": "123456789",
+        "contrasena": "daniel123",
+        "face_token": "b9cee067c59d5a7351f74e64d4531092"
     }
 }
