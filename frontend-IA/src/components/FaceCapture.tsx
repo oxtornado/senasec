@@ -4,13 +4,14 @@ import axios from 'axios'; // conectar contenido con el backend
 
 interface FaceCaptureProps {
     username: string;
+    documento: string;
     rol: string;
     email: string;
     telefono: string;
     password: string;
 }
 
-const FaceCapture: React.FC<FaceCaptureProps> = ({ username, rol, email, telefono, password }) => {
+const FaceCapture: React.FC<FaceCaptureProps> = ({ username, documento, rol, email, telefono, password }) => {
     const webcamRef = useRef<Webcam>(null); // referencia para tomar capturas
     const [capturing, setCapturing] = useState(false); // 
     const [status, setStatus] = useState(''); // muestra msj del proceso, fots en backend, tomando fotos...
@@ -39,6 +40,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ username, rol, email, telefon
     });
         // contenido del formulario de registro
         formData.append('username', username);
+        formData.append('documento', documento);
         formData.append('rol', rol);
         formData.append('email', email);
         formData.append('telefono', telefono);

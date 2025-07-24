@@ -23,6 +23,18 @@ API_SECRET = "tyxWMjsNMPKpycsFuu-BkJU-aJj-9ja7"
 FACE_DETECT_URL = "https://api-us.faceplusplus.com/facepp/v3/detect" # endpoint de face ++ para dectar un rostro 
 FACE_COMPARE_URL = "https://api-us.faceplusplus.com/facepp/v3/compare" # endpoint de face ++ para comparar un rostro
 
+
+# mandar los datos a django
+def enviar_a_django(data: dict):
+    try:
+        response = requests.post("http://127.0.0.1:8001/users/usuarios/", json=data)
+        if response.status_code == 201:
+            print("Datos guardados correctamente en Django.")
+        else:
+            print("Error al guardar en Django:", response.status_code, response.text)
+    except Exception as e:
+        print("Error de conexión con Django:", e)
+
 # funcion para guardar los usuarios en un archivo .JSON(se usara temporalmente)
 def save_users(data: dict):
     path = "usuarios_face.json"
@@ -39,7 +51,7 @@ def save_users(data: dict):
         "email": email,
         "rol": data["rol"],
         "telefono": data["telefono"],
-        "contrasena": data["contrasena"],  # actualmente no hasheada 
+        "password": data["password"],  # actualmente no hasheada 
         "face_token": data["face_token"]
     }
 
@@ -63,6 +75,7 @@ def get_face_token_by_email(email: str) -> str:
 @app.post("/register-face/")
 async def register_face(
     username: str = Form(...),
+    documento: str = Form(...),
     email: str = Form(...),
     rol: str = Form(...),
     telefono: str = Form(...),
@@ -92,52 +105,55 @@ async def register_face(
     if best_token:
         data_usuario = {
             "username": username,
+            "documento": documento,
             "email": email,
             "rol": rol,
             "telefono": telefono,
-            "contrasena": password,
+            "password": password,
             "face_token": best_token
         }
-        save_users(data_usuario)
+        enviar_a_django(data_usuario)
         return {"message": "Registro facial exitoso", "face_token": best_token}
     else:
         return {"error": "No se detectó ningún rostro válido"}
 
+def get_face_token_from_django(email: str) -> str:
+    """ Hace GET al backend de Django para obtener el face_token """
+    url = f"http://localhost:8001/api/get-face-token/?email={email}" 
+    response = requests.get(url)
+    if response.status_code == 200:
+        return response.json()["face_token"]
+    return None
+
 # endpoint que hace la comparacion e inicia sesion si(80%)
 @app.post("/login-face/")
-async def login_face(
-    email: str = Form(...),
-    image: UploadFile = File(...)
-):
-    # Obtener el face_token registrado
-    stored_token = get_face_token_by_email(email)
+async def login_face(email: str = Form(...), image: UploadFile = File(...)):
+    # Primero obtiene el face_token de Django
+    stored_token = get_face_token_from_django(email)
     if not stored_token:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado o sin registro facial")
+        raise HTTPException(404, "Usuario no encontrado o sin face_token.")
 
-    # Detectar face_token del rostro actual
+    # Después continúa con Face++
     contents = await image.read()
-    image.file.seek(0)
-    files = {"image_file": (image.filename, image.file, image.content_type)}
+    files = {"image_file": (image.filename, contents, image.content_type)}
     data = {"api_key": API_KEY, "api_secret": API_SECRET}
+
     detect_resp = requests.post(FACE_DETECT_URL, files=files, data=data)
     detect_data = detect_resp.json()
 
     if not detect_data.get("faces"):
-        raise HTTPException(status_code=400, detail="No se detectó ningún rostro en la imagen enviada")
+        raise HTTPException(400, "No se detectó ningún rostro en la imagen.")
 
     login_face_token = detect_data["faces"][0]["face_token"]
 
-    # Comparar tokens
     compare_data = {
         "api_key": API_KEY,
         "api_secret": API_SECRET,
         "face_token1": stored_token,
         "face_token2": login_face_token
     }
-
     compare_resp = requests.post(FACE_COMPARE_URL, data=compare_data)
     compare_result = compare_resp.json()
-
     confidence = compare_result.get("confidence", 0)
 
     if confidence > 80:
