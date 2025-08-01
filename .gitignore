@@ -1,0 +1,10 @@
+# .gitignore
+senasec_venv/
+*.pyc
+__pycache__/
+*.env
+.env
+node_modules/
+dist/
+.DS_Store
+*.log
