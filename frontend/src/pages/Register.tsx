@@ -6,6 +6,11 @@ import { User, Mail, KeyRound, Phone } from 'lucide-react';
 import FaceCapture from '../components/FaceCapture';
 
 const Register = () => {
+  const [isVerificationStep, setIsVerificationStep] = useState(false);
+  const [verificationCode, setVerificationCode] = useState('');
+  const [errorMessage, setErrorMessage] = useState('');
+  const [successMessage, setSuccessMessage] = useState('');
+
 
   const navigate = useNavigate()
 
@@ -22,24 +27,39 @@ const Register = () => {
   console.log(formData);
 
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  try {
+    const response = await axios.post("http://localhost:8000/users/registrar/", formData, {
+      headers: {
+        "Content-Type": "application/json"
+      }
+    });
 
-    try {
-      const response = await axios.post("http://localhost:8000/users/registrar/", formData, {
-        headers: {
-          "Content-Type": "application/json"
-        }
-      });
+    console.log("Registro exitoso:", response.data);
+    setSuccessMessage("Registro exitoso. Revisa tu correo para el código.");
+    setIsVerificationStep(true);  // switch to verification step
 
-      console.log("Registro exitoso:", response.data);
-      setTimeout(() => {
-        navigate("/login")
-      }, 2000);
-    } catch (error) {
-      console.error("Error al registrar:", error);
-    }
-  };
+  } catch (error: any) {
+    console.error("Error al registrar:", error);
+    setErrorMessage(error.response?.data?.error || 'Error en el registro.');
+  }
+};
+const handleVerifyCode = async () => {
+  try {
+    const payload = {
+      documento: formData.documento,
+      code: verificationCode
+    };
+
+    const res = await axios.post("http://localhost:8000/verify-email-code/", payload);
+    setSuccessMessage("Cuenta verificada correctamente. Redirigiendo...");
+    setTimeout(() => navigate("/login"), 2000);
+  } catch (err: any) {
+    setErrorMessage(err.response?.data?.error || "Código inválido o expirado.");
+  }
+};
+
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
@@ -56,6 +76,10 @@ const Register = () => {
     <div className="min-h-screen bg-gray-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+
+          {errorMessage && <p className="text-red-600 text-sm">{errorMessage}</p>}
+          {successMessage && <p className="text-green-600 text-sm">{successMessage}</p>}
+
           <form className="space-y-6" onSubmit={handleSubmit}>  
             <div>
               <label htmlFor="name" className="block text-sm font-medium text-gray-700">
@@ -114,9 +138,10 @@ const Register = () => {
                   className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 >
                   <option value="">Seleccione un rol</option>
+                  <option value="admin">Jefe de Inventarios</option>
                   <option value="instructor">Instructor</option>
-                  <option value="security">Jefe de Seguridad</option>
-                  <option value="inventory">Jefe de Inventarios</option>
+                  <option value="seguridad">Jefe de Seguridad</option>
+                  <option value="aseo">Personal de Aseo</option>
                 </select>
               </div>
             </div>
@@ -200,6 +225,25 @@ const Register = () => {
               </button>
             </div>
           </form>
+          {isVerificationStep && (
+            <div className="mt-6 space-y-4">
+              <label className="block text-sm font-medium text-gray-700">Ingresa el código de verificación enviado a tu correo:</label>
+              <input
+                type="text"
+                name="code"
+                value={verificationCode}
+                onChange={(e) => setVerificationCode(e.target.value)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm"
+                placeholder="Código de verificación"
+              />
+              <button
+                onClick={handleVerifyCode}
+                className="w-full bg-green-600 text-white py-2 px-4 rounded hover:bg-green-700"
+              >
+                Verificar cuenta
+              </button>
+            </div>
+          )}
 
           <div className="mt-6">
             <div className="relative">

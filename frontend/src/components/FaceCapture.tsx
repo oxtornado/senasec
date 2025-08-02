@@ -7,6 +7,7 @@ interface FaceCaptureProps {
 }
 
 const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture }) => {
+
     const webcamRef = useRef<Webcam>(null); // referencia para tomar capturas
     const [capturing, setCapturing] = useState(false); // 
     const [status, setStatus] = useState(''); // muestra msj del proceso, fots en backend, tomando fotos...

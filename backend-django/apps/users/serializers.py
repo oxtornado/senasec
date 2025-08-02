@@ -6,6 +6,9 @@ import requests
 
 User = get_user_model()
 
+class EmailVerificationRequestSerializer(serializers.Serializer):
+    document = serializers.CharField()
+
 class UsuarioSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -32,7 +35,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
-    
+
         # Si se envió imagen, llamamos a la API de Face++ para obtener el token
         #if image:
         #    import requests
@@ -82,6 +85,8 @@ class UsuarioSerializer(serializers.ModelSerializer):
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'documento'  # <- Esto indica que usaremos el campo documento para la autenticación
 
+
+
     def validate(self, attrs):
         # Sobrescribimos para usar 'documento' y 'password'
         documento = attrs.get("documento")
@@ -91,6 +96,9 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
 
         if not user:
             raise serializers.ValidationError("Credenciales inválidas, verifica tu correo y contraseña.")
+
+        if not user.is_active:
+            raise serializers.ValidationError("Tu cuenta no está activada. Verifica tu correo.")
 
         data = super().validate(attrs)
         data['user'] = {

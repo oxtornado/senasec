@@ -1,5 +1,6 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.utils import timezone
 
 class Usuario(AbstractUser):
     # Definición de las opciones de rol
@@ -20,10 +21,10 @@ class Usuario(AbstractUser):
     email = models.EmailField(unique=True, null=True)
     
     # Campo de número de celular único
-    telefono = models.CharField(max_length=15, unique=True, null=True)
+    telefono = models.CharField(max_length=15, blank=True, null=True)
 
     # Campo de estado de usuario
-    is_active = models.BooleanField(default=True, null=True) # Para activar/desactivar el usuario
+    is_active = models.BooleanField(default=False)
 
     # Campo de fecha de registro
     fecha_registro = models.DateTimeField(auto_now=True) # Fecha de registro automática
@@ -36,3 +37,11 @@ class Usuario(AbstractUser):
 
     def __str__(self):
         return f"{self.username} - {self.documento}"
+
+class EmailVerificationCode(models.Model):
+    user = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    code = models.CharField(max_length=6)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def is_expired(self):
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=5)
