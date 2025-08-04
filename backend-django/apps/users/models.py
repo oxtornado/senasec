@@ -1,7 +1,7 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
+from django.conf import settings
 from django.utils import timezone
-
 class Usuario(AbstractUser):
     # Definición de las opciones de rol
     ROL_CHOICES = [
@@ -18,7 +18,7 @@ class Usuario(AbstractUser):
     documento = models.CharField(max_length=20, unique=True) # Documento de identidad único
 
     # Campo de correo electrónico único
-    email = models.EmailField(unique=True, null=True)
+    email = models.EmailField(null=True)
     
     # Campo de número de celular único
     telefono = models.CharField(max_length=15, blank=True, null=True)
@@ -39,9 +39,41 @@ class Usuario(AbstractUser):
         return f"{self.username} - {self.documento}"
 
 class EmailVerificationCode(models.Model):
-    user = models.ForeignKey(Usuario, on_delete=models.CASCADE)
+    email = models.EmailField()
+    documento = models.CharField(max_length=20)
     code = models.CharField(max_length=6)
     created_at = models.DateTimeField(auto_now_add=True)
+    used = models.BooleanField(default=False)
+    verified = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-created_at']
+        indexes = [
+            models.Index(fields=['email', 'documento', 'code']),
+        ]
 
     def is_expired(self):
-        return timezone.now() > self.created_at + timezone.timedelta(minutes=5)
+        # Codes expire after 15 minutes
+        return timezone.now() > self.created_at + timezone.timedelta(minutes=15)
+        
+    def mark_used(self):
+        self.used = True
+        self.save()
+        
+    def mark_verified(self):
+        self.verified = True
+        self.used = True
+        self.save()
+        
+    @classmethod
+    def get_valid_code(cls, email, documento, code):
+        try:
+            return cls.objects.get(
+                email=email,
+                documento=documento,
+                code=code,
+                used=False,
+                created_at__gte=timezone.now() - timezone.timedelta(minutes=15)
+            )
+        except cls.DoesNotExist:
+            return None
