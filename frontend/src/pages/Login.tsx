@@ -1,159 +1,291 @@
-import { useNavigate } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
-import { Lock, User, Mail, Loader2, Shield, Eye, AlertCircle, CheckCircle, Search } from 'lucide-react';
-import toast from 'react-hot-toast';
-import axios from 'axios';
-import FaceCapture from '../components/FaceCapture';
+"use client"
+
+import { useNavigate } from "react-router-dom"
+import type React from "react"
+import { useState, useEffect, useRef } from "react"
+import { Link } from "react-router-dom"
+import {
+  Lock,
+  User,
+  Mail,
+  Loader2,
+  Shield,
+  Eye,
+  AlertCircle,
+  CheckCircle,
+  Search,
+  XCircle,
+  Camera,
+  CameraOff,
+} from "lucide-react"
+import toast from "react-hot-toast"
+import axios from "axios"
 
 interface UserData {
-  id: number;
-  documento: string;
-  email: string;
-  username: string;
-  face_token?: string;
+  id: number
+  documento: string
+  email: string
+  username: string
+  face_token?: string
 }
 
 const Login = () => {
-  const navigate = useNavigate();
+  const navigate = useNavigate()
+  const [documento, setDocumento] = useState("")
+  const [temporalToken, setTemporalToken] = useState("")
+  const [emailCode, setEmailCode] = useState("")
+  const [authMethod, setAuthMethod] = useState<"face" | "email">("face")
+  const [isLoading, setIsLoading] = useState(false)
+  const [isSendingCode, setIsSendingCode] = useState(false)
+  const [isSearchingUser, setIsSearchingUser] = useState(false)
+  const [userData, setUserData] = useState<UserData | null>(null)
+  const [userNotFound, setUserNotFound] = useState(false)
+  const [codeSent, setCodeSent] = useState(false)
 
-  const [documento, setDocumento] = useState('');
-  const [temporalToken, setTemporalToken] = useState('');
-  const [emailCode, setEmailCode] = useState('');
-  const [authMethod, setAuthMethod] = useState<'face' | 'email'>('face');
-  const [isLoading, setIsLoading] = useState(false);
-  const [isSendingCode, setIsSendingCode] = useState(false);
-  const [isSearchingUser, setIsSearchingUser] = useState(false);
-  const [userData, setUserData] = useState<UserData | null>(null);
-  const [userNotFound, setUserNotFound] = useState(false);
-  const [codeSent, setCodeSent] = useState(false);
+  // New error states for enhanced visual feedback
+  const [documentError, setDocumentError] = useState("")
+  const [codeError, setCodeError] = useState("")
+  const [faceError, setFaceError] = useState("")
+  const [shakeAnimation, setShakeAnimation] = useState("")
+
+  // Face capture states
+  const videoRef = useRef<HTMLVideoElement>(null)
+  const canvasRef = useRef<HTMLCanvasElement>(null)
+  const [isStreaming, setIsStreaming] = useState(false)
+  const [cameraError, setCameraError] = useState("")
 
   // Search for user when document is filled
   useEffect(() => {
     const searchUser = async () => {
-      if (documento.length >= 6) { // Start searching when at least 6 digits
-        setIsSearchingUser(true);
-        setUserNotFound(false);
-        setUserData(null);
-        
+      if (documento.length >= 6) {
+        setIsSearchingUser(true)
+        setUserNotFound(false)
+        setUserData(null)
+        setDocumentError("")
+
         try {
-          const response = await axios.get(`http://localhost:8000/users/usuarios/`);
-          const users = response.data;
-          
-          const foundUser = users.find((user: UserData) => user.documento === documento);
-          
+          const response = await axios.get(`http://localhost:8000/users/usuarios/`)
+          const users = response.data
+          const foundUser = users.find((user: UserData) => user.documento === documento)
+
           if (foundUser) {
-            setUserData(foundUser);
-            setUserNotFound(false);
+            setUserData(foundUser)
+            setUserNotFound(false)
+            setDocumentError("")
           } else {
-            setUserData(null);
-            setUserNotFound(true);
+            setUserData(null)
+            setUserNotFound(true)
+            setDocumentError("User not found with this document number")
+            triggerShake()
           }
         } catch (error) {
-          console.error('Error searching for user:', error);
-          setUserData(null);
-          setUserNotFound(true);
+          console.error("Error searching for user:", error)
+          setUserData(null)
+          setUserNotFound(true)
+          setDocumentError("Error searching for user. Please try again.")
+          triggerShake()
         } finally {
-          setIsSearchingUser(false);
+          setIsSearchingUser(false)
         }
       } else {
-        setUserData(null);
-        setUserNotFound(false);
-        setCodeSent(false);
+        setUserData(null)
+        setUserNotFound(false)
+        setCodeSent(false)
+        setDocumentError("")
       }
-    };
+    }
 
-    const debounceTimer = setTimeout(searchUser, 500);
-    return () => clearTimeout(debounceTimer);
-  }, [documento]);
+    const debounceTimer = setTimeout(searchUser, 500)
+    return () => clearTimeout(debounceTimer)
+  }, [documento])
+
+  // Face capture functions
+  useEffect(() => {
+    if (userData && authMethod === "face" && userData.face_token) {
+      startCamera()
+    } else {
+      stopCamera()
+    }
+
+    return () => {
+      stopCamera()
+    }
+  }, [userData, authMethod])
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({
+        video: { width: 640, height: 480 },
+      })
+
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream
+        setIsStreaming(true)
+        setCameraError("")
+      }
+    } catch (err) {
+      console.error("Error accessing camera:", err)
+      setCameraError("Unable to access camera. Please check permissions.")
+    }
+  }
+
+  const stopCamera = () => {
+    if (videoRef.current && videoRef.current.srcObject) {
+      const tracks = (videoRef.current.srcObject as MediaStream).getTracks()
+      tracks.forEach((track) => track.stop())
+      setIsStreaming(false)
+    }
+  }
+
+  const captureImage = () => {
+    if (videoRef.current && canvasRef.current) {
+      const canvas = canvasRef.current
+      const video = videoRef.current
+      const context = canvas.getContext("2d")
+
+      if (context) {
+        canvas.width = video.videoWidth
+        canvas.height = video.videoHeight
+        context.drawImage(video, 0, 0)
+
+        // Convert to base64 and simulate token generation
+        const imageData = canvas.toDataURL("image/jpeg")
+        const token = btoa(imageData.substring(0, 100)) // Simplified token generation
+        setTemporalToken(token)
+        setFaceError("")
+        stopCamera()
+      }
+    }
+  }
+
+  const triggerShake = () => {
+    setShakeAnimation("animate-shake")
+    setTimeout(() => setShakeAnimation(""), 600)
+  }
 
   const handleSendEmailCode = async () => {
     if (!userData) {
-      toast.error('User not found');
-      return;
+      toast.error("User not found")
+      return
     }
 
-    setIsSendingCode(true);
+    setIsSendingCode(true)
+    setCodeError("")
+
     try {
-      await axios.post('http://localhost:8000/users/verify-email-code/', {
+      await axios.post("http://localhost:8000/users/verify-email-code/", {
         documento: userData.documento,
-        email: userData.email
-      });
-      setCodeSent(true);
-      toast.success(`Verification code sent to ${userData.email}`);
+        email: userData.email,
+      })
+      setCodeSent(true)
+      toast.success(`Verification code sent to ${userData.email}`)
     } catch (err: any) {
-      console.error("❌ Error sending email:", err);
-      const msg = err.response?.data?.error || 'Error sending verification code';
-      toast.error(msg);
+      console.error("❌ Error sending email:", err)
+      const msg = err.response?.data?.error || "Error sending verification code"
+      setCodeError(msg)
+      toast.error(msg)
+      triggerShake()
     } finally {
-      setIsSendingCode(false);
+      setIsSendingCode(false)
     }
-  };
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
+    e.preventDefault()
+
+    // Reset all error states
+    setDocumentError("")
+    setCodeError("")
+    setFaceError("")
+
     if (!userData) {
-      toast.error('Please enter a valid document number');
-      return;
+      setDocumentError("Please enter a valid document number")
+      triggerShake()
+      return
     }
 
-    if (authMethod === 'face' && !temporalToken) {
-      toast.error('Please capture your face before signing in');
-      return;
+    if (authMethod === "face" && !temporalToken) {
+      setFaceError("Please capture your face before signing in")
+      triggerShake()
+      return
     }
 
-    if (authMethod === 'email' && !emailCode) {
-      toast.error('Please enter the verification code');
-      return;
+    if (authMethod === "email" && !emailCode) {
+      setCodeError("Please enter the verification code")
+      triggerShake()
+      return
     }
 
-    setIsLoading(true);
+    setIsLoading(true)
+
     try {
-      if (authMethod === 'face') {
+      if (authMethod === "face") {
         if (!userData.face_token) {
-          toast.error('This user has no face capture registered');
-          return;
+          setFaceError("This user has no face capture registered")
+          triggerShake()
+          return
         }
 
         // Compare faces
-        const formData = new FormData();
-        formData.append('registered_token', userData.face_token);
-        formData.append('temporal_token', temporalToken);
+        const formData = new FormData()
+        formData.append("registered_token", userData.face_token)
+        formData.append("temporal_token", temporalToken)
 
-        const compareRes = await axios.post('http://0.0.0.0:8001/compare-face/', formData);
-        const result = compareRes.data;
+        const compareRes = await axios.post("http://0.0.0.0:8001/compare-face/", formData)
+        const result = compareRes.data
 
         if (result.match) {
-          toast.success('Login successful!');
-          setTimeout(() => navigate('/inventory'), 1500);
+          toast.success("Login successful!")
+          setTimeout(() => navigate("/inventory"), 1500)
         } else {
-          toast.error('Face verification failed');
+          setFaceError("Face verification failed. Please try again.")
+          triggerShake()
         }
-
-      } else if (authMethod === 'email') {
+      } else if (authMethod === "email") {
         // Verify email code
-        const verifyRes = await axios.post('http://localhost:8000/users/verify-code/', {
+        const verifyRes = await axios.post("http://localhost:8000/users/verify-code/", {
           email: userData.email,
           documento: userData.documento,
           code: emailCode,
-        });
+        })
 
-        toast.success('Code verified. Login successful!');
-        setTimeout(() => navigate('/inventory'), 1500);
+        toast.success("Code verified. Login successful!")
+        setTimeout(() => navigate("/inventory"), 1500)
+      }
+    } catch (error: any) {
+      console.error("❌ Login error:", error)
+      const msg = error.response?.data?.error || "Login process failed"
+
+      if (authMethod === "email") {
+        if (msg.toLowerCase().includes("code") || msg.toLowerCase().includes("verification")) {
+          setCodeError("Invalid verification code. Please check and try again.")
+        } else {
+          setCodeError(msg)
+        }
+      } else if (authMethod === "face") {
+        setFaceError(msg)
       }
 
-    } catch (error: any) {
-      console.error("❌ Login error:", error);
-      const msg = error.response?.data?.error || 'Login process failed';
-      toast.error(msg);
+      triggerShake()
+      toast.error(msg)
     } finally {
-      setIsLoading(false);
+      setIsLoading(false)
     }
-  };
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
+      <style>{`
+        @keyframes shake {
+          0%, 100% { transform: translateX(0); }
+          10%, 30%, 50%, 70%, 90% { transform: translateX(-4px); }
+          20%, 40%, 60%, 80% { transform: translateX(4px); }
+        }
+        .animate-shake {
+          animation: shake 0.6s ease-in-out;
+        }
+      `}</style>
+
       {/* Header */}
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <div className="flex justify-center mb-8">
@@ -166,88 +298,96 @@ const Login = () => {
             </div>
           </div>
         </div>
-        
         <h2 className="text-center text-4xl font-bold bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
           SENASEC
         </h2>
-        <p className="mt-3 text-center text-lg text-gray-600 font-medium">
-          Smart Security System
-        </p>
-        <p className="mt-1 text-center text-sm text-gray-500">
-          Secure access to your workspace
-        </p>
+        <p className="mt-3 text-center text-lg text-gray-600 font-medium">Smart Security System</p>
+        <p className="mt-1 text-center text-sm text-gray-500">Secure access to your workspace</p>
       </div>
 
       {/* Login Form */}
       <div className="mt-10 sm:mx-auto sm:w-full sm:max-w-md">
-        <div className="bg-white/80 backdrop-blur-sm py-10 px-6 shadow-2xl border border-white/20 rounded-2xl">
+        <div
+          className={`bg-white/80 backdrop-blur-sm py-10 px-6 shadow-2xl border border-white/20 rounded-2xl ${shakeAnimation}`}
+        >
           <form className="space-y-8" onSubmit={handleSubmit}>
-            
             {/* Document Input */}
             <div className="space-y-2">
-              <label className="block text-sm font-semibold text-gray-700">
-                Document Number
-              </label>
+              <label className="block text-sm font-semibold text-gray-700">Document Number</label>
               <div className="relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                  <User className="h-5 w-5 text-gray-400" />
+                  <User className={`h-5 w-5 ${documentError ? "text-red-400" : "text-gray-400"}`} />
                 </div>
                 <input
                   type="text"
                   value={documento}
                   onChange={(e) => {
-                    // Only allow numbers
                     if (/^\d*$/.test(e.target.value)) {
-                      setDocumento(e.target.value);
-                      setEmailCode(''); // Reset email code when document changes
-                      setCodeSent(false);
+                      setDocumento(e.target.value)
+                      setEmailCode("")
+                      setCodeSent(false)
+                      setDocumentError("")
+                      setCodeError("")
+                      setFaceError("")
                     }
                   }}
-                  className="block w-full pl-10 pr-10 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                  className={`block w-full pl-10 pr-10 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${
+                    documentError
+                      ? "border-red-300 focus:ring-red-500 bg-red-50"
+                      : "border-gray-200 focus:ring-blue-500"
+                  }`}
                   placeholder="Enter your document number"
                   disabled={isLoading}
                 />
                 <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
-                  {isSearchingUser && (
-                    <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />
-                  )}
+                  {isSearchingUser && <Loader2 className="h-5 w-5 text-blue-500 animate-spin" />}
                   {!isSearchingUser && documento.length >= 6 && userData && (
                     <CheckCircle className="h-5 w-5 text-green-500" />
                   )}
                   {!isSearchingUser && documento.length >= 6 && userNotFound && (
-                    <AlertCircle className="h-5 w-5 text-red-500" />
+                    <XCircle className="h-5 w-5 text-red-500" />
                   )}
                 </div>
               </div>
-              
-              {/* User Status Messages */}
+
+              {/* Enhanced User Status Messages */}
               {documento.length >= 6 && (
                 <div className="mt-2">
                   {isSearchingUser && (
-                    <div className="flex items-center text-sm text-blue-600">
-                      <Search className="w-4 h-4 mr-2" />
+                    <div className="flex items-center text-sm text-blue-600 bg-blue-50 p-3 rounded-lg">
+                      <Search className="w-4 h-4 mr-2 animate-pulse" />
                       Searching for user...
                     </div>
                   )}
                   {!isSearchingUser && userData && (
-                    <div className="flex items-center text-sm text-green-600">
+                    <div className="flex items-center text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       User found: {userData.username} ({userData.email})
                     </div>
                   )}
                   {!isSearchingUser && userNotFound && (
-                    <div className="flex items-center text-sm text-red-600">
-                      <AlertCircle className="w-4 h-4 mr-2" />
-                      No user found with this document number
+                    <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                      <XCircle className="w-4 h-4 mr-2" />
+                      <div>
+                        <div className="font-medium">User not found</div>
+                        <div className="text-xs mt-1">No user exists with document number: {documento}</div>
+                      </div>
                     </div>
                   )}
                 </div>
               )}
-              
+
               {documento.length > 0 && documento.length < 6 && (
-                <div className="flex items-center text-sm text-gray-500">
+                <div className="flex items-center text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
                   <AlertCircle className="w-4 h-4 mr-2" />
                   Enter at least 6 digits to search for user
+                </div>
+              )}
+
+              {documentError && (
+                <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                  <XCircle className="w-4 h-4 mr-2" />
+                  {documentError}
                 </div>
               )}
             </div>
@@ -255,45 +395,49 @@ const Login = () => {
             {/* Authentication Method Selector - Only show if user is found */}
             {userData && (
               <div className="space-y-4">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Authentication Method
-                </label>
+                <label className="block text-sm font-semibold text-gray-700">Authentication Method</label>
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     type="button"
-                    onClick={() => setAuthMethod('face')}
+                    onClick={() => {
+                      setAuthMethod("face")
+                      setCodeError("")
+                      setFaceError("")
+                    }}
                     disabled={isLoading || !userData.face_token}
                     className={`relative flex flex-col items-center justify-center py-4 px-3 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
-                      authMethod === 'face'
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg transform scale-105'
-                        : userData.face_token 
-                          ? 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50'
-                          : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed'
+                      authMethod === "face"
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg transform scale-105"
+                        : userData.face_token
+                          ? "bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
+                          : "bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed"
                     }`}
                   >
                     <Eye className="h-6 w-6 mb-2" />
                     Face Recognition
-                    {!userData.face_token && (
-                      <span className="text-xs mt-1">Not available</span>
-                    )}
-                    {authMethod === 'face' && userData.face_token && (
+                    {!userData.face_token && <span className="text-xs mt-1">Not available</span>}
+                    {authMethod === "face" && userData.face_token && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"></div>
                     )}
                   </button>
-                  
+
                   <button
                     type="button"
-                    onClick={() => setAuthMethod('email')}
+                    onClick={() => {
+                      setAuthMethod("email")
+                      setCodeError("")
+                      setFaceError("")
+                    }}
                     disabled={isLoading}
                     className={`relative flex flex-col items-center justify-center py-4 px-3 rounded-xl text-sm font-medium border-2 transition-all duration-200 ${
-                      authMethod === 'email'
-                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg transform scale-105'
-                        : 'bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50'
+                      authMethod === "email"
+                        ? "bg-gradient-to-r from-blue-600 to-indigo-600 text-white border-blue-600 shadow-lg transform scale-105"
+                        : "bg-white text-gray-700 border-gray-200 hover:border-blue-300 hover:bg-blue-50"
                     }`}
                   >
                     <Mail className="h-6 w-6 mb-2" />
                     Email Code
-                    {authMethod === 'email' && (
+                    {authMethod === "email" && (
                       <div className="absolute -top-1 -right-1 w-3 h-3 bg-green-400 rounded-full"></div>
                     )}
                   </button>
@@ -302,17 +446,57 @@ const Login = () => {
             )}
 
             {/* Face Capture - Only show if user found and has face token */}
-            {userData && authMethod === 'face' && userData.face_token && (
+            {userData && authMethod === "face" && userData.face_token && (
               <div className="space-y-4">
-                <label className="block text-sm font-semibold text-gray-700">
-                  Face Capture
-                </label>
-                <div className="bg-gray-50 rounded-xl p-4 border-2 border-dashed border-gray-200">
-                  <FaceCapture onCapture={(token) => setTemporalToken(token)} />
-                  {temporalToken && (
+                <label className="block text-sm font-semibold text-gray-700">Face Capture</label>
+                <div
+                  className={`bg-gray-50 rounded-xl p-4 border-2 border-dashed ${
+                    faceError ? "border-red-300 bg-red-50" : "border-gray-200"
+                  }`}
+                >
+                  <div className="space-y-4">
+                    <div className="relative bg-black rounded-lg overflow-hidden">
+                      <video ref={videoRef} autoPlay playsInline muted className="w-full h-48 object-cover" />
+                      <canvas ref={canvasRef} className="hidden" />
+
+                      {!isStreaming && (
+                        <div className="absolute inset-0 flex items-center justify-center bg-gray-800">
+                          <div className="text-center text-white">
+                            <CameraOff className="w-8 h-8 mx-auto mb-2" />
+                            <p className="text-sm">Camera not available</p>
+                          </div>
+                        </div>
+                      )}
+                    </div>
+
+                    {cameraError && <div className="text-sm text-red-600 bg-red-50 p-2 rounded">{cameraError}</div>}
+
+                    <div className="flex justify-center">
+                      <button
+                        type="button"
+                        onClick={isStreaming ? captureImage : startCamera}
+                        disabled={!isStreaming && !!cameraError}
+                        className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
+                        <Camera className="w-4 h-4 mr-2" />
+                        {isStreaming ? "Capture Face" : "Start Camera"}
+                      </button>
+                    </div>
+                  </div>
+
+                  {temporalToken && !faceError && (
                     <div className="mt-3 flex items-center text-sm text-green-600">
                       <CheckCircle className="w-4 h-4 mr-2" />
                       Face captured successfully
+                    </div>
+                  )}
+                  {faceError && (
+                    <div className="mt-3 flex items-center text-sm text-red-600 bg-red-100 p-3 rounded-lg">
+                      <XCircle className="w-4 h-4 mr-2" />
+                      <div>
+                        <div className="font-medium">Face verification failed</div>
+                        <div className="text-xs mt-1">{faceError}</div>
+                      </div>
                     </div>
                   )}
                 </div>
@@ -320,12 +504,10 @@ const Login = () => {
             )}
 
             {/* Email Verification - Only show if user found and email method selected */}
-            {userData && authMethod === 'email' && (
+            {userData && authMethod === "email" && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <label className="block text-sm font-semibold text-gray-700">
-                    Verification Code
-                  </label>
+                  <label className="block text-sm font-semibold text-gray-700">Verification Code</label>
                   <button
                     type="button"
                     onClick={handleSendEmailCode}
@@ -338,36 +520,51 @@ const Login = () => {
                         Sending...
                       </>
                     ) : codeSent ? (
-                      'Resend Code'
+                      "Resend Code"
                     ) : (
-                      'Send Code'
+                      "Send Code"
                     )}
                   </button>
                 </div>
-                
-                {codeSent && (
-                  <div className="flex items-center text-sm text-green-600 bg-green-50 p-3 rounded-lg">
+
+                {codeSent && !codeError && (
+                  <div className="flex items-center text-sm text-green-600 bg-green-50 p-3 rounded-lg border border-green-200">
                     <CheckCircle className="w-4 h-4 mr-2" />
                     Code sent to {userData.email}
                   </div>
                 )}
-                
+
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <Mail className="h-5 w-5 text-gray-400" />
+                    <Mail className={`h-5 w-5 ${codeError ? "text-red-400" : "text-gray-400"}`} />
                   </div>
                   <input
                     type="text"
                     value={emailCode}
-                    onChange={(e) => setEmailCode(e.target.value)}
-                    className="block w-full pl-10 pr-3 py-3 border border-gray-200 rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all duration-200"
+                    onChange={(e) => {
+                      setEmailCode(e.target.value)
+                      setCodeError("")
+                    }}
+                    className={`block w-full pl-10 pr-3 py-3 border rounded-xl shadow-sm placeholder-gray-400 focus:outline-none focus:ring-2 focus:border-transparent transition-all duration-200 ${
+                      codeError ? "border-red-300 focus:ring-red-500 bg-red-50" : "border-gray-200 focus:ring-blue-500"
+                    }`}
                     placeholder="Enter verification code"
                     disabled={isLoading || !codeSent}
                   />
                 </div>
-                
-                {!codeSent && (
-                  <div className="flex items-center text-sm text-gray-500">
+
+                {codeError && (
+                  <div className="flex items-center text-sm text-red-600 bg-red-50 p-3 rounded-lg border border-red-200">
+                    <XCircle className="w-4 h-4 mr-2" />
+                    <div>
+                      <div className="font-medium">Verification failed</div>
+                      <div className="text-xs mt-1">{codeError}</div>
+                    </div>
+                  </div>
+                )}
+
+                {!codeSent && !codeError && (
+                  <div className="flex items-center text-sm text-gray-500 bg-gray-50 p-3 rounded-lg">
                     <AlertCircle className="w-4 h-4 mr-2" />
                     Click "Send Code" to receive verification code
                   </div>
@@ -376,8 +573,8 @@ const Login = () => {
             )}
 
             {/* Show message if no face token available for face auth */}
-            {userData && authMethod === 'face' && !userData.face_token && (
-              <div className="flex items-center text-sm text-amber-600 bg-amber-50 p-4 rounded-lg">
+            {userData && authMethod === "face" && !userData.face_token && (
+              <div className="flex items-center text-sm text-amber-600 bg-amber-50 p-4 rounded-lg border border-amber-200">
                 <AlertCircle className="w-5 h-5 mr-2" />
                 This user has no face capture registered. Please use email verification or register face capture.
               </div>
@@ -391,8 +588,8 @@ const Login = () => {
                   disabled={
                     isLoading ||
                     !userData ||
-                    (authMethod === 'face' && (!temporalToken || !userData.face_token)) ||
-                    (authMethod === 'email' && (!emailCode || !codeSent))
+                    (authMethod === "face" && (!temporalToken || !userData.face_token)) ||
+                    (authMethod === "email" && (!emailCode || !codeSent))
                   }
                   className="w-full flex justify-center items-center py-4 px-4 border border-transparent rounded-xl text-base font-semibold text-white bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transform transition-all duration-200 hover:scale-105 disabled:hover:scale-100 shadow-lg"
                 >
@@ -415,8 +612,8 @@ const Login = () => {
           {/* Additional Links */}
           <div className="mt-8 space-y-4">
             <div className="text-center">
-              <Link 
-                to="/forgot-password" 
+              <Link
+                to="/forgot-password"
                 className="text-sm font-medium text-blue-600 hover:text-blue-500 transition-colors duration-200"
               >
                 Forgot your password?
@@ -428,9 +625,7 @@ const Login = () => {
                 <div className="w-full border-t border-gray-200" />
               </div>
               <div className="relative flex justify-center text-sm">
-                <span className="px-4 bg-white text-gray-500 font-medium">
-                  Don't have an account?
-                </span>
+                <span className="px-4 bg-white text-gray-500 font-medium">Don't have an account?</span>
               </div>
             </div>
 
@@ -448,13 +643,11 @@ const Login = () => {
 
         {/* Footer */}
         <div className="mt-8 text-center">
-          <p className="text-xs text-gray-500">
-            Secure access powered by advanced biometric technology
-          </p>
+          <p className="text-xs text-gray-500">Secure access powered by advanced biometric technology</p>
         </div>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login
