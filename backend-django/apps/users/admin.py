@@ -14,6 +14,13 @@ class UsuarioAdmin(UserAdmin):
     
     # Ordenar la lista de usuarios por el campo de correo electrónico
     ordering = ('email',)
+    
+    # Habilitar acciones de eliminación
+    actions = ['delete_selected']
+    
+    # Asegurarse de que el usuario tenga permisos de eliminación
+    def has_delete_permission(self, request, obj=None):
+        return True
 
 # Registrar el modelo Usuario en el panel de administración
 admin.site.register(Usuario, UsuarioAdmin)
