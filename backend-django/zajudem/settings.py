@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/5.1/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
-
+from decouple import config
 from pathlib import Path
 from datetime import timedelta
 
@@ -82,7 +82,16 @@ MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
 ]
 
-EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
+## -----------------------------
+# EMAIL CONFIGURATION — GMAIL
+# -----------------------------
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.gmail.com'
+EMAIL_PORT = 587
+EMAIL_HOST_USER = 'zajudem.senasec@gmail.com'
+EMAIL_HOST_PASSWORD = config('EMAIL_HOST_PASSWORD')  # Make sure this is set!
+EMAIL_USE_TLS = True
+DEFAULT_FROM_EMAIL = 'zajudem.senasec@gmail.com'  # Add this line
 
 # Para permitir todo durante desarrollo
 CORS_ALLOW_ALL_ORIGINS = True

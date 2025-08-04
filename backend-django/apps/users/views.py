@@ -14,6 +14,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.core.mail import send_mail
 from django.contrib.auth import get_user_model
+from django.utils import timezone
 from .models import EmailVerificationCode
 from .serializers import EmailVerificationRequestSerializer
 from .utils import generate_code
@@ -32,19 +33,20 @@ class VerifyEmailCode(APIView):
             return Response({'error': 'Faltan campos'}, status=400)
 
         try:
-            user = User.objects.get(documento=documento)
-        except User.DoesNotExist:
+            user = Usuario.objects.get(documento=documento)
+        except Usuario.DoesNotExist:
             return Response({'error': 'Usuario no encontrado'}, status=404)
 
         try:
-            verification = EmailVerificationCode.objects.filter(user=user, code=code, used=False).latest('created_at')
+            verification = EmailVerificationCode.objects.filter(
+                user=user, code=code, used=False
+            ).latest('created_at')
         except EmailVerificationCode.DoesNotExist:
             return Response({'error': 'Código inválido'}, status=400)
 
         if verification.is_expired():
             return Response({'error': 'Código expirado'}, status=400)
 
-        # Activate user
         user.is_active = True
         user.save()
 
@@ -123,28 +125,50 @@ class ProfileView(APIView):  # Hereda de APIView para definir una vista más per
 class UsuarioCreateView(generics.CreateAPIView):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
+    permission_classes = [AllowAny]
 
-    def perform_create(self, serializer):
-        user = serializer.save(is_active=False)  # ← critical
+    def verify_email_code(self, email, documento, code):
+        """Verify that the email has been verified with the given code."""
+        try:
+            verification = EmailVerificationCode.objects.get(
+                email=email,
+                documento=documento,
+                code=code,
+                verified=True,
+                created_at__gte=timezone.now() - timezone.timedelta(minutes=15)
+            )
+            return True
+        except EmailVerificationCode.DoesNotExist:
+            return False
 
-        code = str(randint(100000, 999999))
-        
-        EmailVerificationCode.objects.create(user=user, code=code)
-
-        send_mail(
-            subject='Código de verificación',
-            message=f'Tu código de verificación es: {code}',
-            from_email='no-reply@senasec.com',
-            recipient_list=[user.email],
-            fail_silently=False
-        )
     def create(self, request, *args, **kwargs):
         serializer = self.get_serializer(data=request.data)
         if not serializer.is_valid():
-            print("Registration error:", serializer.errors)  # ← This logs the real cause
             return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        self.perform_create(serializer)
-        return Response(serializer.data, status=status.HTTP_201_CREATED)
+        
+        # Extract verification data
+        email = request.data.get('email')
+        documento = request.data.get('documento')
+        verification_code = request.data.get('verificationCode')
+        
+        # Verify the email was verified
+        if not self.verify_email_code(email, documento, verification_code):
+            return Response(
+                {'error': 'Por favor verifica tu correo electrónico primero'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            # Create the user
+            user = serializer.save(is_active=True)  # User is active after verification
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            print("Registration error:", str(e))
+            return Response(
+                {'error': 'Error al crear el usuario'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
 
 
 class UsuarioViewSet(viewsets.ModelViewSet): # Vista para ver todos los usuarios

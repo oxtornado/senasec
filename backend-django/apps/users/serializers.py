@@ -10,6 +10,7 @@ class EmailVerificationRequestSerializer(serializers.Serializer):
     document = serializers.CharField()
 
 class UsuarioSerializer(serializers.ModelSerializer):
+    username = serializers.CharField(required=False)  # Make username optional
 
     class Meta:
         model = User
@@ -20,9 +21,12 @@ class UsuarioSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         face_token = validated_data.get('face_token')
-
+        
+        # If username is not provided, use documento as username
+        username = validated_data.get('username', validated_data['documento'])
+        
         user = User.objects.create_user(
-            username=validated_data['username'],
+            username=username,
             documento=validated_data['documento'],
             email=validated_data['email'],
             telefono=validated_data.get('telefono'),
