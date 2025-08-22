@@ -15,6 +15,7 @@ ZAJUDEM es un servicio de software desarrollado por la empresa Senasec. Este sis
 - Python 3.10 o superior
 - Node.js 18 o superior
 - npm (viene con Node.js)
+- postgreSQL 
 
 ---
 
@@ -77,6 +78,10 @@ ZAJUDEM es un servicio de software desarrollado por la empresa Senasec. Este sis
     ```bash
     npm run dev
     ```
+### Base de datos dirigida por Django (postgreSQL)
+1. crear un usuario y crearle una contraseña
+2. En cuanto se este en la carpeta `db_django` en `settings.py` remplace el usuario existente por el usuario que acaba de crear y por la contraseña del usuario  
+
 
 ---
 ### Instalación en Arduino
