@@ -1,0 +1,44 @@
+version: '3'
+
+services:
+  db:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: senasec_db
+      MYSQL_USER: senasec_user
+      MYSQL_PASSWORD: secure_password
+    volumes:
+      - mysql_data:/var/lib/mysql
+    ports:
+      - "3306:3306"
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./senasec/backend
+    environment:
+      - DATABASE_URL=mysql://senasec_user:secure_password@db:3306/senasec_db
+      - SECRET_KEY=your_super_secret_key_for_jwt
+      - ENVIRONMENT=production
+      - ALLOWED_ORIGINS=http://localhost:80,https://senasec.example.com
+    ports:
+      - "8000:8000"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: always
+
+  frontend:
+    build: .
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    restart: always
+
+volumes:
+  mysql_data:
