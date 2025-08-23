@@ -1,0 +1,19 @@
+Superusuario
+email: admin@gmail.com
+documento: 0000000000
+password: admin1234
+
+Administrador
+documento: 1111111111
+email: nicolasagamezmelo1@gmail.com
+password: nicolas12345678
+
+Inventario
+documento: 3333333333
+email: inventario@gmail.com
+password: inventario123
+
+Instructor
+documento: 2222222222
+email: pepito@gmail.com
+password: pepi1234
