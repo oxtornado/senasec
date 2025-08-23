@@ -44,12 +44,12 @@ python manage.py runserver
 
 >[!NOTE]
 > Estos son los endpoints de SENASEC (GET)
+
 > 1. Entrada y salida de usuarios
 ```bash
 http://127.0.0.1:8000/login/
 http://127.0.0.1:8000/api/token/refresh/
 localhost:8000/logout/
-.\venv\Scripts\Activate   
 ```
 
 > 2. Usuarios
