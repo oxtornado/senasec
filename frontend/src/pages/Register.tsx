@@ -66,10 +66,11 @@ const Register = () => {
     setErrorMessage('');
     setSuccessMessage('');
     
-    try {
+    try { 
       const response = await axios.post("http://localhost:8000/users/verify-email-code/", {
         email: formData.email,
-        documento: formData.documento
+        documento: formData.documento,
+        flow_type: 'registration'
       });
       
       setSuccessMessage(response.data.message || 'Verification code sent to your email');
@@ -95,7 +96,8 @@ const Register = () => {
       await axios.post("http://localhost:8000/users/verify-code/", {
         email: formData.email,
         documento: formData.documento,
-        code: verificationCode
+        code: verificationCode,
+        flow_type: 'registration'
       });
       
       setSuccessMessage('Email verified successfully');

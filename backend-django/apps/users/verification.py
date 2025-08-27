@@ -14,7 +14,7 @@ class SendVerificationCodeView(APIView):
     permission_classes = [AllowAny]
     
     def generate_code(self):
-        """Generate a 6-digit verification code."""
+        """ Generate a 6-digit verification code."""
         return ''.join(random.choices(string.digits, k=6))
     
     def post(self, request):
@@ -22,9 +22,10 @@ class SendVerificationCodeView(APIView):
         print(f"Request data: {request.data}")
         
         email = request.data.get('email')
-        documento = request.data.get('documento')  # Updated to match frontend
+        documento = request.data.get('documento')
+        flow_type = request.data.get('flow_type', 'login')  # 'login' or 'registration'
         
-        print(f"Email: {email}, Documento: {documento}")
+        print(f"Email: {email}, Documento: {documento}, Flow: {flow_type}")
         
         if not email or not documento:
             error_msg = 'Email y documento son requeridos'
@@ -34,17 +35,33 @@ class SendVerificationCodeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Verify user exists with this documento and email
-        try:
-            user = Usuario.objects.get(documento=documento, email=email)
-            print(f"User found: {user.username}")
-        except Usuario.DoesNotExist:
-            error_msg = 'Usuario no encontrado con este documento y correo'
-            print(f"ERROR: {error_msg}")
-            return Response(
-                {'error': error_msg},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Different validation based on flow type
+        if flow_type == 'login':
+            # For login/recovery: user MUST exist
+            try:
+                user = Usuario.objects.filter(documento=documento, email=email).first()
+                if not user:
+                    return Response(
+                        {'error': 'Usuario no encontrado con este documento y correo'},
+                        status=status.HTTP_404_NOT_FOUND
+                    )            
+                print(f"User found for login: {user.username}")
+            except Usuario.DoesNotExist:
+                error_msg = 'Usuario no encontrado con este documento y correo'
+                print(f"ERROR: {error_msg}")
+                return Response(
+                    {'error': error_msg},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        elif flow_type == 'registration':
+            # For registration: user should NOT exist
+            existing_user = Usuario.objects.filter(documento=documento, email=email).first()
+            if existing_user:
+                return Response(
+                    {'error': 'Ya existe un usuario con este documento y correo'},
+                    status=status.HTTP_409_CONFLICT
+                )
+            print("Registration flow: No existing user found (good)")
         
         # Invalidate previous codes for this email/documento
         print("Invalidating previous codes...")
@@ -147,8 +164,9 @@ class VerifyCodeView(APIView):
         email = request.data.get('email')
         documento = request.data.get('documento')
         code = request.data.get('code')
+        flow_type = request.data.get('flow_type', 'login')  # 'login' or 'registration'
         
-        print(f"Email: {email}, Documento: {documento}, Code: {code}")
+        print(f"Email: {email}, Documento: {documento}, Code: {code}, Flow: {flow_type}")
         
         if not all([email, documento, code]):
             error_msg = 'Email, documento y código son requeridos'
@@ -158,17 +176,21 @@ class VerifyCodeView(APIView):
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        # Verify user exists with this documento and email
-        try:
-            user = Usuario.objects.get(documento=documento, email=email)
-            print(f"User found: {user.username}")
-        except Usuario.DoesNotExist:
-            error_msg = 'Usuario no encontrado con este documento y correo'
-            print(f"ERROR: {error_msg}")
-            return Response(
-                {'error': error_msg},
-                status=status.HTTP_404_NOT_FOUND
-            )
+        # Only check for existing user if this is a login flow
+        user = None
+        if flow_type == 'login':
+            try:
+                user = Usuario.objects.get(documento=documento, email=email)
+                print(f"User found for login: {user.username}")
+            except Usuario.DoesNotExist:
+                error_msg = 'Usuario no encontrado con este documento y correo'
+                print(f"ERROR: {error_msg}")
+                return Response(
+                    {'error': error_msg},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+        else:
+            print("Registration flow: Skipping user existence check")
         
         print("Checking verification code...")
         verification = EmailVerificationCode.get_valid_code(email, documento, code)
@@ -187,11 +209,16 @@ class VerifyCodeView(APIView):
         
         success_msg = 'Código verificado correctamente'
         print(f"SUCCESS: {success_msg}")
-        return Response(
-            {
-                'message': success_msg,
+        
+        # Response differs based on flow type
+        response_data = {'message': success_msg}
+        
+        if flow_type == 'login' and user:
+            response_data.update({
                 'user_id': user.id,
                 'username': user.username
-            },
-            status=status.HTTP_200_OK
-        )
+            })
+        elif flow_type == 'registration':
+            response_data['ready_for_registration'] = True
+        
+        return Response(response_data, status=status.HTTP_200_OK)

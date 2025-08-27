@@ -42,7 +42,7 @@ const Login = () => {
   const [userNotFound, setUserNotFound] = useState(false)
   const [codeSent, setCodeSent] = useState(false)
 
-  // New error states for enhanced visual feedback
+  // Error states for enhanced visual feedback
   const [documentError, setDocumentError] = useState("")
   const [codeError, setCodeError] = useState("")
   const [faceError, setFaceError] = useState("")
@@ -137,26 +137,55 @@ const Login = () => {
     }
   }
 
-  const captureImage = () => {
-    if (videoRef.current && canvasRef.current) {
-      const canvas = canvasRef.current
-      const video = videoRef.current
-      const context = canvas.getContext("2d")
+const captureImage = async () => {
+  if (videoRef.current && canvasRef.current) {
+    const canvas = canvasRef.current
+    const video = videoRef.current
+    const context = canvas.getContext("2d")
 
-      if (context) {
-        canvas.width = video.videoWidth
-        canvas.height = video.videoHeight
-        context.drawImage(video, 0, 0)
+    if (context) {
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      context.drawImage(video, 0, 0)
 
-        // Convert to base64 and simulate token generation
-        const imageData = canvas.toDataURL("image/jpeg")
-        const token = btoa(imageData.substring(0, 100)) // Simplified token generation
-        setTemporalToken(token)
-        setFaceError("")
-        stopCamera()
-      }
+      // Convert canvas to blob
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          setIsLoading(true)
+          setFaceError("")
+          
+          try {
+            // Create FormData with the image
+            const formData = new FormData()
+            formData.append("images", blob, "face_capture.jpg")
+            
+            // Send to your register-face endpoint to get a REAL Face++ token
+            const response = await axios.post("http://0.0.0.0:8001/register-face/", formData, {
+              headers: {
+                'Content-Type': 'multipart/form-data'
+              }
+            })
+            
+            if (response.data.face_token) {
+              setTemporalToken(response.data.face_token) // This is a REAL Face++ token
+              toast.success("Face captured successfully!")
+            } else {
+              setFaceError(response.data.error || "No face detected")
+              triggerShake()
+            }
+          } catch (error: any) {
+            console.error("Face registration error:", error)
+            setFaceError(error.response?.data?.error || "Failed to process face")
+            triggerShake()
+          } finally {
+            setIsLoading(false)
+            stopCamera()
+          }
+        }
+      }, "image/jpeg")
     }
   }
+}
 
   const triggerShake = () => {
     setShakeAnimation("animate-shake")
@@ -176,11 +205,12 @@ const Login = () => {
       await axios.post("http://localhost:8000/users/verify-email-code/", {
         documento: userData.documento,
         email: userData.email,
+        flow_type: 'login'
       })
       setCodeSent(true)
       toast.success(`Verification code sent to ${userData.email}`)
     } catch (err: any) {
-      console.error("❌ Error sending email:", err)
+      console.error("Error sending email:", err)
       const msg = err.response?.data?.error || "Error sending verification code"
       setCodeError(msg)
       toast.error(msg)
@@ -190,89 +220,155 @@ const Login = () => {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault()
 
-    // Reset all error states
-    setDocumentError("")
-    setCodeError("")
-    setFaceError("")
+  // Reset all error states
+  setDocumentError("")
+  setCodeError("")
+  setFaceError("")
 
-    if (!userData) {
-      setDocumentError("Please enter a valid document number")
-      triggerShake()
-      return
-    }
-
-    if (authMethod === "face" && !temporalToken) {
-      setFaceError("Please capture your face before signing in")
-      triggerShake()
-      return
-    }
-
-    if (authMethod === "email" && !emailCode) {
-      setCodeError("Please enter the verification code")
-      triggerShake()
-      return
-    }
-
-    setIsLoading(true)
-
-    try {
-      if (authMethod === "face") {
-        if (!userData.face_token) {
-          setFaceError("This user has no face capture registered")
-          triggerShake()
-          return
-        }
-
-        // Compare faces
-        const formData = new FormData()
-        formData.append("registered_token", userData.face_token)
-        formData.append("temporal_token", temporalToken)
-
-        const compareRes = await axios.post("http://0.0.0.0:8001/compare-face/", formData)
-        const result = compareRes.data
-
-        if (result.match) {
-          toast.success("Login successful!")
-          setTimeout(() => navigate("/inventory"), 1500)
-        } else {
-          setFaceError("Face verification failed. Please try again.")
-          triggerShake()
-        }
-      } else if (authMethod === "email") {
-        // Verify email code
-        const verifyRes = await axios.post("http://localhost:8000/users/verify-code/", {
-          email: userData.email,
-          documento: userData.documento,
-          code: emailCode,
-        })
-
-        toast.success("Code verified. Login successful!")
-        setTimeout(() => navigate("/inventory"), 1500)
-      }
-    } catch (error: any) {
-      console.error("❌ Login error:", error)
-      const msg = error.response?.data?.error || "Login process failed"
-
-      if (authMethod === "email") {
-        if (msg.toLowerCase().includes("code") || msg.toLowerCase().includes("verification")) {
-          setCodeError("Invalid verification code. Please check and try again.")
-        } else {
-          setCodeError(msg)
-        }
-      } else if (authMethod === "face") {
-        setFaceError(msg)
-      }
-
-      triggerShake()
-      toast.error(msg)
-    } finally {
-      setIsLoading(false)
-    }
+  if (!userData) {
+    setDocumentError("Please enter a valid document number")
+    triggerShake()
+    return
   }
 
+  if (authMethod === "face" && !temporalToken) {
+    setFaceError("Please capture your face before signing in")
+    triggerShake()
+    return
+  }
+
+  if (authMethod === "email" && !emailCode) {
+    setCodeError("Please enter the verification code")
+    triggerShake()
+    return
+  }
+
+  setIsLoading(true)
+
+  try {
+    if (authMethod === "face") {
+      if (!userData.face_token) {
+        setFaceError("This user has no face capture registered")
+        triggerShake()
+        return
+      }
+
+      // Compare faces - FIXED: Remove duplicate const declaration
+      const compareRes = await axios.post("http://0.0.0.0:8001/compare-face/", {
+        registered_token: userData.face_token,  // This should be the stored Face++ token
+        temporal_token: temporalToken           // This should be the newly captured Face++ token
+      }, {
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        }
+      })
+      
+      const result = compareRes.data
+
+      if (result.match) {
+        toast.success("Login successful!")
+
+        // Send door control request - SUCCESS CASE
+        try {
+          await axios.post("http://0.0.0.0:8002/door/control/", {
+            result: true,
+            user_id: userData.id,
+            username: userData.username,
+            auth_method: "face",
+            timestamp: new Date().toISOString()
+          })
+          console.log("Door opened successfully")
+        } catch (doorError) {
+          console.error("Failed to control door:", doorError)
+          toast.error("Access granted but door control failed")
+        }
+
+        setTimeout(() => navigate("/inventory"), 1500)
+      } else {
+        setFaceError("Face verification failed. Please try again.")
+
+        // Send door control request - FAILURE CASE
+        try {
+          await axios.post("http://0.0.0.0:8002/door/control/", {
+            result: false,
+            user_id: userData.id,
+            username: userData.username,
+            auth_method: "face",
+            error: "Face verification failed",
+            timestamp: new Date().toISOString()
+          })
+          console.log("Access denied - door remains locked")
+        } catch (doorError) {
+          console.error("Failed to send denial signal:", doorError)
+        }
+
+        triggerShake()
+      }
+    } else if (authMethod === "email") {
+      // Verify email code
+      await axios.post("http://localhost:8000/users/verify-code/", {
+        email: userData.email,
+        documento: userData.documento,
+        code: emailCode,
+      })
+
+      toast.success("Code verified. Login successful!")
+
+      // Send door control request - EMAIL SUCCESS
+      try {
+        await axios.post("http://0.0.0.0:8002/door/control/", {
+          result: true,
+          user_id: userData.id,
+          username: userData.username,
+          auth_method: "email",
+          timestamp: new Date().toISOString()
+        })
+        console.log("Door opened successfully (email auth)")
+      } catch (doorError) {
+        console.error("Failed to control door:", doorError)
+        toast.error("Access granted but door control failed")
+      }
+
+      setTimeout(() => navigate("/inventory"), 1500)
+    }
+  } catch (error: any) {
+    console.error("Login error:", error)
+    const msg = error.response?.data?.error || "Login process failed"
+
+    // Send door control request - ERROR CASE
+    try {
+      await axios.post("http://0.0.0.0:8002/door/control/", {
+        result: false,
+        user_id: userData?.id,
+        username: userData?.username,
+        auth_method: authMethod,
+        error: msg,
+        timestamp: new Date().toISOString()
+      })
+      console.log("Access denied due to error")
+    } catch (doorError) {
+      console.error("Failed to send error signal:", doorError)
+    }
+
+    if (authMethod === "email") {
+      if (msg.toLowerCase().includes("code") || msg.toLowerCase().includes("verification")) {
+        setCodeError("Invalid verification code. Please check and try again.")
+      } else {
+        setCodeError(msg)
+      }
+    } else if (authMethod === "face") {
+      setFaceError(msg)
+    }
+
+    triggerShake()
+    toast.error(msg)
+  } finally {
+    setIsLoading(false)
+  }
+}
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-indigo-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8">
       <style>{`
@@ -634,7 +730,7 @@ const Login = () => {
                 to="/register"
                 className="w-full flex justify-center items-center py-3 px-4 border-2 border-blue-200 rounded-xl text-base font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 hover:border-blue-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-200 transform hover:scale-105"
               >
-                <User className="w-5 h-5 mr-2" />
+                <User className="w-5 mr-2" />
                 Create Account
               </Link>
             </div>

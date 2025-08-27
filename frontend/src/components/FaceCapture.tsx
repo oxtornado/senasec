@@ -10,7 +10,7 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ onCapture }) => {
 
     const webcamRef = useRef<Webcam>(null); // referencia para tomar capturas
     const [capturing, setCapturing] = useState(false); // 
-    const [status, setStatus] = useState(''); // muestra msj del proceso, fots en backend, tomando fotos...
+    const [status, setStatus] = useState(''); // muestra msj del proceso, fotos en backend, tomando fotos...
     const captureMultiplePhotos = async () => { // funcion que se activa la oprimir el boton
         setCapturing(true); // inicio de captura
         setStatus('Capturando fotos...');
