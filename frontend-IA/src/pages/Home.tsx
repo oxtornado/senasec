@@ -299,7 +299,7 @@ const Home = () => {
         </section>
       </div>
 
-      {/* ventada de aviso de uso de datos del usuario*/}
+      {/* ventada de aviso de uso de datos privados*/}
       {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
                     <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
