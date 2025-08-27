@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Manual de Usuario - SENASEC</title>
+    <style>
+        body { font-family: 'Calibri', sans-serif; line-height: 1.6; color: #333; margin: 40px; }
+        h1 { color: #2563eb; text-align: center; border-bottom: 3px solid #2563eb; padding-bottom: 10px; }
+        h2 { color: #1e40af; border-left: 4px solid #3b82f6; padding-left: 15px; margin-top: 30px; }
+        h3 { color: #1f2937; margin-top: 25px; }
+        .highlight { background-color: #fef3c7; padding: 15px; border-left: 4px solid #f59e0b; margin: 15px 0; }
+        .steps { background-color: #f0f9ff; padding: 15px; border-left: 4px solid #0ea5e9; margin: 15px 0; }
+        .warning { background-color: #fef2f2; padding: 15px; border-left: 4px solid #ef4444; margin: 15px 0; }
+        .info { background-color: #f0fdf4; padding: 15px; border-left: 4px solid #22c55e; margin: 15px 0; }
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #d1d5db; padding: 12px; text-align: left; }
+        th { background-color: #f3f4f6; font-weight: 600; }
+        .contact-info { background-color: #f8fafc; padding: 20px; margin: 20px 0; }
+    </style>
+</head>
+<body>
+    <h1>MANUAL DE USUARIO - SENASEC</h1>
+    <p style="text-align: center; font-size: 18px;"><strong>Sistema de Seguridad Inteligente para Aulas</strong></p>
+
+    <h2>TABLA DE CONTENIDOS</h2>
+    <ol>
+        <li>Introducción</li>
+        <li>Inicio de Sesión</li>
+        <li>Navegación General</li>
+        <li>Funciones del Usuario Estándar</li>
+        <li>Funciones del Administrador</li>
+        <li>Configuración Personal</li>
+        <li>Preguntas Frecuentes</li>
+        <li>Soporte Técnico</li>
+    </ol>
+
+    <h2>1. INTRODUCCIÓN</h2>
+
+    <h3>¿Qué es SENASEC?</h3>
+    <p>SENASEC (Sistema de Seguridad Inteligente para Aulas) es una aplicación web moderna diseñada para gestionar la seguridad y el control de equipos en ambientes educativos. El sistema permite administrar inventarios de equipos, gestionar préstamos y reservas, todo con una interfaz intuitiva y moderna.</p>
+
+    <h3>Objetivos del Sistema</h3>
+    <ul>
+        <li><strong>Gestión eficiente</strong> de equipos tecnológicos en aulas</li>
+        <li><strong>Control de préstamos</strong> y reservas de equipos</li>
+        <li><strong>Monitoreo en tiempo real</strong> del estado de los equipos</li>
+        <li><strong>Generación de reportes</strong> para análisis y toma de decisiones</li>
+        <li><strong>Seguridad</strong> en el manejo de recursos institucionales</li>
+    </ul>
+
+    <h3>Tipos de Usuario</h3>
+    <div class="info">
+        <p><strong>Usuario Estándar</strong>: Puede consultar inventarios, solicitar préstamos, ver programaciones y generar reportes básicos.</p>
+    </div>
+    <div class="highlight">
+        <p><strong>Administrador</strong>: Tiene acceso completo al sistema, incluyendo gestión de usuarios, equipos, asignaciones y configuraciones avanzadas.</p>
+    </div>
+
+    <h2>2. INICIO DE SESIÓN</h2>
+
+    <h3>Acceso al Sistema</h3>
+    <div class="steps">
+        <ol>
+            <li><strong>Abrir navegador web</strong> y dirigirse a la URL del sistema SENASEC</li>
+            <li>En la página principal, hacer clic en <strong>"Iniciar Sesión"</strong></li>
+            <li>Ingresar las credenciales: Usuario/correo y contraseña</li>
+            <li>Hacer clic en <strong>"Iniciar sesión"</strong></li>
+        </ol>
+    </div>
+
+    <h3>Registro de Nuevo Usuario</h3>
+    <div class="steps">
+        <ol>
+            <li>En la página de inicio de sesión, hacer clic en <strong>"Registrarse"</strong></li>
+            <li>Completar el formulario con: Nombre completo, correo, usuario, contraseña</li>
+            <li>Hacer clic en <strong>"Registrarse"</strong></li>
+            <li>Esperar la aprobación del administrador (si es requerida)</li>
+        </ol>
+    </div>
+
+    <h2>3. NAVEGACIÓN GENERAL</h2>
+
+    <h3>Interfaz Principal</h3>
+    <p><strong>Barra de Navegación Superior:</strong></p>
+    <ul>
+        <li>Logo SENASEC (enlace al inicio)</li>
+        <li>Menú de navegación principal</li>
+        <li>Información del usuario actual</li>
+        <li>Selector de idioma (Español/Inglés)</li>
+        <li>Botón de modo oscuro/claro</li>
+        <li>Botón "Cerrar Sesión"</li>
+    </ul>
+
+    <p><strong>Menú Principal:</strong></p>
+    <ul>
+        <li><strong>Ambientes</strong>: Visualización del inventario por ubicación</li>
+        <li><strong>Programaciones</strong>: Calendario de préstamos y reservas</li>
+        <li><strong>Reportes</strong>: Generación de informes y estadísticas</li>
+    </ul>
+
+    <h2>4. FUNCIONES DEL USUARIO ESTÁNDAR</h2>
+
+    <h3>4.1 Consulta de Ambientes (Inventario)</h3>
+    <p><strong>Propósito</strong>: Visualizar el estado de los equipos en cada ambiente o aula.</p>
+
+    <div class="steps">
+        <p><strong>Pasos para usar:</strong></p>
+        <ol>
+            <li>Hacer clic en <strong>"Ambientes"</strong> en el menú principal</li>
+            <li>Se mostrará una vista del aula con posiciones numeradas y estados de equipos</li>
+        </ol>
+    </div>
+
+    <p><strong>Interpretación de Estados:</strong></p>
+    <ul>
+        <li>🟢 <strong>Verde</strong>: Disponible</li>
+        <li>🔵 <strong>Azul</strong>: En uso</li>
+        <li>🟡 <strong>Amarillo</strong>: En mantenimiento</li>
+        <li>🔴 <strong>Rojo</strong>: Dañado</li>
+    </ul>
+
+    <h3>4.2 Consulta de Programaciones</h3>
+    <p><strong>Propósito</strong>: Ver el calendario de préstamos y reservas de equipos.</p>
+    <div class="steps">
+        <ol>
+            <li>Hacer clic en <strong>"Programaciones"</strong> en el menú principal</li>
+            <li>Se mostrará un calendario con vista mensual y eventos programados</li>
+        </ol>
+    </div>
+
+    <h3>4.3 Generación de Reportes Básicos</h3>
+    <div class="steps">
+        <ol>
+            <li>Hacer clic en <strong>"Reportes"</strong> en el menú principal</li>
+            <li>Seleccionar tipo de reporte: Estado de equipos, Uso por período, Disponibilidad</li>
+            <li>Configurar parámetros: Rango de fechas, Filtros específicos</li>
+            <li>Hacer clic en <strong>"Generar Reporte"</strong></li>
+            <li>Descargar, imprimir o compartir el reporte</li>
+        </ol>
+    </div>
+
+    <h2>5. FUNCIONES DEL ADMINISTRADOR</h2>
+    <div class="highlight">
+        <p>Los administradores tienen acceso a todas las funciones de usuario estándar, más las siguientes funciones exclusivas:</p>
+    </div>
+
+    <h3>5.1 Gestión de Equipos</h3>
+    <p><strong>Acceso</strong>: Menú <strong>"Equipos"</strong> (solo visible para administradores)</p>
+
+    <p><strong>Agregar Nuevo Equipo:</strong></p>
+    <div class="steps">
+        <ol>
+            <li>Hacer clic en <strong>"+ Agregar Equipo"</strong></li>
+            <li>Completar formulario: Posición, Marca, Modelo, Número de serie, Tipo, Estado, Características</li>
+            <li>Hacer clic en <strong>"Guardar"</strong></li>
+        </ol>
+    </div>
+
+    <p><strong>Editar/Eliminar Equipo:</strong></p>
+    <ul>
+        <li>Usar íconos de editar (lápiz) o eliminar (papelera) en la lista</li>
+        <li>Confirmar acciones cuando sea solicitado</li>
+    </ul>
+
+    <h3>5.2 Gestión de Usuarios</h3>
+    <p><strong>Acceso</strong>: Menú <strong>"Usuarios"</strong> (solo visible para administradores)</p>
+
+    <div class="steps">
+        <p><strong>Crear Nuevo Usuario:</strong></p>
+        <ol>
+            <li>Hacer clic en <strong>"+ Agregar Usuario"</strong></li>
+            <li>Completar: Nombre completo, Correo, Rol, Teléfono, Contraseña inicial</li>
+            <li>Hacer clic en <strong>"Crear Usuario"</strong></li>
+        </ol>
+    </div>
+
+    <h3>5.3 Gestión de Asignaciones</h3>
+    <p><strong>Acceso</strong>: Menú <strong>"Asignaciones"</strong> (solo visible para administradores)</p>
+
+    <div class="steps">
+        <p><strong>Crear Nueva Asignación:</strong></p>
+        <ol>
+            <li>Hacer clic en <strong>"+ Nueva Asignación"</strong></li>
+            <li>Completar: Usuario, Equipo, Fechas de inicio y fin, Propósito</li>
+            <li>Hacer clic en <strong>"Crear Asignación"</strong></li>
+        </ol>
+    </div>
+
+    <h3>5.4 Reportes Avanzados</h3>
+    <table>
+        <tr>
+            <th>Tipo de Reporte</th>
+            <th>Descripción</th>
+        </tr>
+        <tr>
+            <td><strong>Uso por Usuario</strong></td>
+            <td>Estadísticas de uso, tiempo promedio de préstamos, equipos más solicitados</td>
+        </tr>
+        <tr>
+            <td><strong>Eficiencia de Equipos</strong></td>
+            <td>Tiempo de uso vs disponibilidad, análisis de utilización y mantenimientos</td>
+        </tr>
+        <tr>
+            <td><strong>Reporte Financiero</strong></td>
+            <td>Costos de mantenimiento, valor del inventario, depreciación</td>
+        </tr>
+    </table>
+
+    <h2>6. CONFIGURACIÓN PERSONAL</h2>
+
+    <h3>Cambio de Contraseña</h3>
+    <div class="steps">
+        <ol>
+            <li>Hacer clic en tu nombre en la barra superior</li>
+            <li>Seleccionar <strong>"Configuración"</strong></li>
+            <li>Ingresar contraseña actual y nueva contraseña</li>
+            <li>Hacer clic en <strong>"Actualizar Contraseña"</strong></li>
+        </ol>
+    </div>
+
+    <h3>Preferencias de Idioma</h3>
+    <p>Usar el selector de idioma en la barra superior. La preferencia se guarda automáticamente.</p>
+
+    <h2>7. PREGUNTAS FRECUENTES</h2>
+
+    <h3>Generales</h3>
+    <p><strong>P: ¿Puedo acceder desde mi teléfono móvil?</strong><br>
+    R: Sí, SENASEC es completamente responsive y funciona en dispositivos móviles.</p>
+
+    <p><strong>P: ¿Se guardan automáticamente mis cambios?</strong><br>
+    R: Los cambios se guardan al hacer clic en "Guardar" o "Actualizar".</p>
+
+    <h3>Para Usuarios Estándar</h3>
+    <p><strong>P: ¿Cómo solicito un préstamo de equipo?</strong><br>
+    R: Los préstamos deben ser gestionados por un administrador. Contacta al administrador del sistema.</p>
+
+    <p><strong>P: ¿Cómo reporto un problema con un equipo?</strong><br>
+    R: En la vista de Ambientes, haz clic en el equipo y usa "Reportar Problema".</p>
+
+    <h3>Para Administradores</h3>
+    <p><strong>P: ¿Puedo importar datos desde Excel?</strong><br>
+    R: Actualmente no hay función de importación masiva. Los equipos deben agregarse individualmente.</p>
+
+    <h2>8. SOPORTE TÉCNICO</h2>
+
+    <div class="contact-info">
+        <h3>Información de Contacto</h3>
+        <p><strong>Correo Electrónico</strong>: soporte@senasec.com</p>
+        <p><strong>Teléfono</strong>: (+57) 3202020844</p>
+        <p><strong>Dirección</strong>: CBA Mosquera, Mosquera Cundinamarca | 250040</p>
+    </div>
+
+    <h3>Horarios de Atención</h3>
+    <ul>
+        <li><strong>Lunes a Viernes</strong>: 8:00 AM - 6:00 PM</li>
+        <li><strong>Sábados</strong>: 9:00 AM - 1:00 PM</li>
+        <li><strong>Domingos</strong>: No hay atención</li>
+    </ul>
+
+    <h3>Tipos de Soporte</h3>
+    <p><strong>Soporte Técnico</strong>: Problemas de acceso, errores, recuperación de contraseñas</p>
+    <p><strong>Soporte Funcional</strong>: Capacitación, consultas sobre procedimientos, nuevas funcionalidades</p>
+
+    <div class="warning">
+        <h3>Antes de Contactar Soporte</h3>
+        <p><strong>Verifica</strong>: Conexión a internet, navegador actualizado, credenciales correctas</p>
+        <p><strong>Ten a mano</strong>: Información de usuario, descripción del problema, pasos realizados</p>
+    </div>
+
+    <div class="warning">
+        <h3>Notas Importantes de Seguridad</h3>
+        <ul>
+            <li><strong>Nunca compartas</strong> tu contraseña con otros usuarios</li>
+            <li><strong>Cierra sesión</strong> siempre al terminar</li>
+            <li><strong>Reporta</strong> actividad sospechosa inmediatamente</li>
+            <li><strong>Mantén actualizada</strong> tu información de contacto</li>
+        </ul>
+    </div>
+
+    <div style="text-align: center; margin-top: 40px; padding-top: 20px; border-top: 2px solid #e5e7eb; color: #6b7280;">
+        <p><strong>© 2024 SENASEC - Sistema de Seguridad Inteligente para Aulas</strong></p>
+        <p>Todos los derechos reservados</p>
+        <p><em>Manual de Usuario - Versión 1.0 - Agosto 2024</em></p>
+    </div>
+
+</body>
+</html>

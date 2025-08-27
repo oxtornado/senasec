@@ -1,0 +1,953 @@
+diff --git a/README.md b/README.md
+index 28dbd2b..a9b1793 100644
+--- a/README.md
++++ b/README.md
+@@ -1,3 +1,109 @@
+-# sb1-jrlgmcdl
++# SENASEC - Sistema de Seguridad Inteligente para Aulas
+
+-[Edit in StackBlitz next generation editor ⚡️](https://stackblitz.com/~/github.com/EmilianoPe1979/sb1-jrlgmcdl)
+\ No newline at end of file
++## Descripción
++
++SENASEC es una aplicación web moderna para gestionar la seguridad y el control de equipos en aulas educativas. Permite administrar inventario de equipos, gestionar préstamos y reservas, con soporte multilingüe (español/inglés) y una interfaz moderna y responsiva.
++
++## Características
++
++- **Sistema de autenticación**: Registro de usuarios, inicio de sesión y gestión de perfiles.
++- **Gestión de inventario**: Control de equipos con diferentes estados (Disponible, En uso, Mantenimiento).
++- **Sistema de préstamos**: Solicitud, aprobación y devolución de equipos.
++- **Soporte multilingüe**: Interfaz disponible en español e inglés.
++- **Modo oscuro/claro**: Interfaz adaptable a las preferencias del usuario.
++- **Dashboard**: Visualización de estadísticas y métricas importantes.
++- **Calendario de reservas**: Planificación visual de préstamos y disponibilidad.
++- **Sistema de notificaciones**: Alertas y recordatorios para usuarios.
++
++## Tecnologías
++
++### Frontend
++
++- React con TypeScript
++- Tailwind CSS para estilos
++- React Router para navegación
++- i18next para internacionalización
++- Lucide React para iconos
++
++### Backend
++
++- Python con FastAPI
++- Tortoise ORM para la gestión de base de datos
++- SQLite/MySQL para almacenamiento de datos
++- JWT para autenticación
++
++## Estructura del proyecto
++
++```
++senasec/
++├── frontend/           # Código React existente
++└── backend/
++    ├── app/
++    │   ├── api/        # Endpoints de la API
++    │   ├── core/       # Configuración central
++    │   ├── db/         # Configuración de base de datos
++    │   ├── models/     # Modelos Tortoise ORM
++    │   ├── schemas/    # Esquemas Pydantic
++    │   ├── services/   # Lógica de negocio
++    │   └── utils/      # Utilidades
++    ├── tests/          # Pruebas
++    ├── .env.example    # Ejemplo de variables de entorno
++    ├── requirements.txt # Dependencias
++    └── main.py         # Punto de entrada
++```
++
++## Instalación y Ejecución
++
++### Backend
++
++```bash
++# Crear entorno virtual
++python -m venv venv
++source venv/bin/activate  # En Windows: venv\Scripts\activate
++
++# Instalar dependencias
++cd senasec/backend
++pip install -r requirements.txt
++
++# Ejecutar servidor de desarrollo
++uvicorn main:app --reload
++```
++
++### Frontend
++
++```bash
++# Instalar dependencias
++npm install
++
++# Ejecutar servidor de desarrollo
++npm run dev
++```
++
++## Despliegue
++
++El proyecto está configurado para despliegue con Docker y CI/CD a través de GitHub Actions.
++
++```bash
++# Construir y ejecutar con Docker Compose
++docker-compose up -d
++```
++
++## Documentación de la API
++
++La documentación de la API está disponible en `/docs` o `/redoc` cuando el servidor está en ejecución.
++
++## Contribuir
++
++1. Haz un fork del repositorio
++2. Crea una rama para tu característica (`git checkout -b feature/amazing-feature`)
++3. Haz commit de tus cambios (`git commit -m 'Add some amazing feature'`)
++4. Haz push a la rama (`git push origin feature/amazing-feature`)
++5. Abre un Pull Request
++
++## Licencia
++
++Este proyecto está licenciado bajo la Licencia MIT - ver el archivo LICENSE para más detalles.
++
++## Contacto
++
++Soporte: soporte@senasec.com
+diff --git a/package-lock.json b/package-lock.json
+index dd55f7e..fc70489 100644
+--- a/package-lock.json
++++ b/package-lock.json
+@@ -8,11 +8,14 @@
+       "name": "senasec",
+       "version": "0.0.0",
+       "dependencies": {
++        "axios": "^1.11.0",
+         "clsx": "^2.1.0",
++        "i18next": "^25.3.2",
+         "lucide-react": "^0.344.0",
+         "react": "^18.3.1",
+         "react-dom": "^18.3.1",
+         "react-hot-toast": "^2.4.1",
++        "react-i18next": "^15.6.1",
+         "react-router-dom": "^6.22.3"
+       },
+       "devDependencies": {
+@@ -293,6 +296,14 @@
+         "@babel/core": "^7.0.0-0"
+       }
+     },
++    "node_modules/@babel/runtime": {
++      "version": "7.28.2",
++      "resolved": "https://registry.npmjs.org/@babel/runtime/-/runtime-7.28.2.tgz",
++      "integrity": "sha512-KHp2IflsnGywDjBWDkR9iEqiWSpc8GIi0lgTT3mOElT0PP1tG26P4tmFI2YvAdzgq9RGyoHZQEIEdZy6Ec5xCA==",
++      "engines": {
++        "node": ">=6.9.0"
++      }
++    },
+     "node_modules/@babel/template": {
+       "version": "7.25.7",
+       "resolved": "https://registry.npmjs.org/@babel/template/-/template-7.25.7.tgz",
+@@ -1633,6 +1644,11 @@
+       "integrity": "sha512-8+9WqebbFzpX9OR+Wa6O29asIogeRMzcGtAINdpMHHyAg10f05aSFVBbcEqGf/PXw1EjAZ+q2/bEBg3DvurK3Q==",
+       "dev": true
+     },
++    "node_modules/asynckit": {
++      "version": "0.4.0",
++      "resolved": "https://registry.npmjs.org/asynckit/-/asynckit-0.4.0.tgz",
++      "integrity": "sha512-Oei9OH4tRh0YqU3GxhX79dM/mwVgvbZJaSNaRk+bshkj0S5cfHcgYakreBjrHwatXKbz+IoIdYLxrKim2MjW0Q=="
++    },
+     "node_modules/autoprefixer": {
+       "version": "10.4.20",
+       "resolved": "https://registry.npmjs.org/autoprefixer/-/autoprefixer-10.4.20.tgz",
+@@ -1670,6 +1686,16 @@
+         "postcss": "^8.1.0"
+       }
+     },
++    "node_modules/axios": {
++      "version": "1.11.0",
++      "resolved": "https://registry.npmjs.org/axios/-/axios-1.11.0.tgz",
++      "integrity": "sha512-1Lx3WLFQWm3ooKDYZD1eXmoGO9fxYQjrycfHFC8P0sCfQVXyROp0p9PFWBehewBOdCwHc+f/b8I0fMto5eSfwA==",
++      "dependencies": {
++        "follow-redirects": "^1.15.6",
++        "form-data": "^4.0.4",
++        "proxy-from-env": "^1.1.0"
++      }
++    },
+     "node_modules/balanced-match": {
+       "version": "1.0.2",
+       "resolved": "https://registry.npmjs.org/balanced-match/-/balanced-match-1.0.2.tgz",
+@@ -1742,6 +1768,18 @@
+         "node": "^6 || ^7 || ^8 || ^9 || ^10 || ^11 || ^12 || >=13.7"
+       }
+     },
++    "node_modules/call-bind-apply-helpers": {
++      "version": "1.0.2",
++      "resolved": "https://registry.npmjs.org/call-bind-apply-helpers/-/call-bind-apply-helpers-1.0.2.tgz",
++      "integrity": "sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==",
++      "dependencies": {
++        "es-errors": "^1.3.0",
++        "function-bind": "^1.1.2"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/callsites": {
+       "version": "3.1.0",
+       "resolved": "https://registry.npmjs.org/callsites/-/callsites-3.1.0.tgz",
+@@ -1853,6 +1891,17 @@
+       "integrity": "sha512-72fSenhMw2HZMTVHeCA9KCmpEIbzWiQsjN+BHcBbS9vr1mtt+vJjPdksIBNUmKAW8TFUDPJK5SUU3QhE9NEXDw==",
+       "dev": true
+     },
++    "node_modules/combined-stream": {
++      "version": "1.0.8",
++      "resolved": "https://registry.npmjs.org/combined-stream/-/combined-stream-1.0.8.tgz",
++      "integrity": "sha512-FQN4MRfuJeHf7cBbBMJFXhKSDq+2kAArBlmRBvcvFE5BB1HZKXtSFASDhdlz9zOYwxh8lDdnvmMOe/+5cdoEdg==",
++      "dependencies": {
++        "delayed-stream": "~1.0.0"
++      },
++      "engines": {
++        "node": ">= 0.8"
++      }
++    },
+     "node_modules/commander": {
+       "version": "4.1.1",
+       "resolved": "https://registry.npmjs.org/commander/-/commander-4.1.1.tgz",
+@@ -1928,6 +1977,14 @@
+       "integrity": "sha512-oIPzksmTg4/MriiaYGO+okXDT7ztn/w3Eptv/+gSIdMdKsJo0u4CfYNFJPy+4SKMuCqGw2wxnA+URMg3t8a/bQ==",
+       "dev": true
+     },
++    "node_modules/delayed-stream": {
++      "version": "1.0.0",
++      "resolved": "https://registry.npmjs.org/delayed-stream/-/delayed-stream-1.0.0.tgz",
++      "integrity": "sha512-ZySD7Nf91aLB0RxL4KGrKHBXl7Eds1DAmEdcoVawXnLD7SDhpNgtuII2aAkg7a7QS41jxPSZ17p4VdGnMHk3MQ==",
++      "engines": {
++        "node": ">=0.4.0"
++      }
++    },
+     "node_modules/didyoumean": {
+       "version": "1.2.2",
+       "resolved": "https://registry.npmjs.org/didyoumean/-/didyoumean-1.2.2.tgz",
+@@ -1940,6 +1997,19 @@
+       "integrity": "sha512-+HlytyjlPKnIG8XuRG8WvmBP8xs8P71y+SKKS6ZXWoEgLuePxtDoUEiH7WkdePWrQ5JBpE6aoVqfZfJUQkjXwA==",
+       "dev": true
+     },
++    "node_modules/dunder-proto": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/dunder-proto/-/dunder-proto-1.0.1.tgz",
++      "integrity": "sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==",
++      "dependencies": {
++        "call-bind-apply-helpers": "^1.0.1",
++        "es-errors": "^1.3.0",
++        "gopd": "^1.2.0"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/eastasianwidth": {
+       "version": "0.2.0",
+       "resolved": "https://registry.npmjs.org/eastasianwidth/-/eastasianwidth-0.2.0.tgz",
+@@ -1958,6 +2028,47 @@
+       "integrity": "sha512-L18DaJsXSUk2+42pv8mLs5jJT2hqFkFE4j21wOmgbUqsZ2hL72NsUU785g9RXgo3s0ZNgVl42TiHp3ZtOv/Vyg==",
+       "dev": true
+     },
++    "node_modules/es-define-property": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/es-define-property/-/es-define-property-1.0.1.tgz",
++      "integrity": "sha512-e3nRfgfUZ4rNGL232gUgX06QNyyez04KdjFrF+LTRoOXmrOgFKDg4BCdsjW8EnT69eqdYGmRpJwiPVYNrCaW3g==",
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
++    "node_modules/es-errors": {
++      "version": "1.3.0",
++      "resolved": "https://registry.npmjs.org/es-errors/-/es-errors-1.3.0.tgz",
++      "integrity": "sha512-Zf5H2Kxt2xjTvbJvP2ZWLEICxA6j+hAmMzIlypy4xcBg1vKVnx89Wy0GbS+kf5cwCVFFzdCFh2XSCFNULS6csw==",
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
++    "node_modules/es-object-atoms": {
++      "version": "1.1.1",
++      "resolved": "https://registry.npmjs.org/es-object-atoms/-/es-object-atoms-1.1.1.tgz",
++      "integrity": "sha512-FGgH2h8zKNim9ljj7dankFPcICIK9Cp5bm+c2gQSYePhpaG5+esrLODihIorn+Pe6FGJzWhXQotPv73jTaldXA==",
++      "dependencies": {
++        "es-errors": "^1.3.0"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
++    "node_modules/es-set-tostringtag": {
++      "version": "2.1.0",
++      "resolved": "https://registry.npmjs.org/es-set-tostringtag/-/es-set-tostringtag-2.1.0.tgz",
++      "integrity": "sha512-j6vWzfrGVfyXxge+O0x5sh6cvxAog0a/4Rdd2K36zCMV5eJ+/+tOAngRO8cODMNWbVRdVlmGZQL2YS3yR8bIUA==",
++      "dependencies": {
++        "es-errors": "^1.3.0",
++        "get-intrinsic": "^1.2.6",
++        "has-tostringtag": "^1.0.2",
++        "hasown": "^2.0.2"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/esbuild": {
+       "version": "0.21.5",
+       "resolved": "https://registry.npmjs.org/esbuild/-/esbuild-0.21.5.tgz",
+@@ -2378,6 +2489,25 @@
+       "integrity": "sha512-X8cqMLLie7KsNUDSdzeN8FYK9rEt4Dt67OsG/DNGnYTSDBG4uFAJFBnUeiV+zCVAvwFy56IjM9sH51jVaEhNxw==",
+       "dev": true
+     },
++    "node_modules/follow-redirects": {
++      "version": "1.15.9",
++      "resolved": "https://registry.npmjs.org/follow-redirects/-/follow-redirects-1.15.9.tgz",
++      "integrity": "sha512-gew4GsXizNgdoRyqmyfMHyAmXsZDk6mHkSxZFCzW9gwlbtOW44CDtYavM+y+72qD/Vq2l550kMF52DT8fOLJqQ==",
++      "funding": [
++        {
++          "type": "individual",
++          "url": "https://github.com/sponsors/RubenVerborgh"
++        }
++      ],
++      "engines": {
++        "node": ">=4.0"
++      },
++      "peerDependenciesMeta": {
++        "debug": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/foreground-child": {
+       "version": "3.3.0",
+       "resolved": "https://registry.npmjs.org/foreground-child/-/foreground-child-3.3.0.tgz",
+@@ -2394,6 +2524,21 @@
+         "url": "https://github.com/sponsors/isaacs"
+       }
+     },
++    "node_modules/form-data": {
++      "version": "4.0.4",
++      "resolved": "https://registry.npmjs.org/form-data/-/form-data-4.0.4.tgz",
++      "integrity": "sha512-KrGhL9Q4zjj0kiUt5OO4Mr/A/jlI2jDYs5eHBpYHPcBEVSiipAvn2Ko2HnPe20rmcuuvMHNdZFp+4IlGTMF0Ow==",
++      "dependencies": {
++        "asynckit": "^0.4.0",
++        "combined-stream": "^1.0.8",
++        "es-set-tostringtag": "^2.1.0",
++        "hasown": "^2.0.2",
++        "mime-types": "^2.1.12"
++      },
++      "engines": {
++        "node": ">= 6"
++      }
++    },
+     "node_modules/fraction.js": {
+       "version": "4.3.7",
+       "resolved": "https://registry.npmjs.org/fraction.js/-/fraction.js-4.3.7.tgz",
+@@ -2425,7 +2570,6 @@
+       "version": "1.1.2",
+       "resolved": "https://registry.npmjs.org/function-bind/-/function-bind-1.1.2.tgz",
+       "integrity": "sha512-7XHNxH7qX9xG5mIwxkhumTox/MIRNcOgDrxWsMt2pAr23WHp6MrRlN7FBSFpCpr+oVO0F744iUgR82nJMfG2SA==",
+-      "dev": true,
+       "funding": {
+         "url": "https://github.com/sponsors/ljharb"
+       }
+@@ -2439,6 +2583,41 @@
+         "node": ">=6.9.0"
+       }
+     },
++    "node_modules/get-intrinsic": {
++      "version": "1.3.0",
++      "resolved": "https://registry.npmjs.org/get-intrinsic/-/get-intrinsic-1.3.0.tgz",
++      "integrity": "sha512-9fSjSaos/fRIVIp+xSJlE6lfwhES7LNtKaCBIamHsjr2na1BiABJPo0mOjjz8GJDURarmCPGqaiVg5mfjb98CQ==",
++      "dependencies": {
++        "call-bind-apply-helpers": "^1.0.2",
++        "es-define-property": "^1.0.1",
++        "es-errors": "^1.3.0",
++        "es-object-atoms": "^1.1.1",
++        "function-bind": "^1.1.2",
++        "get-proto": "^1.0.1",
++        "gopd": "^1.2.0",
++        "has-symbols": "^1.1.0",
++        "hasown": "^2.0.2",
++        "math-intrinsics": "^1.1.0"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/ljharb"
++      }
++    },
++    "node_modules/get-proto": {
++      "version": "1.0.1",
++      "resolved": "https://registry.npmjs.org/get-proto/-/get-proto-1.0.1.tgz",
++      "integrity": "sha512-sTSfBjoXBp89JvIKIefqw7U2CCebsc74kiY6awiGogKtoSGbgjYE/G/+l9sF3MWFPNc9IcoOC4ODfKHfxFmp0g==",
++      "dependencies": {
++        "dunder-proto": "^1.0.1",
++        "es-object-atoms": "^1.0.0"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/glob": {
+       "version": "10.4.5",
+       "resolved": "https://registry.npmjs.org/glob/-/glob-10.4.5.tgz",
+@@ -2515,6 +2694,17 @@
+         "csstype": "^3.0.10"
+       }
+     },
++    "node_modules/gopd": {
++      "version": "1.2.0",
++      "resolved": "https://registry.npmjs.org/gopd/-/gopd-1.2.0.tgz",
++      "integrity": "sha512-ZUKRh6/kUFoAiTAtTYPZJ3hw9wNxx+BIBOijnlG9PnrJsCcSjs1wyyD6vJpaYtgnzDrKYRSqf3OO6Rfa93xsRg==",
++      "engines": {
++        "node": ">= 0.4"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/ljharb"
++      }
++    },
+     "node_modules/graphemer": {
+       "version": "1.4.0",
+       "resolved": "https://registry.npmjs.org/graphemer/-/graphemer-1.4.0.tgz",
+@@ -2530,11 +2720,35 @@
+         "node": ">=4"
+       }
+     },
++    "node_modules/has-symbols": {
++      "version": "1.1.0",
++      "resolved": "https://registry.npmjs.org/has-symbols/-/has-symbols-1.1.0.tgz",
++      "integrity": "sha512-1cDNdwJ2Jaohmb3sg4OmKaMBwuC48sYni5HUw2DvsC8LjGTLK9h+eb1X6RyuOHe4hT0ULCW68iomhjUoKUqlPQ==",
++      "engines": {
++        "node": ">= 0.4"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/ljharb"
++      }
++    },
++    "node_modules/has-tostringtag": {
++      "version": "1.0.2",
++      "resolved": "https://registry.npmjs.org/has-tostringtag/-/has-tostringtag-1.0.2.tgz",
++      "integrity": "sha512-NqADB8VjPFLM2V0VvHUewwwsw0ZWBaIdgo+ieHtK3hasLz4qeCRjYcqfB6AQrBggRKppKF8L52/VqdVsO47Dlw==",
++      "dependencies": {
++        "has-symbols": "^1.0.3"
++      },
++      "engines": {
++        "node": ">= 0.4"
++      },
++      "funding": {
++        "url": "https://github.com/sponsors/ljharb"
++      }
++    },
+     "node_modules/hasown": {
+       "version": "2.0.2",
+       "resolved": "https://registry.npmjs.org/hasown/-/hasown-2.0.2.tgz",
+       "integrity": "sha512-0hJU9SCPvmMzIBdZFqNPXWa6dqh7WdH0cII9y+CyS8rG3nL48Bclra9HmKhVVUHyPWNH5Y7xDwAB7bfgSjkUMQ==",
+-      "dev": true,
+       "dependencies": {
+         "function-bind": "^1.1.2"
+       },
+@@ -2542,6 +2756,44 @@
+         "node": ">= 0.4"
+       }
+     },
++    "node_modules/html-parse-stringify": {
++      "version": "3.0.1",
++      "resolved": "https://registry.npmjs.org/html-parse-stringify/-/html-parse-stringify-3.0.1.tgz",
++      "integrity": "sha512-KknJ50kTInJ7qIScF3jeaFRpMpE8/lfiTdzf/twXyPBLAGrLRTmkz3AdTnKeh40X8k9L2fdYwEp/42WGXIRGcg==",
++      "dependencies": {
++        "void-elements": "3.1.0"
++      }
++    },
++    "node_modules/i18next": {
++      "version": "25.3.2",
++      "resolved": "https://registry.npmjs.org/i18next/-/i18next-25.3.2.tgz",
++      "integrity": "sha512-JSnbZDxRVbphc5jiptxr3o2zocy5dEqpVm9qCGdJwRNO+9saUJS0/u4LnM/13C23fUEWxAylPqKU/NpMV/IjqA==",
++      "funding": [
++        {
++          "type": "individual",
++          "url": "https://locize.com"
++        },
++        {
++          "type": "individual",
++          "url": "https://locize.com/i18next.html"
++        },
++        {
++          "type": "individual",
++          "url": "https://www.i18next.com/how-to/faq#i18next-is-awesome.-how-can-i-support-the-project"
++        }
++      ],
++      "dependencies": {
++        "@babel/runtime": "^7.27.6"
++      },
++      "peerDependencies": {
++        "typescript": "^5"
++      },
++      "peerDependenciesMeta": {
++        "typescript": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/ignore": {
+       "version": "5.3.2",
+       "resolved": "https://registry.npmjs.org/ignore/-/ignore-5.3.2.tgz",
+@@ -2817,6 +3069,14 @@
+         "react": "^16.5.1 || ^17.0.0 || ^18.0.0"
+       }
+     },
++    "node_modules/math-intrinsics": {
++      "version": "1.1.0",
++      "resolved": "https://registry.npmjs.org/math-intrinsics/-/math-intrinsics-1.1.0.tgz",
++      "integrity": "sha512-/IXtbwEk5HTPyEwyKX6hGkYXxM9nbj64B+ilVJnC/R6B0pH5G4V3b0pVbL7DBj4tkhBAppbQUlf6F6Xl9LHu1g==",
++      "engines": {
++        "node": ">= 0.4"
++      }
++    },
+     "node_modules/merge2": {
+       "version": "1.4.1",
+       "resolved": "https://registry.npmjs.org/merge2/-/merge2-1.4.1.tgz",
+@@ -2839,6 +3099,25 @@
+         "node": ">=8.6"
+       }
+     },
++    "node_modules/mime-db": {
++      "version": "1.52.0",
++      "resolved": "https://registry.npmjs.org/mime-db/-/mime-db-1.52.0.tgz",
++      "integrity": "sha512-sPU4uV7dYlvtWJxwwxHD0PuihVNiE7TyAbQ5SWxDCB9mUYvOgroQOwYQQOKPJ8CIbE+1ETVlOoK1UC2nU3gYvg==",
++      "engines": {
++        "node": ">= 0.6"
++      }
++    },
++    "node_modules/mime-types": {
++      "version": "2.1.35",
++      "resolved": "https://registry.npmjs.org/mime-types/-/mime-types-2.1.35.tgz",
++      "integrity": "sha512-ZDY+bPm5zTTF+YpCrAU9nK0UgICYPT0QtT1NZWFv4s++TNkcgVaT0g6+4R2uI4MjQjzysHB1zxuWL50hzaeXiw==",
++      "dependencies": {
++        "mime-db": "1.52.0"
++      },
++      "engines": {
++        "node": ">= 0.6"
++      }
++    },
+     "node_modules/minimatch": {
+       "version": "3.1.2",
+       "resolved": "https://registry.npmjs.org/minimatch/-/minimatch-3.1.2.tgz",
+@@ -3254,6 +3533,11 @@
+         "node": ">= 0.8.0"
+       }
+     },
++    "node_modules/proxy-from-env": {
++      "version": "1.1.0",
++      "resolved": "https://registry.npmjs.org/proxy-from-env/-/proxy-from-env-1.1.0.tgz",
++      "integrity": "sha512-D+zkORCbA9f1tdWRK0RaCR3GPv50cMxcrz4X8k5LTSUD1Dkw47mKJEZQNunItRTkWwgtaUSo1RVFRIG9ZXiFYg=="
++    },
+     "node_modules/punycode": {
+       "version": "2.3.1",
+       "resolved": "https://registry.npmjs.org/punycode/-/punycode-2.3.1.tgz",
+@@ -3322,6 +3606,31 @@
+         "react-dom": ">=16"
+       }
+     },
++    "node_modules/react-i18next": {
++      "version": "15.6.1",
++      "resolved": "https://registry.npmjs.org/react-i18next/-/react-i18next-15.6.1.tgz",
++      "integrity": "sha512-uGrzSsOUUe2sDBG/+FJq2J1MM+Y4368/QW8OLEKSFvnDflHBbZhSd1u3UkW0Z06rMhZmnB/AQrhCpYfE5/5XNg==",
++      "dependencies": {
++        "@babel/runtime": "^7.27.6",
++        "html-parse-stringify": "^3.0.1"
++      },
++      "peerDependencies": {
++        "i18next": ">= 23.2.3",
++        "react": ">= 16.8.0",
++        "typescript": "^5"
++      },
++      "peerDependenciesMeta": {
++        "react-dom": {
++          "optional": true
++        },
++        "react-native": {
++          "optional": true
++        },
++        "typescript": {
++          "optional": true
++        }
++      }
++    },
+     "node_modules/react-refresh": {
+       "version": "0.14.2",
+       "resolved": "https://registry.npmjs.org/react-refresh/-/react-refresh-0.14.2.tgz",
+@@ -3808,7 +4117,7 @@
+       "version": "5.6.3",
+       "resolved": "https://registry.npmjs.org/typescript/-/typescript-5.6.3.tgz",
+       "integrity": "sha512-hjcS1mhfuyi4WW8IWtjP7brDrG2cuDZukyrYrSauoXGNgx0S7zceP07adYkJycEr56BOUTNPzbInooiN3fn1qw==",
+-      "dev": true,
++      "devOptional": true,
+       "bin": {
+         "tsc": "bin/tsc",
+         "tsserver": "bin/tsserver"
+@@ -3944,6 +4253,14 @@
+         }
+       }
+     },
++    "node_modules/void-elements": {
++      "version": "3.1.0",
++      "resolved": "https://registry.npmjs.org/void-elements/-/void-elements-3.1.0.tgz",
++      "integrity": "sha512-Dhxzh5HZuiHQhbvTW9AMetFfBHDMYpo23Uo9btPXgdYP+3T5S+p+jgNy7spra+veYhBP2dCSgxR/i2Y02h5/6w==",
++      "engines": {
++        "node": ">=0.10.0"
++      }
++    },
+     "node_modules/which": {
+       "version": "2.0.2",
+       "resolved": "https://registry.npmjs.org/which/-/which-2.0.2.tgz",
+diff --git a/package.json b/package.json
+index 71dc423..9ad8094 100644
+--- a/package.json
++++ b/package.json
+@@ -10,12 +10,15 @@
+     "preview": "vite preview"
+   },
+   "dependencies": {
++    "axios": "^1.11.0",
++    "clsx": "^2.1.0",
++    "i18next": "^25.3.2",
+     "lucide-react": "^0.344.0",
+     "react": "^18.3.1",
+     "react-dom": "^18.3.1",
+-    "react-router-dom": "^6.22.3",
+     "react-hot-toast": "^2.4.1",
+-    "clsx": "^2.1.0"
++    "react-i18next": "^15.6.1",
++    "react-router-dom": "^6.22.3"
+   },
+   "devDependencies": {
+     "@eslint/js": "^9.9.1",
+@@ -33,4 +36,4 @@
+     "typescript-eslint": "^8.3.0",
+     "vite": "^5.4.2"
+   }
+-}
+\ No newline at end of file
++}
+diff --git a/src/components/Layout.tsx b/src/components/Layout.tsx
+index 8b9fab8..74a0948 100644
+--- a/src/components/Layout.tsx
++++ b/src/components/Layout.tsx
+@@ -1,28 +1,47 @@
+-import React from 'react';
+-import { Outlet, Link, useLocation } from 'react-router-dom';
+-import { Lock, Cloud, Package, Calendar } from 'lucide-react';
+-import clsx from 'clsx';
++import React, { useState, useEffect } from "react";
++import { Outlet, Link, useLocation } from "react-router-dom";
++import { Lock, Cloud, Package, Calendar, Moon, Sun } from "lucide-react";
++import { useTranslation } from "react-i18next";
++import clsx from "clsx";
++import LanguageSelector from "./LanguageSelector";
+
+ const Layout = () => {
+   const location = useLocation();
++  const { t } = useTranslation();
++  const [darkMode, setDarkMode] = useState(false);
++
++  const toggleDarkMode = () => {
++    const newDarkMode = !darkMode;
++    setDarkMode(newDarkMode);
++    document.documentElement.classList.toggle("dark", newDarkMode);
++    localStorage.setItem("darkMode", newDarkMode ? "true" : "false");
++  };
++
++  useEffect(() => {
++    const savedDarkMode = localStorage.getItem("darkMode") === "true";
++    setDarkMode(savedDarkMode);
++    document.documentElement.classList.toggle("dark", savedDarkMode);
++  }, []);
+
+   const navigation = [
+-    { name: 'Inventario', href: '/inventory', icon: Package },
+-    { name: 'Préstamos', href: '/loans', icon: Calendar },
++    { name: t("inventory"), href: "/inventory", icon: Package },
++    { name: t("loans"), href: "/loans", icon: Calendar },
+   ];
+
+   return (
+-    <div className="min-h-screen bg-gray-50">
+-      <nav className="bg-white shadow-sm">
++    <div className="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-200">
++      <nav className="bg-white dark:bg-gray-800 shadow-sm">
+         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+           <div className="flex h-16 justify-between">
+             <div className="flex">
+               <Link to="/" className="flex items-center gap-2">
+-                <div className="flex items-center text-blue-600">
++                <div className="flex items-center text-blue-600 dark:text-blue-400">
+                   <Lock className="h-6 w-6" />
+                   <Cloud className="h-6 w-6 -ml-2" />
+                 </div>
+-                <span className="text-xl font-bold text-gray-900">SENASEC</span>
++                <span className="text-xl font-bold text-gray-900 dark:text-white">
++                  SENASEC
++                </span>
+               </Link>
+               <div className="ml-10 flex items-center space-x-4">
+                 {navigation.map((item) => {
+@@ -32,10 +51,10 @@ const Layout = () => {
+                       key={item.name}
+                       to={item.href}
+                       className={clsx(
+-                        'inline-flex items-center px-3 py-2 text-sm font-medium rounded-md',
++                        "inline-flex items-center px-3 py-2 text-sm font-medium rounded-md",
+                         location.pathname === item.href
+-                          ? 'bg-blue-50 text-blue-600'
+-                          : 'text-gray-600 hover:bg-gray-50'
++                          ? "bg-blue-50 text-blue-600 dark:bg-blue-900 dark:text-blue-300"
++                          : "text-gray-600 hover:bg-gray-50 dark:text-gray-300 dark:hover:bg-gray-700",
+                       )}
+                     >
+                       <Icon className="h-4 w-4 mr-2" />
+@@ -45,6 +64,19 @@ const Layout = () => {
+                 })}
+               </div>
+             </div>
++            <div className="flex items-center space-x-4">
++              <LanguageSelector />
++              <button
++                onClick={toggleDarkMode}
++                className="p-2 rounded-full text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
++              >
++                {darkMode ? (
++                  <Sun className="h-5 w-5" />
++                ) : (
++                  <Moon className="h-5 w-5" />
++                )}
++              </button>
++            </div>
+           </div>
+         </div>
+       </nav>
+@@ -53,11 +85,13 @@ const Layout = () => {
+           <Outlet />
+         </div>
+       </main>
+-      <footer className="bg-white border-t">
++      <footer className="bg-white dark:bg-gray-800 border-t dark:border-gray-700">
+         <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-6">
+-          <div className="text-center text-sm text-gray-500">
+-            <p>© 2024 SENASEC. Todos los derechos reservados.</p>
+-            <p>Contacto: soporte@senasec.com | Tel: (123) 456-7890</p>
++          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
++            <p>© 2024 SENASEC. {t("allRightsReserved")}</p>
++            <p>
++              {t("contact")}: soporte@senasec.com | {t("tel")}: (123) 456-7890
++            </p>
+           </div>
+         </div>
+       </footer>
+@@ -65,4 +99,4 @@ const Layout = () => {
+   );
+ };
+
+-export default Layout;
+\ No newline at end of file
++export default Layout;
+diff --git a/src/pages/Login.tsx b/src/pages/Login.tsx
+index 8064e1c..aaf9cfa 100644
+--- a/src/pages/Login.tsx
++++ b/src/pages/Login.tsx
+@@ -1,16 +1,39 @@
+-import React, { useState } from 'react';
+-import { Link } from 'react-router-dom';
+-import { Lock, Cloud, Mail, KeyRound } from 'lucide-react';
+-import toast from 'react-hot-toast';
++import React, { useState } from "react";
++import { Link, useNavigate } from "react-router-dom";
++import { Lock, Cloud, Mail, KeyRound } from "lucide-react";
++import toast from "react-hot-toast";
++import { login } from "../services/auth";
+
+ const Login = () => {
+-  const [email, setEmail] = useState('');
+-  const [password, setPassword] = useState('');
++  const navigate = useNavigate();
++  const [username, setUsername] = useState("");
++  const [password, setPassword] = useState("");
++  const [isLoading, setIsLoading] = useState(false);
++  const [error, setError] = useState("");
+
+-  const handleSubmit = (e: React.FormEvent) => {
++  const handleSubmit = async (e: React.FormEvent) => {
+     e.preventDefault();
+-    // TODO: Implement actual login logic
+-    toast.success('Inicio de sesión exitoso');
++    setIsLoading(true);
++    setError("");
++
++    try {
++      // Llamar al servicio de autenticación
++      await login(username, password);
++
++      toast.success("Inicio de sesión exitoso");
++
++      // Redirigir al usuario a la página de inventario después del inicio de sesión exitoso
++      navigate("/inventory");
++    } catch (err: any) {
++      console.error("Error de inicio de sesión:", err);
++      setError(
++        err.response?.data?.detail ||
++          "Error al iniciar sesión. Verifica tus credenciales.",
++      );
++      toast.error("Error al iniciar sesión");
++    } finally {
++      setIsLoading(false);
++    }
+   };
+
+   return (
+@@ -34,29 +57,35 @@ const Login = () => {
+         <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
+           <form className="space-y-6" onSubmit={handleSubmit}>
+             <div>
+-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+-                Correo electrónico
++              <label
++                htmlFor="username"
++                className="block text-sm font-medium text-gray-700"
++              >
++                Usuario o correo electrónico
+               </label>
+               <div className="mt-1 relative">
+                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                   <Mail className="h-5 w-5 text-gray-400" />
+                 </div>
+                 <input
+-                  id="email"
+-                  name="email"
+-                  type="email"
+-                  autoComplete="email"
++                  id="username"
++                  name="username"
++                  type="text"
++                  autoComplete="username"
+                   required
+-                  value={email}
+-                  onChange={(e) => setEmail(e.target.value)}
++                  value={username}
++                  onChange={(e) => setUsername(e.target.value)}
+                   className="appearance-none block w-full pl-10 px-3 py-2 border border-gray-300 rounded-md shadow-sm placeholder-gray-400 focus:outline-none focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+-                  placeholder="usuario@ejemplo.com"
++                  placeholder="usuario o correo"
+                 />
+               </div>
+             </div>
+
+             <div>
+-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
++              <label
++                htmlFor="password"
++                className="block text-sm font-medium text-gray-700"
++              >
+                 Contraseña
+               </label>
+               <div className="mt-1 relative">
+@@ -79,18 +108,62 @@ const Login = () => {
+
+             <div className="flex items-center justify-between">
+               <div className="text-sm">
+-                <Link to="/forgot-password" className="font-medium text-blue-600 hover:text-blue-500">
++                <Link
++                  to="/forgot-password"
++                  className="font-medium text-blue-600 hover:text-blue-500"
++                >
+                   ¿Olvidaste tu contraseña?
+                 </Link>
+               </div>
+             </div>
+
++            {error && (
++              <div className="rounded-md bg-red-50 p-4 mb-4">
++                <div className="flex">
++                  <div className="ml-3">
++                    <p className="text-sm font-medium text-red-800">{error}</p>
++                  </div>
++                </div>
++              </div>
++            )}
++
+             <div>
+               <button
+                 type="submit"
+-                className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
++                disabled={isLoading}
++                className={`w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white ${
++                  isLoading
++                    ? "bg-blue-400 cursor-not-allowed"
++                    : "bg-blue-600 hover:bg-blue-700"
++                } focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500`}
+               >
+-                Iniciar sesión
++                {isLoading ? (
++                  <>
++                    <svg
++                      className="animate-spin -ml-1 mr-3 h-5 w-5 text-white"
++                      xmlns="http://www.w3.org/2000/svg"
++                      fill="none"
++                      viewBox="0 0 24 24"
++                    >
++                      <circle
++                        className="opacity-25"
++                        cx="12"
++                        cy="12"
++                        r="10"
++                        stroke="currentColor"
++                        strokeWidth="4"
++                      ></circle>
++                      <path
++                        className="opacity-75"
++                        fill="currentColor"
++                        d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
++                      ></path>
++                    </svg>
++                    Iniciando sesión...
++                  </>
++                ) : (
++                  "Iniciar sesión"
++                )}
+               </button>
+             </div>
+           </form>
+@@ -101,7 +174,9 @@ const Login = () => {
+                 <div className="w-full border-t border-gray-300" />
+               </div>
+               <div className="relative flex justify-center text-sm">
+-                <span className="px-2 bg-white text-gray-500">¿No tienes una cuenta?</span>
++                <span className="px-2 bg-white text-gray-500">
++                  ¿No tienes una cuenta?
++                </span>
+               </div>
+             </div>
+
+@@ -120,4 +195,4 @@ const Login = () => {
+   );
+ };
+
+-export default Login;
+\ No newline at end of file
++export default Login;
+diff --git a/tailwind.config.js b/tailwind.config.js
+index d21f1cd..8ef0543 100644
+--- a/tailwind.config.js
++++ b/tailwind.config.js
+@@ -1,6 +1,7 @@
+ /** @type {import('tailwindcss').Config} */
+ export default {
+-  content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
++  content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
++  darkMode: "class", // Habilitar el modo oscuro basado en clases
+   theme: {
+     extend: {},
+   },

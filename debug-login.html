@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Login - SENASEC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        button:hover {
+            background-color: #0056b3;
+        }
+        .result {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .error {
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            color: #721c24;
+        }
+        .success {
+            background-color: #d4edda;
+            border-color: #c3e6cb;
+            color: #155724;
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Login SENASEC</h1>
+        
+        <div>
+            <h3>Credenciales de Prueba:</h3>
+            <input type="text" id="username" placeholder="Usuario" value="admin">
+            <input type="password" id="password" placeholder="Contraseña" value="admin123">
+        </div>
+
+        <button onclick="testBackendConnection()">1. Probar Conexión Backend</button>
+        <button onclick="testLogin()">2. Probar Login</button>
+        <button onclick="testCurrentUser()">3. Probar Usuario Actual</button>
+        <button onclick="clearStorageAndTest()">4. Limpiar Storage y Probar</button>
+
+        <div id="result" class="result" style="display: none;"></div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:8000";
+
+        function showResult(message, isError = false) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            resultDiv.className = `result ${isError ? 'error' : 'success'}`;
+            resultDiv.textContent = message;
+        }
+
+        async function testBackendConnection() {
+            try {
+                const response = await fetch(`${API_URL}/api/users/me`);
+                const data = await response.json();
+                
+                if (response.status === 401) {
+                    showResult(`✅ Backend conectado correctamente\nRespuesta: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult(`⚠️ Respuesta inesperada del backend\nStatus: ${response.status}\nRespuesta: ${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                showResult(`❌ Error de conexión con el backend:\n${error.message}`, true);
+            }
+        }
+
+        async function testLogin() {
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+
+            try {
+                const formData = new URLSearchParams();
+                formData.append("username", username);
+                formData.append("password", password);
+
+                const response = await fetch(`${API_URL}/token`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    localStorage.setItem('token', data.access_token);
+                    showResult(`✅ Login exitoso!\nToken guardado en localStorage\nRespuesta: ${JSON.stringify(data, null, 2)}`);
+                } else {
+                    showResult(`❌ Error en login\nStatus: ${response.status}\nRespuesta: ${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                showResult(`❌ Error en login:\n${error.message}`, true);
+            }
+        }
+
+        async function testCurrentUser() {
+            const token = localStorage.getItem('token');
+            
+            if (!token) {
+                showResult('❌ No hay token en localStorage. Haz login primero.', true);
+                return;
+            }
+
+            try {
+                const response = await fetch(`${API_URL}/api/users/me`, {
+                    headers: {
+                        'Authorization': `Bearer ${token}`
+                    }
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showResult(`✅ Usuario obtenido correctamente!\nDatos del usuario: ${JSON.stringify(data, null, 2)}\nEs admin: ${data.is_admin ? 'SÍ' : 'NO'}`);
+                } else {
+                    showResult(`❌ Error obteniendo usuario\nStatus: ${response.status}\nRespuesta: ${JSON.stringify(data, null, 2)}`, true);
+                }
+            } catch (error) {
+                showResult(`❌ Error obteniendo usuario:\n${error.message}`, true);
+            }
+        }
+
+        async function clearStorageAndTest() {
+            localStorage.clear();
+            sessionStorage.clear();
+            showResult('🧹 Storage limpiado. Ahora puedes probar el login desde cero.');
+        }
+
+        // Mostrar info inicial
+        window.onload = function() {
+            const token = localStorage.getItem('token');
+            if (token) {
+                showResult(`ℹ️ Token encontrado en localStorage:\n${token.substring(0, 50)}...`);
+            } else {
+                showResult('ℹ️ No hay token en localStorage. Listo para hacer login.');
+            }
+        };
+    </script>
+</body>
+</html>

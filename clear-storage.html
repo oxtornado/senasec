@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Limpiar Storage - SENASEC</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            text-align: center;
+        }
+        button {
+            background-color: #dc3545;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px;
+        }
+        button:hover {
+            background-color: #c82333;
+        }
+        .success {
+            color: #28a745;
+            margin-top: 20px;
+        }
+        .info {
+            background-color: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧹 Limpiar Storage de SENASEC</h1>
+        
+        <div class="info">
+            <p><strong>Problema:</strong> El cambio de puerto (5182 → 5184) puede causar problemas de autenticación.</p>
+            <p><strong>Solución:</strong> Limpiar el localStorage y sessionStorage para permitir un nuevo login.</p>
+        </div>
+
+        <button onclick="clearStorage()">Limpiar Todo el Storage</button>
+        <button onclick="clearTokenOnly()">Limpiar Solo Token</button>
+        <button onclick="showStorageInfo()">Ver Contenido del Storage</button>
+
+        <div id="result"></div>
+        <div id="storageInfo"></div>
+
+        <div style="margin-top: 30px;">
+            <p><strong>Después de limpiar:</strong></p>
+            <ol style="text-align: left;">
+                <li>Ve a <a href="http://localhost:5184" target="_blank">http://localhost:5184</a></li>
+                <li>Haz login con: <strong>admin / admin123</strong></li>
+                <li>Accede a Asignaciones</li>
+            </ol>
+        </div>
+    </div>
+
+    <script>
+        function clearStorage() {
+            localStorage.clear();
+            sessionStorage.clear();
+            document.getElementById('result').innerHTML = 
+                '<div class="success">✅ Todo el storage ha sido limpiado correctamente</div>';
+        }
+
+        function clearTokenOnly() {
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            sessionStorage.removeItem('token');
+            sessionStorage.removeItem('user');
+            document.getElementById('result').innerHTML = 
+                '<div class="success">✅ Tokens de autenticación eliminados</div>';
+        }
+
+        function showStorageInfo() {
+            let info = '<h3>Contenido del LocalStorage:</h3><ul style="text-align: left;">';
+            
+            if (localStorage.length === 0) {
+                info += '<li>LocalStorage está vacío</li>';
+            } else {
+                for (let i = 0; i < localStorage.length; i++) {
+                    const key = localStorage.key(i);
+                    const value = localStorage.getItem(key);
+                    info += `<li><strong>${key}:</strong> ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}</li>`;
+                }
+            }
+            
+            info += '</ul><h3>Contenido del SessionStorage:</h3><ul style="text-align: left;">';
+            
+            if (sessionStorage.length === 0) {
+                info += '<li>SessionStorage está vacío</li>';
+            } else {
+                for (let i = 0; i < sessionStorage.length; i++) {
+                    const key = sessionStorage.key(i);
+                    const value = sessionStorage.getItem(key);
+                    info += `<li><strong>${key}:</strong> ${value.substring(0, 50)}${value.length > 50 ? '...' : ''}</li>`;
+                }
+            }
+            
+            info += '</ul>';
+            document.getElementById('storageInfo').innerHTML = info;
+        }
+
+        // Mostrar info al cargar
+        window.onload = function() {
+            showStorageInfo();
+        };
+    </script>
+</body>
+</html>
