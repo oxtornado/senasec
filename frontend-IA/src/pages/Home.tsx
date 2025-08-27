@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import SupportForm from "./SupportForm";
 // import nijudemLogo from "../assets/Nijudem.png"; // Temporalmente comentado
 import { Link } from "react-router-dom";
@@ -18,8 +18,12 @@ import { useLanguage } from "../contexts/LanguageContext";
 import LanguageSelector from "../components/LanguageSelector";
 import ThemeToggle from "../components/ThemeToggle";
 
+
 const Home = () => {
   const { t } = useLanguage();
+
+  // declaracion de modal para el aviso de uso de datos
+  const [showModal, setShowModal] = useState(true);
 
   const features = [
     {
@@ -294,6 +298,30 @@ const Home = () => {
           </div>
         </section>
       </div>
+
+      {/* ventada de aviso de uso de datos */}
+      {showModal && (
+                <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
+                        <h2 className="text-xl font-semibold mb-4">
+                            Aviso de privacidad
+                        </h2>
+                        <p className="text-gray-700 mb-6">
+                            SENASEC usará su foto y acceso a la cámara para la
+                            apertura de aulas.  
+                            <br />
+                            Garantizamos la seguridad de su información y el
+                            resguardo responsable de sus datos.
+                        </p>
+                        <button
+                            onClick={() => setShowModal(false)}
+                            className="bg-blue-700 text-white px-6 py-2 rounded-xl hover:bg-blue-800 transition"
+                        >
+                            Aceptar
+                        </button>
+                    </div>
+                </div>
+            )}
 
       {/* Footer Mejorado */}
       <footer className="bg-gradient-to-r from-blue-700 to-blue-900 text-white py-6 mt-16">
