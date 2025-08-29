@@ -1,12 +1,51 @@
-import React from 'react';
+import { useState } from 'react';
 import { useAssignments } from '../contexts/AssignmentsContext';
-import { Clock, Users, Calendar, BookOpen } from 'lucide-react';
+import { Clock, Users, Calendar, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
 
 const Loans = () => {
   // Obtener datos del contexto de asignaciones
   const { t } = useLanguage();
-  const { assignments, schedules } = useAssignments();
+  const { schedules } = useAssignments();
+  
+  // Estado para manejar la semana actual
+  const [currentWeek, setCurrentWeek] = useState(new Date());
+  
+  // Función para obtener el número de semana del año
+  const getWeekNumber = (date: Date) => {
+    const firstDayOfYear = new Date(date.getFullYear(), 0, 1);
+    const pastDaysOfYear = (date.getTime() - firstDayOfYear.getTime()) / 86400000;
+    return Math.ceil((pastDaysOfYear + firstDayOfYear.getDay() + 1) / 7);
+  };
+  
+  // Función para obtener las fechas de la semana actual
+  const getWeekDates = (date: Date) => {
+    const startOfWeek = new Date(date);
+    const day = startOfWeek.getDay();
+    const diff = startOfWeek.getDate() - day + (day === 0 ? -6 : 1); // Ajustar para que lunes sea el primer día
+    startOfWeek.setDate(diff);
+    
+    const weekDates = [];
+    for (let i = 0; i < 6; i++) { // Solo lunes a sábado
+      const currentDate = new Date(startOfWeek);
+      currentDate.setDate(startOfWeek.getDate() + i);
+      weekDates.push(currentDate);
+    }
+    return weekDates;
+  };
+  
+  // Función para navegar entre semanas
+  const navigateWeek = (direction: 'prev' | 'next') => {
+    const newWeek = new Date(currentWeek);
+    newWeek.setDate(currentWeek.getDate() + (direction === 'next' ? 7 : -7));
+    setCurrentWeek(newWeek);
+  };
+  
+  // Obtener datos de la semana actual
+  const weekNumber = getWeekNumber(currentWeek);
+  const weekDates = getWeekDates(currentWeek);
+  const currentYear = currentWeek.getFullYear();
+  const isCurrentWeek = getWeekNumber(new Date()) === weekNumber && new Date().getFullYear() === currentYear;
 
   // Solo las 3 jornadas completas + horario de aseo
   const timeSlots = [
@@ -24,6 +63,14 @@ const Loans = () => {
     { name: 'VIERNES', short: 'VIE', color: 'from-neutral-600 to-stone-600' },
     { name: 'SÁBADO', short: 'SÁB', color: 'from-gray-700 to-slate-700' }
   ];
+  
+  // Formatear fecha para mostrar
+  const formatDate = (date: Date) => {
+    return date.toLocaleDateString('es-ES', { 
+      day: '2-digit', 
+      month: '2-digit'
+    });
+  };
 
   // Función para obtener información de la clase en una jornada y día específico
   const getClassForSlot = (dayName: string, timeSlot: string) => {
@@ -100,8 +147,23 @@ const Loans = () => {
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                 <span className="text-sm font-medium text-green-700 dark:text-green-300">SINCRONIZADO</span>
               </div>
-              <div className="bg-blue-100 dark:bg-blue-900 px-4 py-2 rounded-full">
-                <span className="text-sm font-medium text-blue-700 dark:text-blue-300">SEMANA ACTUAL</span>
+              <div className={`px-4 py-2 rounded-full ${
+                isCurrentWeek 
+                  ? 'bg-blue-100 dark:bg-blue-900' 
+                  : 'bg-gray-100 dark:bg-gray-700'
+              }`}>
+                <span className={`text-sm font-medium ${
+                  isCurrentWeek 
+                    ? 'text-blue-700 dark:text-blue-300' 
+                    : 'text-gray-700 dark:text-gray-300'
+                }`}>
+                  {isCurrentWeek ? 'SEMANA ACTUAL' : `SEMANA ${weekNumber}`}
+                </span>
+              </div>
+              <div className="bg-purple-100 dark:bg-purple-900 px-4 py-2 rounded-full">
+                <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
+                  AÑO {currentYear}
+                </span>
               </div>
             </div>
           </div>
@@ -133,10 +195,48 @@ const Loans = () => {
       {/* Tabla de horarios mejorada */}
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden">
         <div className="bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 p-6">
-          <h2 className="text-xl font-bold text-white flex items-center">
-            <Clock className="h-6 w-6 mr-3" />
-            Horario Semanal de Jornadas
-          </h2>
+          <div className="flex items-center justify-between">
+            <h2 className="text-xl font-bold text-white flex items-center">
+              <Clock className="h-6 w-6 mr-3" />
+              Horario Semanal de Jornadas
+            </h2>
+            <div className="flex items-center space-x-4">
+              <div className="text-white text-right">
+                <div className="text-sm opacity-90">Semana {weekNumber} de {currentYear}</div>
+                <div className="text-xs opacity-75">
+                  {formatDate(weekDates[0])} - {formatDate(weekDates[5])}
+                </div>
+              </div>
+              <div className="flex items-center space-x-2">
+                <button
+                  onClick={() => navigateWeek('prev')}
+                  className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-200"
+                  title="Semana anterior"
+                >
+                  <ChevronLeft className="h-4 w-4 text-white" />
+                </button>
+                <button
+                  onClick={() => setCurrentWeek(new Date())}
+                  className={`px-3 py-1 rounded-lg text-xs font-medium transition-colors duration-200 ${
+                    isCurrentWeek 
+                      ? 'bg-white/30 text-white cursor-default' 
+                      : 'bg-white/20 hover:bg-white/30 text-white'
+                  }`}
+                  disabled={isCurrentWeek}
+                  title="Ir a semana actual"
+                >
+                  HOY
+                </button>
+                <button
+                  onClick={() => navigateWeek('next')}
+                  className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-200"
+                  title="Semana siguiente"
+                >
+                  <ChevronRight className="h-4 w-4 text-white" />
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
         
         <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
@@ -150,14 +250,32 @@ const Loans = () => {
                     <span>JORNADA</span>
                   </div>
                 </th>
-                {days.map((day) => (
-                  <th key={day.name} className="w-44 px-2 py-4 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0">
-                    <div className={`bg-gradient-to-r ${day.color} text-white px-2 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300`}>
-                      <div className="font-bold text-sm">{day.short}</div>
-                      <div className="text-xs opacity-90">{day.name}</div>
-                    </div>
-                  </th>
-                ))}
+                {days.map((day, index) => {
+                  const dayDate = weekDates[index];
+                  const isToday = dayDate && new Date().toDateString() === dayDate.toDateString();
+                  return (
+                    <th key={day.name} className="w-44 px-2 py-4 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0">
+                      <div className={`bg-gradient-to-r ${
+                        isToday 
+                          ? 'from-green-500 to-green-600 ring-2 ring-green-300' 
+                          : day.color
+                      } text-white px-2 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300`}>
+                        <div className="font-bold text-sm">{day.short}</div>
+                        <div className="text-xs opacity-90">{day.name}</div>
+                        {dayDate && (
+                          <div className="text-xs opacity-80 mt-1 font-medium">
+                            {formatDate(dayDate)}
+                          </div>
+                        )}
+                        {isToday && (
+                          <div className="text-xs opacity-90 font-bold">
+                            HOY
+                          </div>
+                        )}
+                      </div>
+                    </th>
+                  );
+                })}
               </tr>
             </thead>
             
