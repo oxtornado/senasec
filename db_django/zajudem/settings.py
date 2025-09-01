@@ -111,7 +111,7 @@ WSGI_APPLICATION = 'zajudem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', #Conexión al gestor de base de datos en este caso postgresql
-        'NAME': 'zajudemborra', #Nombre de la base de datos
+        'NAME': 'senasec', #Nombre de la base de datos
         'USER': 'postgres', #Usuario de la base de datos
         'PASSWORD': '0000', #Contraseña de la base de datos
         'HOST': '127.0.0.1', #Host de la base de datos
