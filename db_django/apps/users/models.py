@@ -8,6 +8,7 @@ class Usuario(AbstractUser):
         ('instructor', 'Instructor'),
         ('seguridad', 'Guardia'),
         ('aseo', 'Limpieza'),
+        ('inventario', 'Inventario'),
     ]
     
     # Campo para almacenar el rol del usuario
@@ -31,7 +32,7 @@ class Usuario(AbstractUser):
     # Campo del face_token
     face_token = models.CharField(max_length=255, blank=False, null=False)
 
-    USERNAME_FIELD = 'documento'  # Define el campo que se usará para iniciar sesión
+    USERNAME_FIELD = 'email'  # Define el campo que se usará para iniciar sesión
     REQUIRED_FIELDS = ['username']  # Campos requeridos al crear un usuario
 
     def __str__(self):

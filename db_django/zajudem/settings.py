@@ -82,6 +82,8 @@ MIDDLEWARE = [
 # Para permitir todo durante desarrollo
 CORS_ALLOW_ALL_ORIGINS = True
 
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+
 ROOT_URLCONF = 'zajudem.urls'
 
 TEMPLATES = [
@@ -109,10 +111,10 @@ WSGI_APPLICATION = 'zajudem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', #Conexión al gestor de base de datos en este caso postgresql
-        'NAME': 'zajudem', #Nombre de la base de datos
-        'USER': 'julian', #Usuario de la base de datos
-        'PASSWORD': '1034400103', #Contraseña de la base de datos
-        'HOST': 'localhost', #Host de la base de datos
+        'NAME': 'zajudemborra', #Nombre de la base de datos
+        'USER': 'postgres', #Usuario de la base de datos
+        'PASSWORD': '0000', #Contraseña de la base de datos
+        'HOST': '127.0.0.1', #Host de la base de datos
         'PORT': '5432', #Puerto por defecto para establecer la conexión
     }
 }

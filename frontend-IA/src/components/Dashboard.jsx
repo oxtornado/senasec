@@ -72,7 +72,7 @@ const Dashboard = () => {
         let filteredLoans = loans;
         
         // Si es usuario estándar, solo mostrar sus propios préstamos
-        if (!currentUser.is_admin) {
+        if (!currentUser.rol === "admin") {
           filteredLoans = loans.filter(loan => loan.user_id === currentUser.id);
         }
         
@@ -87,8 +87,8 @@ const Dashboard = () => {
         ).length;
 
         setStats({
-          totalItems: currentUser.is_admin ? items.length : filteredLoans.length,
-          availableItems: currentUser.is_admin ? availableItems : 0,
+          totalItems: currentUser.rol === "admin" ? items.length : filteredLoans.length,
+          availableItems: currentUser.rol === "admin" ? availableItems : 0,
           activeLoans,
           overdueLoans,
         });
@@ -125,11 +125,11 @@ const Dashboard = () => {
         <div className="flex items-center justify-between">
           <div className="flex items-center space-x-4">
             <div className={`p-3 rounded-full ${
-              currentUser.is_admin ? 'bg-red-100 dark:bg-red-900' : 'bg-blue-100 dark:bg-blue-900'
+              currentUser.rol === "admin" ? 'bg-red-100 dark:bg-red-900' : 'bg-blue-100 dark:bg-blue-900'
             }`}>
               {currentUser.is_admin ? (
                 <Shield className={`h-6 w-6 ${
-                  currentUser.is_admin ? 'text-red-600 dark:text-red-300' : 'text-blue-600 dark:text-blue-300'
+                  currentUser.rol === "admin" ? 'text-red-600 dark:text-red-300' : 'text-blue-600 dark:text-blue-300'
                 }`} />
               ) : (
                 <User className="h-6 w-6 text-blue-600 dark:text-blue-300" />
@@ -140,23 +140,23 @@ const Dashboard = () => {
                 {t("dashboard")}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Bienvenido, {currentUser.full_name} ({currentUser.is_admin ? 'Administrador' : 'Usuario Estándar'})
+                Bienvenido, {currentUser.full_name} ({currentUser.rol === "admin" ? 'Administrador' : 'Usuario Estándar'})
               </p>
             </div>
           </div>
           <div className={`px-3 py-1 rounded-full text-xs font-medium ${
-            currentUser.is_admin 
+            currentUser.rol === "admin"
               ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
               : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
           }`}>
-            {currentUser.is_admin ? 'ADMIN' : 'USUARIO'}
+            {currentUser.rol === "admin" ? 'ADMIN' : 'USUARIO'}
           </div>
         </div>
       </div>
 
       {/* Estadísticas diferenciadas por tipo de usuario */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        {currentUser.is_admin ? (
+        {currentUser.rol === "admin" ? (
           // Vista de Administrador - Estadísticas completas del sistema
           <>
             <StatCard
@@ -217,7 +217,7 @@ const Dashboard = () => {
 
       {/* Gráficos y información adicional diferenciada */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {currentUser.is_admin ? (
+        {currentUser.rol === "admin" ? (
           // Vista de Administrador - Gráficos del sistema completo
           <>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">

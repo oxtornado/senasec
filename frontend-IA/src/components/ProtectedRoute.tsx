@@ -10,30 +10,24 @@ interface ProtectedRouteProps {
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin = false }) => {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
     const checkAuth = async () => {
-      const token = localStorage.getItem('token');
-      console.log('=== PROTECTED ROUTE CHECK ===');
-      console.log('Token existe:', !!token);
-      
+      const token = localStorage.getItem("token");
       if (!token) {
-        console.log('No hay token, redirigiendo a login');
+        setUser(null);
         setLoading(false);
         return;
       }
 
       try {
         const currentUser = await getCurrentUser();
-        console.log('Usuario obtenido:', currentUser);
         setUser(currentUser);
-        setIsAuthenticated(true);
       } catch (error) {
-        console.error('Error verificando autenticación:', error);
+        console.warn('Sesión no válida, redirigiendo a login');
         localStorage.removeItem('token');
         localStorage.removeItem('currentUser');
-        setIsAuthenticated(false);
+        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -50,11 +44,11 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ children, requireAdmin 
     );
   }
 
-  if (!isAuthenticated) {
+  if (!user) {
     return <Navigate to="/login" replace />;
   }
 
-  if (requireAdmin && (!user || !user.is_admin)) {
+  if (requireAdmin && !user.is_admin) {
     return <Navigate to="/dashboard/inventory" replace />;
   }
 

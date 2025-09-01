@@ -45,11 +45,7 @@ function App() {
             <Route path="loans" element={<Loans />} />
             <Route path="reports" element={<Reports />} />
             <Route path="assignments" element={<Assignments />} />
-            <Route path="users" element={
-              <ProtectedRoute requireAdmin={true}>
-                <Users />
-              </ProtectedRoute>
-            } />
+            <Route path="users" element={<Users />} />
           </Route>
           
           {/* Ruta catch-all */}

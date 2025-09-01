@@ -58,7 +58,7 @@ const Assignments = () => {
     );
   }
 
-  if (!user || !user.is_admin) {
+  if (!user || user.rol !== "admin") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">

@@ -17,8 +17,8 @@ const LoginFace: React.FC = () => {
             return;
         }
 
-    setLoading(true);
-    setStatus('Capturando y verificando rostro...');
+        setLoading(true);
+        setStatus('Capturando y verificando rostro...');
 
         const screenshot = webcamRef.current?.getScreenshot();
         if (!screenshot) {
@@ -38,19 +38,25 @@ const LoginFace: React.FC = () => {
         });
 
         const data = response.data;
-        if (data.message) {
+        console.log('Respuesta backend:', data);
+
+        if (data.access) {   // Aquí chequeamos el token access que devuelve DRF
+            localStorage.setItem('token', data.access);
+            }
+
+        if (data.user) {
+            localStorage.setItem('currentUser', JSON.stringify(data.user));
+        }
+
+        if (data.access) {
             setStatus('✅ Rostro verificado. Bienvenido');
-            navigate('/loans'); //exple
-
+            navigate('/dashboard/inventory');
         } else {
-            setStatus('❌ Rostro no coincide');
+            setStatus('❌ Rostro no coincide o no se entregó token');
         }
-        } catch (error) {
-            console.error('Error:', error);
-            setStatus('Error durante la verificación');
-        }
-
+        } finally {
         setLoading(false);
+        }
     };
 
     return (

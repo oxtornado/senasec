@@ -16,11 +16,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
         }
 
     def create(self, validated_data):
-
-        request = self.context.get('request')
-        if request:
-            print("📥 Datos recibidos en Django:", request.data)
-            
         face_token = validated_data.get('face_token')
 
         user = User.objects.create_user(
@@ -37,9 +32,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
             user.save()
 
         return user
-
-
-        
+    
         # Si se envió imagen, llamamos a la API de Face++ para obtener el token
         #if image:
         #    import requests
@@ -87,14 +80,14 @@ class UsuarioSerializer(serializers.ModelSerializer):
     
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
-    username_field = 'documento'  # <- Esto indica que usaremos el campo documento para la autenticación
+    username_field = 'email'  # <- Esto indica que usaremos el campo email para la autenticación
 
     def validate(self, attrs):
-        # Sobrescribimos para usar 'documento' y 'password'
-        documento = attrs.get("documento")
+        # Sobrescribimos para usar 'email' y 'password'
+        email = attrs.get("email")
         password = attrs.get("password")
 
-        user = authenticate(request=self.context.get('request'), documento=documento, password=password)
+        user = authenticate(request=self.context.get('request'), email=email, password=password)
 
         if not user:
             raise serializers.ValidationError("Credenciales inválidas, verifica tu correo y contraseña.")

@@ -1,9 +1,11 @@
 import React, { useState } from "react";
 import { useTranslation } from "react-i18next";
 import { ChevronLeft, ChevronRight } from "lucide-react";
+import { useBreakpoints } from "../hooks/useMediaQuery";
 
 const Calendar = ({ loans = [], onDateSelect }) => {
   const { t } = useTranslation();
+  const { isMobile, isTablet } = useBreakpoints();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [selectedDate, setSelectedDate] = useState(null);
 
@@ -23,8 +25,10 @@ const Calendar = ({ loans = [], onDateSelect }) => {
   // Obtener el día de la semana del primer día del mes (0 = Domingo, 1 = Lunes, etc.)
   const firstDayOfWeek = firstDayOfMonth.getDay();
 
-  // Nombres de los días de la semana
-  const weekDays = ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
+  // Nombres de los días de la semana - Adaptados para móvil
+  const weekDays = isMobile 
+    ? ["D", "L", "M", "X", "J", "V", "S"] 
+    : ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"];
 
   // Nombres de los meses
   const months = [
@@ -92,7 +96,7 @@ const Calendar = ({ loans = [], onDateSelect }) => {
 
     // Agregar días vacíos para alinear con el día de la semana correcto
     for (let i = 0; i < firstDayOfWeek; i++) {
-      days.push(<div key={`empty-${i}`} className="h-10 w-10"></div>);
+      days.push(<div key={`empty-${i}`} className={`${isMobile ? 'h-12 w-12' : 'h-10 w-10'}`}></div>);
     }
 
     // Agregar los días del mes
@@ -114,7 +118,7 @@ const Calendar = ({ loans = [], onDateSelect }) => {
         <div
           key={day}
           onClick={() => handleDateClick(day)}
-          className={`h-10 w-10 flex items-center justify-center rounded-full cursor-pointer
+          className={`${isMobile ? 'h-12 w-12 text-base' : 'h-10 w-10 text-sm'} flex items-center justify-center rounded-full cursor-pointer min-h-touch
                      ${
                        isToday
                          ? "bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-300"
@@ -149,33 +153,33 @@ const Calendar = ({ loans = [], onDateSelect }) => {
       <div className="flex items-center justify-between mb-4">
         <button
           onClick={prevMonth}
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+          className={`${isMobile ? 'p-3' : 'p-2'} rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 min-h-touch`}
         >
-          <ChevronLeft className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <ChevronLeft className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'} text-gray-600 dark:text-gray-400`} />
         </button>
-        <h2 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h2 className={`${isMobile ? 'text-base' : 'text-lg'} font-semibold text-gray-900 dark:text-white`}>
           {months[currentDate.getMonth()]} {currentDate.getFullYear()}
         </h2>
         <button
           onClick={nextMonth}
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700"
+          className={`${isMobile ? 'p-3' : 'p-2'} rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 min-h-touch`}
         >
-          <ChevronRight className="h-5 w-5 text-gray-600 dark:text-gray-400" />
+          <ChevronRight className={`${isMobile ? 'h-6 w-6' : 'h-5 w-5'} text-gray-600 dark:text-gray-400`} />
         </button>
       </div>
 
-      <div className="grid grid-cols-7 gap-1 mb-2">
+      <div className={`grid grid-cols-7 ${isMobile ? 'gap-1' : 'gap-1'} mb-2`}>
         {weekDays.map((day) => (
           <div
             key={day}
-            className="h-8 flex items-center justify-center text-sm font-medium text-gray-500 dark:text-gray-400"
+            className={`${isMobile ? 'h-10' : 'h-8'} flex items-center justify-center ${isMobile ? 'text-sm' : 'text-sm'} font-medium text-gray-500 dark:text-gray-400`}
           >
             {day}
           </div>
         ))}
       </div>
 
-      <div className="grid grid-cols-7 gap-1">{generateCalendarDays()}</div>
+      <div className={`grid grid-cols-7 ${isMobile ? 'gap-1' : 'gap-1'}`}>{generateCalendarDays()}</div>
 
       <div className="mt-4 flex items-center">
         <div className="w-4 h-4 border-2 border-green-500 dark:border-green-400 rounded-full mr-2"></div>
