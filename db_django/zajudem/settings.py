@@ -41,11 +41,11 @@ INSTALLED_APPS = [
     'corsheaders',
     'apps.users', #Agrego la aplicación users
     'apps.fichas', #Agrego la aplicación fichas
-    'apps.aulas', #Agrego la aplicación aulas
-    'apps.inventario', #Agrego la aplicación inventario
-    'apps.programacion', #Agrego la aplicación programacion
+    'apps.novedades', #Agrego la aplicación novedades
+    'apps.equipos', #Agrego la aplicación equipos
+    'apps.ambiente', #Agrego la aplicación ambiente
+    'apps.programaciones', #Agrego la aplicación programacion
     'apps.reportes', #Agrego la aplicación reportes
-    'apps.asignaciones', #Agrego la aplicación asignaciones
     'rest_framework', #Agrego la aplicación rest_framework
     #'rest_framework.authtoken', #Agrego la aplicación rest_framework.authtoken para autenticación
     'rest_framework_simplejwt', #Agrego la aplicación rest_framework_simplejwt para autenticación
@@ -111,7 +111,7 @@ WSGI_APPLICATION = 'zajudem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', #Conexión al gestor de base de datos en este caso postgresql
-        'NAME': 'zajudemborra', #Nombre de la base de datos
+        'NAME': 'senasec', #Nombre de la base de datos
         'USER': 'postgres', #Usuario de la base de datos
         'PASSWORD': '0000', #Contraseña de la base de datos
         'HOST': '127.0.0.1', #Host de la base de datos

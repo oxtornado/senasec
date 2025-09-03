@@ -22,12 +22,12 @@ from rest_framework_simplejwt.views import TokenRefreshView
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/', include('apps.users.urls')),
-    path('asignaciones/', include('apps.asignaciones.urls')), # URL para las asignaciones
     path('fichas/', include('apps.fichas.urls')), # URL para las fichas
-    path('aulas/', include('apps.aulas.urls')), # URL para las aulas
-    path('inventario/', include('apps.inventario.urls')), # URL para el inventario
-    path('programacion/', include('apps.programacion.urls')), # URL para la programación
-    path('reporte/', include('apps.reportes.urls')), # URL para los reportes
+    path('ambiente/', include('apps.ambiente.urls')), # URL para las ambientes
+    path('novedades/', include('apps.novedades.urls')), # URL para las novedades
+    path('equipos/', include('apps.equipos.urls')), # URL para los equipos
+    path('programaciones/', include('apps.programaciones.urls')), # URL para la programación
+    path('reportes/', include('apps.reportes.urls')), # URL para los reportes
     path('login/', Login.as_view(), name='login'), # URL para pruebas de inicio de sesión
     path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'), # Este es el path para refrescar el token
     path('logout/', LogoutView.as_view(), name='logout'), # Este es el path para cerrar sesión
