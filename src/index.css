@@ -1,3 +1,28 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* Estilos globales para fuentes más grandes */
+body {
+  font-size: 18px;
+  line-height: 1.7;
+  background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 25%, #cbd5e1 50%, #94a3b8 100%);
+  min-height: 100vh;
+}
+
+/* Aumentar tamaños de texto base */
+.text-xs { font-size: 0.875rem; }
+.text-sm { font-size: 1.125rem; }
+.text-base { font-size: 1.25rem; }
+.text-lg { font-size: 1.5rem; }
+.text-xl { font-size: 1.75rem; }
+.text-2xl { font-size: 2.25rem; }
+.text-3xl { font-size: 2.75rem; }
+.text-4xl { font-size: 3.5rem; }
+.text-5xl { font-size: 4rem; }
+
+/* Fondo principal de la aplicación */
+#root {
+  background: linear-gradient(135deg, #f1f5f9 0%, #e2e8f0 20%, #cbd5e1 40%, #94a3b8 60%, #64748b 100%);
+  min-height: 100vh;
+}

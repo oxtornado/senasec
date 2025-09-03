@@ -47,26 +47,44 @@ const Loans = () => {
   const currentYear = currentWeek.getFullYear();
   const isCurrentWeek = getWeekNumber(new Date()) === weekNumber && new Date().getFullYear() === currentYear;
 
-  // Solo las 3 jornadas completas + horario de aseo
+  // Franjas horarias específicas por hora
   const timeSlots = [
-    { time: '07:00 - 13:00', label: 'JORNADA MAÑANA', icon: '🌅', gradient: 'from-slate-500 to-slate-600' },
-    { time: '13:00 - 13:30', label: 'HORARIO DE ASEO', icon: '🧹', gradient: 'from-amber-500 to-orange-500' },
-    { time: '13:30 - 18:00', label: 'JORNADA TARDE', icon: '☀️', gradient: 'from-blue-600 to-slate-600' },
-    { time: '18:30 - 22:00', label: 'JORNADA NOCHE', icon: '🌙', gradient: 'from-indigo-600 to-slate-700' }
+    // Jornada Mañana
+    { time: '07:00 - 08:00', label: '07:00 - 08:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '08:00 - 09:00', label: '08:00 - 09:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '09:00 - 10:00', label: '09:00 - 10:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '10:00 - 11:00', label: '10:00 - 11:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '11:00 - 12:00', label: '11:00 - 12:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '12:00 - 13:00', label: '12:00 - 13:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    // Horario de Aseo
+    { time: '13:00 - 13:30', label: t('cleaningTime'), icon: '🧹', gradient: 'from-amber-500 to-orange-500' },
+    // Jornada Tarde
+    { time: '13:30 - 14:30', label: '13:30 - 14:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '14:30 - 15:30', label: '14:30 - 15:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '15:30 - 16:30', label: '15:30 - 16:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '16:30 - 17:30', label: '16:30 - 17:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '17:30 - 18:00', label: '17:30 - 18:00', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    // Jornada Noche
+    { time: '18:00 - 19:00', label: '18:00 - 19:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' },
+    { time: '19:00 - 20:00', label: '19:00 - 20:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' },
+    { time: '20:00 - 21:00', label: '20:00 - 21:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' },
+    { time: '21:00 - 22:00', label: '21:00 - 22:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' }
   ];
   
   const days = [
-    { name: 'LUNES', short: 'LUN', color: 'from-slate-600 to-slate-700' },
-    { name: 'MARTES', short: 'MAR', color: 'from-gray-600 to-slate-600' },
-    { name: 'MIÉRCOLES', short: 'MIÉ', color: 'from-zinc-600 to-gray-600' },
-    { name: 'JUEVES', short: 'JUE', color: 'from-stone-600 to-zinc-600' },
-    { name: 'VIERNES', short: 'VIE', color: 'from-neutral-600 to-stone-600' },
-    { name: 'SÁBADO', short: 'SÁB', color: 'from-gray-700 to-slate-700' }
+    { name: t('monday'), short: t('mon'), color: 'from-slate-600 to-slate-700' },
+    { name: t('tuesday'), short: t('tue'), color: 'from-gray-600 to-slate-600' },
+    { name: t('wednesday'), short: t('wed'), color: 'from-zinc-600 to-gray-600' },
+    { name: t('thursday'), short: t('thu'), color: 'from-stone-600 to-zinc-600' },
+    { name: t('friday'), short: t('fri'), color: 'from-neutral-600 to-stone-600' },
+    { name: t('saturday'), short: t('sat'), color: 'from-gray-700 to-slate-700' }
   ];
   
   // Formatear fecha para mostrar
   const formatDate = (date: Date) => {
-    return date.toLocaleDateString('es-ES', { 
+    const { language } = useLanguage();
+    const locale = language === 'es' ? 'es-ES' : 'en-US';
+    return date.toLocaleDateString(locale, { 
       day: '2-digit', 
       month: '2-digit'
     });
@@ -77,9 +95,9 @@ const Loans = () => {
     // Verificar si es horario de aseo
     if (timeSlot === '13:00 - 13:30') {
       return {
-        subject: 'ASEO - COLABORADOR DE TURNO',
+        subject: t('cleaningCollaborator'),
         teacher: '',
-        code: 'AULAS DE SISTEMAS',
+        code: t('systemsClassrooms'),
         type: 'aseo'
       };
     }
@@ -139,13 +157,13 @@ const Loans = () => {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {t('schedulesDashboard')}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Sistema de horarios sincronizado en tiempo real</p>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">{t('realTimeScheduleSystem')}</p>
               </div>
             </div>
             <div className="flex items-center space-x-3">
               <div className="flex items-center space-x-2 bg-green-100 dark:bg-green-900 px-4 py-2 rounded-full">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">SINCRONIZADO</span>
+                <span className="text-sm font-medium text-green-700 dark:text-green-300">{t('synchronized')}</span>
               </div>
               <div className={`px-4 py-2 rounded-full ${
                 isCurrentWeek 
@@ -157,12 +175,12 @@ const Loans = () => {
                     ? 'text-blue-700 dark:text-blue-300' 
                     : 'text-gray-700 dark:text-gray-300'
                 }`}>
-                  {isCurrentWeek ? 'SEMANA ACTUAL' : `SEMANA ${weekNumber}`}
+                  {isCurrentWeek ? t('currentWeek') : `${t('week')} ${weekNumber}`}
                 </span>
               </div>
               <div className="bg-purple-100 dark:bg-purple-900 px-4 py-2 rounded-full">
                 <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                  AÑO {currentYear}
+                  {t('year')} {currentYear}
                 </span>
               </div>
             </div>
@@ -174,20 +192,20 @@ const Loans = () => {
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <BookOpen className="h-5 w-5 mr-2 text-blue-600" />
-          Leyenda de Estados
+          {t('statusLegend')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-xl">
             <div className="w-6 h-6 bg-gradient-to-r from-slate-600 to-slate-700 rounded-lg shadow-lg"></div>
-            <span className="font-medium text-slate-700 dark:text-slate-300">Instructor Asignado</span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">{t('assignedInstructor')}</span>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900 dark:to-orange-900 rounded-xl">
             <div className="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg shadow-lg"></div>
-            <span className="font-medium text-amber-700 dark:text-amber-300">Horario de Aseo</span>
+            <span className="font-medium text-amber-700 dark:text-amber-300">{t('cleaningTime')}</span>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl">
             <div className="w-6 h-6 bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg shadow-lg"></div>
-            <span className="font-medium text-gray-700 dark:text-gray-300">Disponible</span>
+            <span className="font-medium text-gray-700 dark:text-gray-300">{t('available')}</span>
           </div>
         </div>
       </div>
@@ -198,11 +216,11 @@ const Loans = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-white flex items-center">
               <Clock className="h-6 w-6 mr-3" />
-              Horario Semanal de Jornadas
+              {t('weeklySchedule')}
             </h2>
             <div className="flex items-center space-x-4">
               <div className="text-white text-right">
-                <div className="text-sm opacity-90">Semana {weekNumber} de {currentYear}</div>
+                <div className="text-sm opacity-90">{t('week')} {weekNumber} {t('of')} {currentYear}</div>
                 <div className="text-xs opacity-75">
                   {formatDate(weekDates[0])} - {formatDate(weekDates[5])}
                 </div>
@@ -211,7 +229,7 @@ const Loans = () => {
                 <button
                   onClick={() => navigateWeek('prev')}
                   className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-200"
-                  title="Semana anterior"
+                  title={t('previousWeek')}
                 >
                   <ChevronLeft className="h-4 w-4 text-white" />
                 </button>
@@ -223,14 +241,14 @@ const Loans = () => {
                       : 'bg-white/20 hover:bg-white/30 text-white'
                   }`}
                   disabled={isCurrentWeek}
-                  title="Ir a semana actual"
+                  title={t('goToCurrentWeek')}
                 >
-                  HOY
+                  {t('today')}
                 </button>
                 <button
                   onClick={() => navigateWeek('next')}
                   className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-200"
-                  title="Semana siguiente"
+                  title={t('nextWeek')}
                 >
                   <ChevronRight className="h-4 w-4 text-white" />
                 </button>

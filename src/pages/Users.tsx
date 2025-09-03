@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Search, Filter, Edit, Trash2, Plus, X, User, Camera } from 'lucide-react';
 import { getCurrentUser } from '../services/auth';
+import { useLanguage } from '../contexts/LanguageContext';
 
 interface UserData {
   id: number;
@@ -13,6 +14,7 @@ interface UserData {
 }
 
 const Users = () => {
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -66,7 +68,7 @@ const Users = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-          <p className="text-gray-600 dark:text-gray-400">Cargando...</p>
+          <p className="text-gray-600 dark:text-gray-400">{t('loading')}</p>
         </div>
       </div>
     );
@@ -77,10 +79,10 @@ const Users = () => {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Acceso Restringido
+            {t('restrictedAccess')}
           </h1>
           <p className="text-gray-600 dark:text-gray-400">
-            Esta sección solo está disponible para administradores.
+            {t('adminOnlySection')}
           </p>
         </div>
       </div>
@@ -165,10 +167,10 @@ const Users = () => {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Gestión de Usuarios
+              {t('userManagement')}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Administrar usuarios del sistema SENASEC
+              {t('manageSystemUsers')}
             </p>
           </div>
         </div>
@@ -182,7 +184,7 @@ const Users = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Buscar usuarios por nombre..."
+              placeholder={t('searchUsersByName')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -199,7 +201,7 @@ const Users = () => {
                 onChange={(e) => setRoleFilter(e.target.value)}
                 className="pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white appearance-none"
               >
-                <option value="todos">Todos los roles</option>
+                <option value="todos">{t('allRoles')}</option>
                 {roles.map(role => (
                   <option key={role} value={role}>{role}</option>
                 ))}
@@ -212,7 +214,7 @@ const Users = () => {
               className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
             >
               <Plus className="h-4 w-4" />
-              <span>Crear Usuario</span>
+              <span>{t('createUser')}</span>
             </button>
           </div>
         </div>
@@ -225,13 +227,13 @@ const Users = () => {
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Nombres y Apellidos
+                  {t('fullName')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Rol
+                  {t('role')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Acciones
+                  {t('actions')}
                 </th>
               </tr>
             </thead>
@@ -262,14 +264,14 @@ const Users = () => {
                       <button
                         onClick={() => handleEditUser(userData)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                        title="Editar usuario"
+                        title={t('editUser')}
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteUser(userData)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        title="Eliminar usuario"
+                        title={t('deleteUser')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -284,7 +286,7 @@ const Users = () => {
         {filteredUsers.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              No se encontraron usuarios que coincidan con los criterios de búsqueda.
+              {t('noUsersFound')}
             </p>
           </div>
         )}
@@ -296,7 +298,7 @@ const Users = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {isEditing ? 'Editar Usuario' : 'Crear Nuevo Usuario'}
+                {isEditing ? t('editUser') : t('createNewUser')}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -310,13 +312,13 @@ const Users = () => {
               {/* Nombre completo */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Nombre completo
+                  {t('fullName')}
                 </label>
                 <input
                   type="text"
                   value={formData.fullName}
                   onChange={(e) => handleInputChange('fullName', e.target.value)}
-                  placeholder="Ingrese nombre completo"
+                  placeholder={t('enterFullName')}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 />
@@ -325,13 +327,13 @@ const Users = () => {
               {/* Correo electrónico */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Correo electrónico
+                  {t('email')}
                 </label>
                 <input
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange('email', e.target.value)}
-                  placeholder="Ingrese correo electrónico"
+                  placeholder={t('enterEmail')}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 />
@@ -340,7 +342,7 @@ const Users = () => {
               {/* Rol */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Rol
+                  {t('role')}
                 </label>
                 <select
                   value={formData.role}
@@ -348,7 +350,7 @@ const Users = () => {
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">Seleccione rol</option>
+                  <option value="">{t('selectRole')}</option>
                   {roles.map(role => (
                     <option key={role} value={role}>{role}</option>
                   ))}
@@ -358,13 +360,13 @@ const Users = () => {
               {/* Teléfono */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Teléfono
+                  {t('phone')}
                 </label>
                 <input
                   type="tel"
                   value={formData.phone}
                   onChange={(e) => handleInputChange('phone', e.target.value)}
-                  placeholder="Ingrese número de teléfono"
+                  placeholder={t('enterPhone')}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 />
@@ -373,13 +375,13 @@ const Users = () => {
               {/* Contraseña */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {isEditing ? 'Nueva contraseña (opcional)' : 'Contraseña'}
+                  {isEditing ? t('newPasswordOptional') : t('password')}
                 </label>
                 <input
                   type="password"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  placeholder={isEditing ? 'Ingrese nueva contraseña' : 'Ingrese contraseña'}
+                  placeholder={isEditing ? t('enterNewPassword') : t('enterPassword')}
                   required={!isEditing}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 />
@@ -388,7 +390,7 @@ const Users = () => {
               {/* Captura facial */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Captura facial
+                  {t('facialCapture')}
                 </label>
                 <div className="flex items-center space-x-2">
                   <input
@@ -409,7 +411,7 @@ const Users = () => {
                     className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md cursor-pointer hover:bg-gray-50 dark:hover:bg-gray-700 dark:bg-gray-700 dark:text-white"
                   >
                     <Camera className="h-4 w-4" />
-                    <span>Suba o capture imagen facial</span>
+                    <span>{t('uploadOrCaptureFacialImage')}</span>
                   </label>
                 </div>
               </div>
@@ -424,7 +426,7 @@ const Users = () => {
                       : 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500'
                   }`}
                 >
-                  {isEditing ? 'Actualizar' : 'Crear usuario'}
+                  {isEditing ? t('update') : t('createUser')}
                 </button>
               </div>
             </form>
@@ -446,15 +448,15 @@ const Users = () => {
               </div>
               
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                ADVERTENCIA
+                {t('warning')}
               </h3>
               
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                Está a punto de borrar un usuario. Esta acción no se puede deshacer.
+                {t('deleteUserWarning')}
               </p>
               
               <div className="text-sm text-gray-700 dark:text-gray-300 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                <strong>Usuario a eliminar:</strong><br />
+                <strong>{t('userToDelete')}:</strong><br />
                 {userToDelete.fullName}
               </div>
               
@@ -463,13 +465,13 @@ const Users = () => {
                   onClick={cancelDeleteUser}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={confirmDeleteUser}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
-                  Borrar usuario
+                  {t('deleteUser')}
                 </button>
               </div>
             </div>

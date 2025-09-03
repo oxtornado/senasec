@@ -20,7 +20,7 @@ import { useAssignments } from '../contexts/AssignmentsContext';
 import ReportModal from '../components/ReportModal';
 
 const Reports = () => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { reports, deleteReport, exportReports } = useReports();
   const { assignments } = useAssignments();
   
@@ -98,7 +98,7 @@ const Reports = () => {
                 {t('reportsDashboard')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Gestión y seguimiento de reportes de funcionarios
+                {t('reportsManagement')}
               </p>
             </div>
           </div>
@@ -108,14 +108,14 @@ const Reports = () => {
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download className="h-4 w-4 mr-2" />
-              Exportar
+              {t('export')}
             </button>
             <button
               onClick={() => setShowCreateModal(true)}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Crear reporte
+              {t('createReport')}
             </button>
           </div>
         </div>
@@ -129,7 +129,7 @@ const Reports = () => {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por funcionario..."
+              placeholder={t('searchByOfficial')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
@@ -141,7 +141,7 @@ const Reports = () => {
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Filtrar por ambiente o estado..."
+              placeholder={t('filterByEnvironmentOrStatus')}
               value={filterCriteria}
               onChange={(e) => setFilterCriteria(e.target.value)}
               className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
@@ -154,10 +154,10 @@ const Reports = () => {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Todos los estados</option>
-            <option value="Completo">Completo</option>
-            <option value="Pendiente">Pendiente</option>
-            <option value="Revisado">Revisado</option>
+            <option value="">{t('allStatuses')}</option>
+            <option value="Completo">{t('complete')}</option>
+            <option value="Pendiente">{t('pending')}</option>
+            <option value="Revisado">{t('reviewed')}</option>
           </select>
 
           {/* Rango de fechas */}
@@ -185,28 +185,28 @@ const Reports = () => {
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  No. Programación
+                  {t('programmingNumber')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Funcionario
+                  {t('official')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Fecha
+                  {t('date')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Hora Entrada
+                  {t('entryTime')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Hora Salida
+                  {t('exitTime')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Ambiente
+                  {t('environment')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Estado
+                  {t('status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Acciones
+                  {t('actions')}
                 </th>
               </tr>
             </thead>
@@ -225,7 +225,7 @@ const Reports = () => {
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {new Date(report.date).toLocaleDateString('es-ES')}
+                    {new Date(report.date).toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US')}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
@@ -285,10 +285,10 @@ const Reports = () => {
           <div className="text-center py-12">
             <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              No hay reportes
+              {t('noReports')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              No se encontraron reportes que coincidan con los criterios de búsqueda.
+              {t('noReportsFound')}
             </p>
           </div>
         )}
@@ -317,14 +317,14 @@ const Reports = () => {
                 <Trash2 className="h-6 w-6 text-red-600 dark:text-red-300" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                Confirmar eliminación
+                {t('confirmDeletion')}
               </h3>
             </div>
             <p className="text-gray-500 dark:text-gray-400 mb-6">
-              <strong>Advertencia:</strong> ¿Quiere borrar este reporte?
+              <strong>{t('warning')}:</strong> {t('deleteReportConfirmation')}
               <br />
               <span className="text-sm">
-                Reporte #{selectedReport.programmingNumber} - {selectedReport.officialName}
+                {t('report')} #{selectedReport.programmingNumber} - {selectedReport.officialName}
               </span>
             </p>
             <div className="flex justify-end space-x-3">
@@ -332,13 +332,13 @@ const Reports = () => {
                 onClick={() => setShowDeleteModal(false)}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
               >
-                Cancelar
+                {t('cancel')}
               </button>
               <button
                 onClick={confirmDelete}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
-                Eliminar
+                {t('delete')}
               </button>
             </div>
           </div>

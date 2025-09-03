@@ -58,18 +58,18 @@ const Layout = () => {
     if (!currentUser) return [];
     
     const baseNavigation = [
-      { name: "Ambientes", href: "/dashboard/inventory", icon: Package },
-      { name: "Programaciones", href: "/dashboard/loans", icon: Calendar },
-      { name: "Reportes", href: "/dashboard/reports", icon: BarChart3 },
+      { name: t('environments'), href: "/dashboard/inventory", icon: Package },
+      { name: t('schedules'), href: "/dashboard/loans", icon: Calendar },
+      { name: t('reports'), href: "/dashboard/reports", icon: BarChart3 },
     ];
     
     // Si es administrador, agregar opciones adicionales
     if (currentUser.is_admin) {
       return [
         ...baseNavigation,
-        { name: "Asignaciones", href: "/dashboard/assignments", icon: UserCheck },
-        { name: "Equipos", href: "/dashboard/equipment", icon: Settings },
-        { name: "Usuarios", href: "/dashboard/users", icon: Users },
+        { name: t('assignments'), href: "/dashboard/assignments", icon: UserCheck },
+        { name: t('equipment'), href: "/dashboard/equipment", icon: Settings },
+        { name: t('users'), href: "/dashboard/users", icon: Users },
       ];
     }
     
@@ -137,7 +137,7 @@ const Layout = () => {
                       ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
                       : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                   }`}>
-                    {currentUser.is_admin ? 'ADMIN' : 'USUARIO'}
+                    {currentUser.is_admin ? t('admin') : t('user')}
                   </span>
                 </div>
               )}
@@ -162,8 +162,13 @@ const Layout = () => {
                   }}
                   className="px-3 py-2 text-sm font-medium text-red-600 hover:bg-red-50 dark:text-red-400 dark:hover:bg-red-900 rounded-md"
                 >
-                  Cerrar Sesión
+                  {t('logout')}
                 </button>
+              </div>
+              
+              {/* Mobile Language Selector - Only visible on mobile */}
+              <div className="md:hidden">
+                <LanguageSelector />
               </div>
 
               {/* Mobile Menu Button */}
@@ -187,7 +192,7 @@ const Layout = () => {
             <div className="fixed inset-0 z-50 bg-black bg-opacity-50" onClick={() => setMobileMenuOpen(false)} />
             <div className="fixed inset-y-0 right-0 z-50 w-full max-w-sm bg-white dark:bg-gray-800 shadow-xl">
               <div className="flex h-16 items-center justify-between px-4 border-b dark:border-gray-700">
-                <span className="text-lg font-semibold text-gray-900 dark:text-white">Menú</span>
+                <span className="text-lg font-semibold text-gray-900 dark:text-white">{t('menu')}</span>
                 <button
                   onClick={() => setMobileMenuOpen(false)}
                   className="p-2 rounded-md text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700"
@@ -217,7 +222,7 @@ const Layout = () => {
                             ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
                             : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
                         }`}>
-                          {currentUser.is_admin ? 'ADMIN' : 'USUARIO'}
+                          {currentUser.is_admin ? t('admin') : t('user')}
                         </span>
                       </div>
                     </div>
@@ -250,12 +255,7 @@ const Layout = () => {
                 {/* Mobile Controls */}
                 <div className="pt-6 border-t dark:border-gray-700 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Idioma</span>
-                    <LanguageSelector />
-                  </div>
-                  
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tema</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('theme')}</span>
                     <button
                       onClick={toggleDarkMode}
                       className="p-2 rounded-md text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 min-h-touch"
@@ -275,7 +275,7 @@ const Layout = () => {
                     }}
                     className="w-full flex items-center justify-center px-4 py-3 text-base font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800 rounded-md min-h-touch"
                   >
-                    Cerrar Sesión
+                    {t('logout')}
                   </button>
                 </div>
               </div>

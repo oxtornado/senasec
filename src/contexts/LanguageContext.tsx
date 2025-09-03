@@ -12,6 +12,48 @@ const translations = {
     equipment: "Equipos",
     users: "Usuarios",
     logout: "Cerrar Sesión",
+    menu: "Menú",
+    language: "Idioma",
+    theme: "Tema",
+    
+    // Días de la semana
+    monday: "Lunes",
+    tuesday: "Martes", 
+    wednesday: "Miércoles",
+    thursday: "Jueves",
+    friday: "Viernes",
+    saturday: "Sábado",
+    
+    // Horarios y turnos
+    morningShift: "Turno Mañana",
+    afternoonShift: "Turno Tarde", 
+    nightShift: "Turno Noche",
+    cleaningTime: "Tiempo de Aseo",
+    allClassrooms: "Todas las aulas",
+    allInstructors: "Todos los instructores",
+    allShifts: "Todos los turnos",
+    free: "Libre",
+    legend: "Leyenda",
+    
+    // Dashboard stats
+    totalElements: "Elementos Totales",
+    availableElements: "Elementos Disponibles",
+    myActiveLoans: "Mis Préstamos Activos",
+    myOverdueLoans: "Mis Préstamos Vencidos",
+    totalMyLoans: "Total de Mis Préstamos",
+    attention: "Atención",
+    upToDate: "Al día",
+    welcome: "Bienvenido",
+    administrator: "Administrador",
+    standardUser: "Usuario Estándar",
+    admin: "ADMIN",
+    user: "USUARIO",
+    
+    // Notificaciones
+    youHaveOverdueLoans: "Tienes {{count}} préstamo(s) vencido(s)",
+    pleaseReturnItems: "Por favor, devuelve los elementos lo antes posible",
+    allLoansUpToDate: "¡Todos tus préstamos están al día!",
+    excellentLoanManagement: "Excelente gestión de tus préstamos",
     
     // Títulos principales
     mainDashboard: "Dashboard SISTEMAS 1",
@@ -116,6 +158,48 @@ const translations = {
     equipment: "Equipment",
     users: "Users",
     logout: "Logout",
+    menu: "Menu",
+    language: "Language",
+    theme: "Theme",
+    
+    // Days of the week
+    monday: "Monday",
+    tuesday: "Tuesday",
+    wednesday: "Wednesday", 
+    thursday: "Thursday",
+    friday: "Friday",
+    saturday: "Saturday",
+    
+    // Schedules and shifts
+    morningShift: "Morning Shift",
+    afternoonShift: "Afternoon Shift",
+    nightShift: "Night Shift", 
+    cleaningTime: "Cleaning Time",
+    allClassrooms: "All classrooms",
+    allInstructors: "All instructors",
+    allShifts: "All shifts",
+    free: "Free",
+    legend: "Legend",
+    
+    // Dashboard stats
+    totalElements: "Total Elements",
+    availableElements: "Available Elements",
+    myActiveLoans: "My Active Loans",
+    myOverdueLoans: "My Overdue Loans",
+    totalMyLoans: "Total My Loans",
+    attention: "Attention",
+    upToDate: "Up to Date",
+    welcome: "Welcome",
+    administrator: "Administrator",
+    standardUser: "Standard User",
+    admin: "ADMIN",
+    user: "USER",
+    
+    // Notifications
+    youHaveOverdueLoans: "You have {{count}} overdue loan(s)",
+    pleaseReturnItems: "Please return the items as soon as possible",
+    allLoansUpToDate: "All your loans are up to date!",
+    excellentLoanManagement: "Excellent management of your loans",
     
     // Main titles
     mainDashboard: "SYSTEMS 1 Dashboard",
@@ -232,11 +316,16 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
     console.log('=== CONTEXTO: CAMBIO DE IDIOMA ===');
     console.log('Idioma anterior:', language);
     console.log('Nuevo idioma:', lang);
-    console.log('setLanguageState function:', typeof setLanguageState);
     
     try {
+      // Forzar re-render completo
       setLanguageState(lang);
       localStorage.setItem('senasec-language', lang);
+      
+      // Forzar actualización del DOM
+      setTimeout(() => {
+        window.dispatchEvent(new Event('languageChanged'));
+      }, 0);
       
       console.log('Estado actualizado exitosamente');
       console.log('Idioma guardado en localStorage:', localStorage.getItem('senasec-language'));
@@ -246,9 +335,13 @@ export const LanguageProvider: React.FC<{ children: ReactNode }> = ({ children }
   };
 
   const t = (key: string): string => {
-    const translation = translations[language]?.[key as keyof typeof translations.es];
+    // Obtener idioma actual del estado más reciente
+    const currentLang = language;
+    const translation = translations[currentLang]?.[key as keyof typeof translations.es];
+    
     if (!translation) {
-      console.warn(`Translation missing for key: ${key} in language: ${language}`);
+      console.warn(`Translation missing for key: ${key} in language: ${currentLang}`);
+      // Intentar con archivos JSON externos como fallback
       return key;
     }
     return translation;

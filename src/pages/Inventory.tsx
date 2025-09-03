@@ -2,8 +2,10 @@ import { useState } from 'react';
 import { Monitor, Tv, DoorOpen, X, AlertCircle, CheckCircle, Clock, Wrench, List, Grid3X3 } from 'lucide-react';
 import { useEquipment, Equipment } from '../contexts/EquipmentContext';
 import { useBreakpoints } from '../hooks/useMediaQuery';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Inventory = () => {
+  const { t } = useLanguage();
   const { equipment } = useEquipment();
   const { isMobile, isTablet } = useBreakpoints();
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
@@ -23,31 +25,31 @@ const Inventory = () => {
   
   const getStatusColor = (status: string) => {
     switch (status) {
-      case 'Disponible': return 'bg-green-500 hover:bg-green-600';
-      case 'En Uso': return 'bg-blue-500 hover:bg-blue-600';
-      case 'Mantenimiento': return 'bg-yellow-500 hover:bg-yellow-600';
-      case 'Dañado': return 'bg-red-500 hover:bg-red-600';
+      case 'disponible': return 'bg-green-500 hover:bg-green-600';
+      case 'en_uso': return 'bg-blue-500 hover:bg-blue-600';
+      case 'mantenimiento': return 'bg-yellow-500 hover:bg-yellow-600';
+      case 'dañado': return 'bg-red-500 hover:bg-red-600';
       default: return 'bg-gray-500 hover:bg-gray-600';
     }
   };
   
   const getStatusIcon = (status: string) => {
     switch (status) {
-      case 'Disponible': return <CheckCircle className="h-4 w-4" />;
-      case 'En Uso': return <Clock className="h-4 w-4" />;
-      case 'Mantenimiento': return <Wrench className="h-4 w-4" />;
-      case 'Dañado': return <AlertCircle className="h-4 w-4" />;
+      case 'disponible': return <CheckCircle className="h-4 w-4" />;
+      case 'en_uso': return <Clock className="h-4 w-4" />;
+      case 'mantenimiento': return <Wrench className="h-4 w-4" />;
+      case 'dañado': return <AlertCircle className="h-4 w-4" />;
       default: return <Monitor className="h-4 w-4" />;
     }
   };
   
   const getStatusText = (status: string) => {
     switch (status) {
-      case 'disponible': return 'Disponible';
-      case 'en_uso': return 'En Uso';
-      case 'mantenimiento': return 'Mantenimiento';
-      case 'dañado': return 'Dañado';
-      default: return 'Desconocido';
+      case 'disponible': return t('available');
+      case 'en_uso': return t('inUse');
+      case 'mantenimiento': return t('maintenance');
+      case 'dañado': return t('damaged');
+      default: return t('unknown');
     }
   };
   
@@ -74,10 +76,10 @@ const Inventory = () => {
             </div>
             <div>
               <h2 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white">
-                Ambientes – Aula de Sistemas 1
+                {t('environmentsSystemsClassroom')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Distribución y estado de equipos en el aula
+                {t('equipmentDistributionStatus')}
               </p>
             </div>
           </div>
@@ -94,7 +96,7 @@ const Inventory = () => {
                 }`}
               >
                 <Grid3X3 className="h-4 w-4" />
-                <span>Esquema</span>
+                <span>{t('schema')}</span>
               </button>
               <button
                 onClick={() => setViewMode('list')}
@@ -105,7 +107,7 @@ const Inventory = () => {
                 }`}
               >
                 <List className="h-4 w-4" />
-                <span>Lista</span>
+                <span>{t('list')}</span>
               </button>
             </div>
           )}
@@ -114,23 +116,23 @@ const Inventory = () => {
 
       {/* Leyenda de Estados */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Leyenda de Estados</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">{t('statusLegend')}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">Disponible</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('available')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-blue-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">En Uso</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('inUse')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">Mantenimiento</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('maintenance')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-red-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">Dañado</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('damaged')}</span>
           </div>
         </div>
       </div>
@@ -139,7 +141,7 @@ const Inventory = () => {
       {(isMobile || viewMode === 'list') ? (
         /* Vista Lista para Móviles */
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Lista de Equipos</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('equipmentList')}</h3>
           
           {/* TV */}
           <div className="mb-6 p-4 bg-green-50 dark:bg-green-900/20 rounded-lg border border-green-200 dark:border-green-800">
@@ -152,12 +154,12 @@ const Inventory = () => {
                   <Tv className="h-6 w-6 text-green-600 dark:text-green-300" />
                 </div>
                 <div className="text-left">
-                  <h4 className="font-medium text-gray-900 dark:text-white">Televisor del Aula</h4>
+                  <h4 className="font-medium text-gray-900 dark:text-white">{t('classroomTV')}</h4>
                   <p className="text-sm text-gray-500 dark:text-gray-400">{tvData.brand} - {tvData.model}</p>
                 </div>
               </div>
               <div className="px-3 py-1 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-full text-sm font-medium">
-                Disponible
+                {t('available')}
               </div>
             </button>
           </div>
@@ -180,7 +182,7 @@ const Inventory = () => {
                       {getStatusIcon(equipment.status)}
                     </div>
                     <div className="text-left">
-                      <h4 className="font-medium text-gray-900 dark:text-white">Equipo #{equipment.position}</h4>
+                      <h4 className="font-medium text-gray-900 dark:text-white">{t('equipment')} #{equipment.position}</h4>
                       <p className="text-sm text-gray-500 dark:text-gray-400">{equipment.brand} - {equipment.model}</p>
                       <p className="text-xs text-gray-400 dark:text-gray-500 font-mono">{equipment.serialNumber}</p>
                     </div>
@@ -225,7 +227,7 @@ const Inventory = () => {
       ) : (
         /* Vista Esquemática Original para Desktop */
         <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Distribución del Aula</h3>
+          <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('classroomDistribution')}</h3>
 
           {/* Grid del Aula */}
           <div className="relative bg-gray-50 dark:bg-gray-700 p-8 rounded-lg" style={{ minHeight: '500px' }}>
@@ -249,7 +251,7 @@ const Inventory = () => {
               {/* Puerta */}
               <div className="w-20 h-16 bg-yellow-400 rounded-lg flex items-center justify-center ml-8">
                 <DoorOpen className="h-8 w-8 text-yellow-800" />
-                <span className="text-xs font-bold text-yellow-800 ml-1">PUERTA</span>
+                <span className="text-xs font-bold text-yellow-800 ml-1">{t('door')}</span>
               </div>
 
               {[3, 2, 1].map((pos) => {
@@ -289,7 +291,7 @@ const Inventory = () => {
             {/* Área Central - Espacio libre */}
             <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
               <div className="w-32 h-16 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center">
-                <span className="text-gray-500 dark:text-gray-400 text-sm">Área Libre</span>
+                <span className="text-gray-500 dark:text-gray-400 text-sm">{t('freeArea')}</span>
               </div>
             </div>
 
@@ -328,7 +330,7 @@ const Inventory = () => {
       {/* Cuadro de Diálogo para Reportes */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4 md:p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Registre aquí la novedad
+          {t('registerIncident')}
         </h3>
         <div className="space-y-4">
           <textarea
@@ -337,28 +339,28 @@ const Inventory = () => {
             maxLength={500}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white min-h-touch"
-            placeholder="Registra si hay alguna novedad con algún equipo, daños o pérdidas. Máx. 500 caracteres"
+            placeholder={t('incidentPlaceholder')}
           />
           <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center space-y-2 sm:space-y-0">
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {reportText.length}/500 caracteres
+              {reportText.length}/500 {t('characters')}
             </span>
             <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-2">
               <button
                 onClick={() => {
-                  alert('Aula sin novedad registrada correctamente');
+                  alert(t('noIncidentRegistered'));
                   setReportText('');
                 }}
                 className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500 min-h-touch"
               >
-                Aula S/N
+                {t('noIncident')}
               </button>
               <button
                 onClick={handleReportSubmit}
                 disabled={!reportText.trim()}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed min-h-touch"
               >
-                Enviar
+                {t('send')}
               </button>
             </div>
           </div>
@@ -371,7 +373,7 @@ const Inventory = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Equipo #{selectedEquipment.position}
+                {t('equipment')} #{selectedEquipment.position}
               </h3>
               <button
                 onClick={() => setSelectedEquipment(null)}
@@ -398,15 +400,15 @@ const Inventory = () => {
               {/* Información del Equipo */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Marca</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('brand')}</label>
                   <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.brand}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('model')}</label>
                   <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.model}</p>
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Serie</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('serialNumber')}</label>
                   <p className="text-sm text-gray-900 dark:text-white font-mono break-all">{selectedEquipment.serialNumber}</p>
                 </div>
               </div>
@@ -414,7 +416,7 @@ const Inventory = () => {
               {/* Accesorios */}
               {selectedEquipment.accessories && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Accesorios</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">{t('accessories')}</label>
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-2">
                     <div className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
                       selectedEquipment.accessories.screen ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
@@ -448,7 +450,7 @@ const Inventory = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Televisor del Aula
+                {t('classroomTV')}
               </h3>
               <button
                 onClick={() => setSelectedTV(false)}
@@ -462,15 +464,15 @@ const Inventory = () => {
               {/* Información del TV */}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Marca</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('brand')}</label>
                   <p className="text-sm text-gray-900 dark:text-white">{tvData.brand}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('model')}</label>
                   <p className="text-sm text-gray-900 dark:text-white">{tvData.model}</p>
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Serie</label>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">{t('serialNumber')}</label>
                   <p className="text-sm text-gray-900 dark:text-white font-mono break-all">{tvData.serialNumber}</p>
                 </div>
               </div>

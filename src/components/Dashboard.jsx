@@ -1,23 +1,24 @@
 import React, { useState, useEffect } from "react";
-import { useTranslation } from "react-i18next";
+import { useLanguage } from '../contexts/LanguageContext';
 import { Package, Calendar, AlertTriangle, CheckCircle, User, Shield } from "lucide-react";
 import { getInventoryItems } from "../services/inventory";
 import { getLoans } from "../services/loans";
 import { getCurrentUser } from "../services/auth";
+import WeeklySchedule from "./WeeklySchedule";
 
 const StatCard = ({ title, value, icon: Icon, color }) => {
   return (
     <div
-      className={`bg-white dark:bg-gray-800 rounded-lg shadow p-6 flex items-center`}
+      className={`bg-gradient-to-br from-slate-50 to-gray-100 dark:bg-gradient-to-br dark:from-gray-800 dark:to-gray-900 rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 flex items-center border border-gray-200/50 dark:border-gray-700/50`}
     >
-      <div className={`p-3 rounded-full ${color} mr-4`}>
-        <Icon className="h-6 w-6 text-white" />
+      <div className={`p-4 rounded-2xl ${color} mr-6 shadow-lg`}>
+        <Icon className="h-8 w-8 text-white" />
       </div>
       <div>
-        <p className="text-sm font-medium text-gray-500 dark:text-gray-400">
+        <p className="text-2xl font-semibold text-gray-600 dark:text-gray-300 mb-2">
           {title}
         </p>
-        <p className="text-2xl font-semibold text-gray-900 dark:text-white">
+        <p className="text-6xl font-bold text-gray-800 dark:text-white">
           {value}
         </p>
       </div>
@@ -26,7 +27,7 @@ const StatCard = ({ title, value, icon: Icon, color }) => {
 };
 
 const Dashboard = () => {
-  const { t } = useTranslation();
+  const { t } = useLanguage();
   const [stats, setStats] = useState({
     totalItems: 0,
     availableItems: 0,
@@ -113,43 +114,41 @@ const Dashboard = () => {
   if (!currentUser) {
     return (
       <div className="flex justify-center py-8">
-        <p className="text-red-500">Error al cargar la información del usuario</p>
+        <p className="text-red-500">{t('userLoadError')}</p>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 bg-gradient-to-br from-amber-50 via-orange-50 to-red-100 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 min-h-screen p-6">
       {/* Header con información del usuario */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-gradient-to-r from-white to-slate-50 dark:bg-gradient-to-r dark:from-gray-800 dark:to-gray-900 rounded-2xl shadow-xl border border-gray-200/50 dark:border-gray-700/50 p-8">
         <div className="flex items-center justify-between">
-          <div className="flex items-center space-x-4">
-            <div className={`p-3 rounded-full ${
-              currentUser.is_admin ? 'bg-red-100 dark:bg-red-900' : 'bg-blue-100 dark:bg-blue-900'
+          <div className="flex items-center space-x-6">
+            <div className={`p-4 rounded-2xl shadow-lg ${
+              currentUser.is_admin ? 'bg-gradient-to-br from-red-500 to-red-600' : 'bg-gradient-to-br from-blue-500 to-blue-600'
             }`}>
               {currentUser.is_admin ? (
-                <Shield className={`h-6 w-6 ${
-                  currentUser.is_admin ? 'text-red-600 dark:text-red-300' : 'text-blue-600 dark:text-blue-300'
-                }`} />
+                <Shield className="h-10 w-10 text-white" />
               ) : (
-                <User className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+                <User className="h-10 w-10 text-white" />
               )}
             </div>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+              <h2 className="text-5xl font-bold text-gray-800 dark:text-white mb-3">
                 {t("dashboard")}
               </h2>
-              <p className="text-sm text-gray-500 dark:text-gray-400">
-                Bienvenido, {currentUser.full_name} ({currentUser.is_admin ? 'Administrador' : 'Usuario Estándar'})
+              <p className="text-2xl text-gray-600 dark:text-gray-300">
+                {t('welcome')}, {currentUser.full_name} ({currentUser.is_admin ? t('administrator') : t('standardUser')})
               </p>
             </div>
           </div>
-          <div className={`px-3 py-1 rounded-full text-xs font-medium ${
+          <div className={`px-4 py-2 rounded-full text-sm font-bold shadow-lg ${
             currentUser.is_admin 
-              ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
-              : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
+              ? 'bg-gradient-to-r from-red-500 to-red-600 text-white' 
+              : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white'
           }`}>
-            {currentUser.is_admin ? 'ADMIN' : 'USUARIO'}
+            {currentUser.is_admin ? t('admin') : t('user')}
           </div>
         </div>
       </div>
@@ -160,59 +159,64 @@ const Dashboard = () => {
           // Vista de Administrador - Estadísticas completas del sistema
           <>
             <StatCard
-              title="Total de Elementos"
+              title={t('totalElements')}
               value={stats.totalItems}
               icon={Package}
-              color="bg-blue-500"
+              color="bg-gradient-to-br from-blue-500 to-blue-600"
             />
             <StatCard
-              title="Elementos Disponibles"
+              title={t('availableElements')}
               value={stats.availableItems}
               icon={CheckCircle}
-              color="bg-green-500"
+              color="bg-gradient-to-br from-green-500 to-green-600"
             />
             <StatCard
-              title="Préstamos Activos"
+              title={t('activeLoans')}
               value={stats.activeLoans}
               icon={Calendar}
-              color="bg-purple-500"
+              color="bg-gradient-to-br from-purple-500 to-purple-600"
             />
             <StatCard
-              title="Préstamos Vencidos"
+              title={t('overdueLoans')}
               value={stats.overdueLoans}
               icon={AlertTriangle}
-              color="bg-red-500"
+              color="bg-gradient-to-br from-red-500 to-red-600"
             />
           </>
         ) : (
           // Vista de Usuario Estándar - Solo sus préstamos
           <>
             <StatCard
-              title="Mis Préstamos Activos"
+              title={t('myActiveLoans')}
               value={stats.activeLoans}
               icon={Calendar}
-              color="bg-purple-500"
+              color="bg-gradient-to-br from-purple-500 to-purple-600"
             />
             <StatCard
-              title="Mis Préstamos Vencidos"
+              title={t('myOverdueLoans')}
               value={stats.overdueLoans}
               icon={AlertTriangle}
-              color="bg-red-500"
+              color="bg-gradient-to-br from-red-500 to-red-600"
             />
             <StatCard
-              title="Total de Mis Préstamos"
+              title={t('totalMyLoans')}
               value={stats.totalItems}
               icon={Package}
-              color="bg-blue-500"
+              color="bg-gradient-to-br from-blue-500 to-blue-600"
             />
             <StatCard
-              title="Estado"
-              value={stats.overdueLoans > 0 ? "Atención" : "Al día"}
+              title={t('status')}
+              value={stats.overdueLoans > 0 ? t('attention') : t('upToDate')}
               icon={stats.overdueLoans > 0 ? AlertTriangle : CheckCircle}
-              color={stats.overdueLoans > 0 ? "bg-red-500" : "bg-green-500"}
+              color={stats.overdueLoans > 0 ? "bg-gradient-to-br from-red-500 to-red-600" : "bg-gradient-to-br from-green-500 to-green-600"}
             />
           </>
         )}
+      </div>
+
+      {/* Programación Semanal - Siempre visible para debug */}
+      <div className="mb-6">
+        <WeeklySchedule />
       </div>
 
       {/* Gráficos y información adicional diferenciada */}
@@ -222,32 +226,32 @@ const Dashboard = () => {
           <>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Estado del Inventario General
+                {t('generalInventoryStatus')}
               </h3>
               <div className="h-64 flex items-center justify-center">
                 <div className="text-center">
                   <Package className="h-16 w-16 text-blue-500 mx-auto mb-4" />
                   <p className="text-gray-500 dark:text-gray-400">
-                    Vista completa del inventario del sistema
+                    {t('completeSystemInventoryView')}
                   </p>
                   <p className="text-sm text-gray-400 mt-2">
-                    Gráficos próximamente
+                    {t('chartsComingSoon')}
                   </p>
                 </div>
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Tendencia de Préstamos del Sistema
+                {t('systemLoansTrend')}
               </h3>
               <div className="h-64 flex items-center justify-center">
                 <div className="text-center">
                   <Calendar className="h-16 w-16 text-purple-500 mx-auto mb-4" />
                   <p className="text-gray-500 dark:text-gray-400">
-                    Análisis de todos los préstamos
+                    {t('allLoansAnalysis')}
                   </p>
                   <p className="text-sm text-gray-400 mt-2">
-                    Gráficos próximamente
+                    {t('chartsComingSoon')}
                   </p>
                 </div>
               </div>
@@ -258,43 +262,43 @@ const Dashboard = () => {
           <>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Historial de Mis Préstamos
+                {t('myLoansHistory')}
               </h3>
               <div className="h-64 flex items-center justify-center">
                 <div className="text-center">
                   <User className="h-16 w-16 text-blue-500 mx-auto mb-4" />
                   <p className="text-gray-500 dark:text-gray-400">
-                    Tu historial personal de préstamos
+                    {t('personalLoansHistory')}
                   </p>
                   <p className="text-sm text-gray-400 mt-2">
-                    Gráficos próximamente
+                    {t('chartsComingSoon')}
                   </p>
                 </div>
               </div>
             </div>
             <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-                Recordatorios y Notificaciones
+                {t('remindersNotifications')}
               </h3>
               <div className="h-64 flex flex-col justify-center items-center space-y-4">
                 {stats.overdueLoans > 0 ? (
                   <div className="text-center">
                     <AlertTriangle className="h-16 w-16 text-red-500 mx-auto mb-4" />
                     <p className="text-red-600 dark:text-red-400 font-medium">
-                      Tienes {stats.overdueLoans} préstamo(s) vencido(s)
+                      {t('youHaveOverdueLoans').replace('{{count}}', stats.overdueLoans)}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
-                      Por favor, devuelve los elementos lo antes posible
+                      {t('pleaseReturnItems')}
                     </p>
                   </div>
                 ) : (
                   <div className="text-center">
                     <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
                     <p className="text-green-600 dark:text-green-400 font-medium">
-                      ¡Todos tus préstamos están al día!
+                      {t('allLoansUpToDate')}
                     </p>
                     <p className="text-sm text-gray-500 mt-2">
-                      Excelente gestión de tus préstamos
+                      {t('excellentLoanManagement')}
                     </p>
                   </div>
                 )}

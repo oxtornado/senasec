@@ -2,8 +2,10 @@ import React, { useState, useEffect } from 'react';
 import { Search, Plus, Edit, Trash2, User, Calendar, Clock, X, Filter, AlertTriangle } from 'lucide-react';
 import { getCurrentUser } from '../services/auth';
 import { useAssignments, Assignment } from '../contexts/AssignmentsContext';
+import { useLanguage } from '../contexts/LanguageContext';
 
 const Assignments = () => {
+  const { t } = useLanguage();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,11 +28,16 @@ const Assignments = () => {
 
   const uniqueInstructors = [...new Set(assignments.map(a => a.instructorName))];
   const classrooms = ['Aula de Sistemas 1', 'Aula de Sistemas 2', 'Aula de Sistemas 3', 'Aula de Diseño', 'Aula de Redes'];
-  // Solo las 3 jornadas completas especificadas
+  // Jornadas completas para asignación manual + franjas específicas
   const scheduleOptions = [
-    '07:00 - 13:00',  // Jornada mañana
-    '13:30 - 18:00',  // Jornada tarde
-    '18:30 - 22:00'   // Jornada noche
+    // Jornadas completas (para asignación manual)
+    '07:00 - 13:00',  // Jornada mañana completa
+    '13:30 - 18:00',  // Jornada tarde completa
+    '18:00 - 22:00',  // Jornada noche completa (corregido)
+    // Franjas específicas (para asignaciones detalladas)
+    '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 13:00',
+    '13:30 - 14:30', '14:30 - 15:30', '15:30 - 16:30', '16:30 - 17:30', '17:30 - 18:00',
+    '18:00 - 19:00', '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'
   ];
   // Nota: 13:00-13:30 está reservado para aseo y no debe usarse para asignaciones
 
@@ -111,8 +118,12 @@ const Assignments = () => {
   };
 
   const handleDeleteAssignment = (id: number) => {
-    if (window.confirm('¿Estás seguro de que deseas eliminar esta asignación?')) {
+    console.log('handleDeleteAssignment llamado con ID:', id);
+    if (window.confirm(t('confirmDeleteAssignment'))) {
+      console.log('Usuario confirmó eliminación');
       deleteAssignment(id);
+    } else {
+      console.log('Usuario canceló eliminación');
     }
   };
 
@@ -122,13 +133,13 @@ const Assignments = () => {
 
     // Validar horario de aseo
     if (isCleaningTime(formData.schedule)) {
-      setScheduleError('No se puede asignar en el horario de aseo (13:00 - 13:30)');
+      setScheduleError(t('cleaningTimeError'));
       return;
     }
 
     // Validar conflictos de horario
     if (validateScheduleConflict(formData.schedule, formData.classroom, selectedAssignment?.id)) {
-      setScheduleError('Ya existe una asignación en este horario y aula');
+      setScheduleError(t('scheduleConflictError'));
       return;
     }
 
@@ -158,10 +169,10 @@ const Assignments = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              Asignaciones de Instructores
+              {t('instructorAssignments')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              Gestión de asignaciones de aulas y horarios para instructores
+              {t('assignmentManagement')}
             </p>
           </div>
         </div>
@@ -173,7 +184,7 @@ const Assignments = () => {
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
-                placeholder="Buscar por nombre de instructor..."
+                placeholder={t('searchInstructor')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
@@ -187,7 +198,7 @@ const Assignments = () => {
                 onChange={(e) => setSelectedInstructor(e.target.value)}
                 className="pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white appearance-none"
               >
-                <option value="">Todos los instructores</option>
+                <option value="">{t('allInstructors')}</option>
                 {uniqueInstructors.map(instructor => (
                   <option key={instructor} value={instructor}>{instructor}</option>
                 ))}
@@ -200,7 +211,7 @@ const Assignments = () => {
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
             <Plus className="h-4 w-4" />
-            <span>Asignar Instructor</span>
+            <span>{t('assignInstructor')}</span>
           </button>
         </div>
       </div>
@@ -212,16 +223,16 @@ const Assignments = () => {
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Instructor
+                  {t('instructor')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Estado
+                  {t('status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Fechas de Asignación
+                  {t('assignmentDates')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Acciones
+                  {t('actions')}
                 </th>
               </tr>
             </thead>
@@ -240,7 +251,7 @@ const Assignments = () => {
                           {assignment.instructorName}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          Ficha asignada: {assignment.ficha}
+                          {t('assignedGroup')}: {assignment.ficha}
                         </div>
                       </div>
                     </div>
@@ -274,14 +285,14 @@ const Assignments = () => {
                       <button
                         onClick={() => handleEditAssignment(assignment)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                        title="Editar asignación"
+                        title={t('editAssignment')}
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteAssignment(assignment.id)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        title="Eliminar asignación"
+                        title={t('deleteAssignment')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -296,7 +307,7 @@ const Assignments = () => {
         {filteredAssignments.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              No se encontraron asignaciones de instructores que coincidan con los criterios de búsqueda.
+              {t('noAssignmentsFound')}
             </p>
           </div>
         )}
@@ -308,7 +319,7 @@ const Assignments = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {isEditing ? 'Editar Asignación de Instructor' : 'Asignar Instructor a Aula'}
+                {isEditing ? t('editInstructorAssignment') : t('assignInstructorToClassroom')}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -322,13 +333,13 @@ const Assignments = () => {
               {/* Nombre del instructor */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Nombre del instructor
+                  {t('instructorName')}
                 </label>
                 <input
                   type="text"
                   value={formData.instructorName}
                   onChange={(e) => handleInputChange('instructorName', e.target.value)}
-                  placeholder="Ingrese nombre completo del instructor"
+                  placeholder={t('enterInstructorName')}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 />
@@ -337,13 +348,13 @@ const Assignments = () => {
               {/* Ficha que imparte */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Ficha que imparte
+                  {t('groupCode')}
                 </label>
                 <input
                   type="text"
                   value={formData.ficha}
                   onChange={(e) => handleInputChange('ficha', e.target.value)}
-                  placeholder="Ingrese código de la ficha que imparte"
+                  placeholder={t('enterGroupCode')}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 />
@@ -352,7 +363,7 @@ const Assignments = () => {
               {/* Estado de la asignación */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Estado de la asignación
+                  {t('assignmentStatus')}
                 </label>
                 <select
                   value={formData.status}
@@ -360,15 +371,15 @@ const Assignments = () => {
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="Inactivo">Inactivo</option>
-                  <option value="Activo">Activo</option>
+                  <option value="Inactivo">{t('inactive')}</option>
+                  <option value="Activo">{t('active')}</option>
                 </select>
               </div>
 
               {/* Fecha de asignación */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Fechas de asignación
+                  {t('assignmentDates')}
                 </label>
                 <select
                   value={formData.assignmentDates}
@@ -376,10 +387,18 @@ const Assignments = () => {
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">Seleccione días de asignación</option>
+                  <option value="">{t('selectAssignmentDays')}</option>
+                  {/* Opciones por rangos */}
                   <option value="Lunes a Viernes">Lunes a Viernes</option>
                   <option value="Lunes a Miércoles">Lunes a Miércoles</option>
                   <option value="Jueves a Sábado">Jueves a Sábado</option>
+                  <option value="Lunes a Domingo">Lunes a Domingo</option>
+                  {/* Días individuales */}
+                  <option value="Lunes">Lunes</option>
+                  <option value="Martes">Martes</option>
+                  <option value="Miércoles">Miércoles</option>
+                  <option value="Jueves">Jueves</option>
+                  <option value="Viernes">Viernes</option>
                   <option value="Sábados">Sábados</option>
                   <option value="Domingos">Domingos</option>
                 </select>

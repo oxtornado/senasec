@@ -5,7 +5,7 @@ import { useLanguage } from '../contexts/LanguageContext';
 import { getCurrentUser } from '../services/auth';
 
 export default function EquipmentDashboard() {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
   const { equipment, updateEquipment, deleteEquipment, addEquipment } = useEquipment();
   const [searchTerm, setSearchTerm] = useState('');
   const [serialFilter, setSerialFilter] = useState('');
@@ -22,7 +22,7 @@ export default function EquipmentDashboard() {
     brand: '',
     model: '',
     serialNumber: '',
-    status: 'Disponible' as Equipment['status'],
+    status: 'disponible' as Equipment['status'],
     type: 'computador' as Equipment['type'],
     characteristics: ''
   });
@@ -55,10 +55,10 @@ export default function EquipmentDashboard() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Acceso Restringido
+            {t('restrictedAccess')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            No tienes permisos para acceder a esta página.
+            {t('noPermissions')}
           </p>
         </div>
       </div>
@@ -80,10 +80,10 @@ export default function EquipmentDashboard() {
 
   const getStatusColor = (status: Equipment['status']) => {
     switch (status) {
-      case 'Disponible': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'En Uso': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'Mantenimiento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'Dañado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'disponible': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'en_uso': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
+      case 'mantenimiento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'dañado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
@@ -105,7 +105,7 @@ export default function EquipmentDashboard() {
       brand: '',
       model: '',
       serialNumber: '',
-      status: 'Disponible',
+      status: 'disponible',
       type: 'computador',
       characteristics: ''
     });
@@ -156,7 +156,7 @@ export default function EquipmentDashboard() {
       status: formData.status,
       type: formData.type,
       characteristics: formData.characteristics.trim(),
-      lastUpdate: new Date().toLocaleDateString('es-ES')
+      lastUpdate: new Date().toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US')
     };
 
     if (isEditing && selectedEquipment) {
@@ -193,7 +193,7 @@ export default function EquipmentDashboard() {
           className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
         >
           <Plus className="h-4 w-4" />
-          <span>{t('add')} Equipo</span>
+          <span>{t('add')} {t('equipment')}</span>
         </button>
       </div>
 
@@ -205,7 +205,7 @@ export default function EquipmentDashboard() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Buscar por marca, modelo, número o características..."
+              placeholder={t('search')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -217,7 +217,7 @@ export default function EquipmentDashboard() {
             <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Filtrar por número de serie..."
+              placeholder={t('filterSerial')}
               value={serialFilter}
               onChange={(e) => setSerialFilter(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -233,28 +233,28 @@ export default function EquipmentDashboard() {
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  No. Equipo
+                  {t('equipmentNumber')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Tipo
+                  {t('type')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Marca Equipo
+                  {t('brand')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Modelo
+                  {t('model')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  No. Serie
+                  {t('serialNumber')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Estado
+                  {t('status')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Última Actualización
+                  {t('lastUpdate')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Acciones
+                  {t('actions')}
                 </th>
               </tr>
             </thead>
@@ -292,14 +292,14 @@ export default function EquipmentDashboard() {
                       <button
                         onClick={() => handleEditEquipment(eq)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
-                        title="Editar equipo"
+                        title={t('editEquipment')}
                       >
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteEquipment(eq)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        title="Eliminar equipo"
+                        title={t('deleteEquipment')}
                       >
                         <Trash2 className="h-4 w-4" />
                       </button>
@@ -313,7 +313,7 @@ export default function EquipmentDashboard() {
 
         {filteredEquipment.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No se encontraron equipos que coincidan con los filtros.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('noEquipmentFound')}</p>
           </div>
         )}
       </div>
@@ -324,7 +324,7 @@ export default function EquipmentDashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
             <div className="flex items-center justify-between mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {isEditing ? 'Editar Equipo' : 'Agregar Nuevo Equipo'}
+                {isEditing ? t('editEquipmentTitle') : t('addNewEquipment')}
               </h3>
               <button
                 onClick={closeModal}
@@ -338,7 +338,7 @@ export default function EquipmentDashboard() {
               {/* Número de posición */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Número de Equipo
+                  {t('equipmentNumberLabel')}
                 </label>
                 <input
                   type="number"
@@ -355,7 +355,7 @@ export default function EquipmentDashboard() {
               {/* Tipo de equipo */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Tipo de Equipo
+                  {t('equipmentType')}
                 </label>
                 <select
                   value={formData.type}
@@ -363,17 +363,17 @@ export default function EquipmentDashboard() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
-                  <option value="computador">Computador</option>
-                  <option value="televisor">Televisor</option>
-                  <option value="videobeam">Videobeam</option>
-                  <option value="sonido">Sonido</option>
+                  <option value="computador">{t('computer')}</option>
+                  <option value="televisor">{t('tv')}</option>
+                  <option value="videobeam">{t('projector')}</option>
+                  <option value="sonido">{t('sound')}</option>
                 </select>
               </div>
 
               {/* Marca */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Marca
+                  {t('brandLabel')}
                 </label>
                 <input
                   type="text"
@@ -388,7 +388,7 @@ export default function EquipmentDashboard() {
               {/* Modelo */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Modelo
+                  {t('modelLabel')}
                 </label>
                 <input
                   type="text"
@@ -403,7 +403,7 @@ export default function EquipmentDashboard() {
               {/* Número de serie */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Número de Serie
+                  {t('serialNumberLabel')}
                 </label>
                 <input
                   type="text"
@@ -418,7 +418,7 @@ export default function EquipmentDashboard() {
               {/* Estado */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Estado
+                  {t('statusLabel')}
                 </label>
                 <select
                   value={formData.status}
@@ -426,17 +426,17 @@ export default function EquipmentDashboard() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
-                  <option value="Disponible">Disponible</option>
-                  <option value="En Uso">En Uso</option>
-                  <option value="Mantenimiento">Mantenimiento</option>
-                  <option value="Dañado">Dañado</option>
+                  <option value="disponible">{t('available')}</option>
+                  <option value="en_uso">{t('inUse')}</option>
+                  <option value="mantenimiento">{t('maintenance')}</option>
+                  <option value="dañado">{t('damaged')}</option>
                 </select>
               </div>
 
               {/* Características */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Características
+                  {t('characteristics')}
                 </label>
                 <textarea
                   value={formData.characteristics}
@@ -454,13 +454,13 @@ export default function EquipmentDashboard() {
                   onClick={closeModal}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button
                   type="submit"
                   className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                 >
-                  {isEditing ? 'Actualizar' : 'Agregar'}
+                  {isEditing ? t('update') : t('add')}
                 </button>
               </div>
             </form>
@@ -477,10 +477,10 @@ export default function EquipmentDashboard() {
                 <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
               </div>
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                ADVERTENCIA
+                {t('warning')}
               </h3>
               <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Está a punto de eliminar un equipo. Esta acción no se puede deshacer.
+                {t('deleteWarning')}
               </p>
               <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 mb-6">
                 <p className="text-sm font-medium text-gray-900 dark:text-white">
@@ -495,13 +495,13 @@ export default function EquipmentDashboard() {
                   onClick={cancelDeleteEquipment}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Cancelar
+                  {t('cancel')}
                 </button>
                 <button
                   onClick={confirmDeleteEquipment}
                   className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
                 >
-                  Eliminar Equipo
+                  {t('deleteConfirm')}
                 </button>
               </div>
             </div>
