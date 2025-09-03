@@ -14,6 +14,7 @@ class Equipo(models.Model):
         ('televisor', 'Televisor'),
     ]
 
+    posicion = models.IntegerField(unique=True, blank=False, null=False)  # Posición única del equipo
     numero_serie = models.CharField(max_length=20, unique=True, blank=False, null=False)  # Número de serie del equipo
     tipo = models.CharField(max_length=15, choices=TIPO_EQUIPO, default='computador')  # Tipo de equipo
     pulgadas = models.CharField(max_length=5, blank=False, null=False)  # Tamaño en pulgadas

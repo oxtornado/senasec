@@ -1,31 +1,34 @@
 import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import { useEquipment, Equipment } from '../contexts/EquipmentContext';
-import { Search, Filter, Edit, Trash2, Plus, Monitor, Tv, Volume2, Projector, X } from 'lucide-react';
+import { Search, Edit, Monitor, Tv, X } from 'lucide-react';
 import { useLanguage } from '../contexts/LanguageContext';
+import { getAuthHeaders } from '../services/equipments';
 import { getCurrentUser } from '../services/auth';
 
 export default function EquipmentDashboard() {
   const { t } = useLanguage();
-  const { equipment, updateEquipment, deleteEquipment, addEquipment } = useEquipment();
+  const { equipment, updateEquipment } = useEquipment();
+  console.log("equipment from context:", equipment);
+
   const [searchTerm, setSearchTerm] = useState('');
-  const [serialFilter, setSerialFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
-  const [showDeleteModal, setShowDeleteModal] = useState(false);
-  const [equipmentToDelete, setEquipmentToDelete] = useState<Equipment | null>(null);
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [ambientes, setAmbientes] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
 
-  const [formData, setFormData] = useState({
-    position: '',
-    brand: '',
-    model: '',
-    serialNumber: '',
-    status: 'Disponible' as Equipment['status'],
-    type: 'computador' as Equipment['type'],
-    characteristics: ''
+  const [formData, setFormData] = useState<Partial<Equipment>>({
+    posicion: '',
+    numero_serie: '',
+    tipo: 'computador',
+    pulgadas: '',
+    caracteristicas: '',
+    estado: 'disponible',
+    ambiente: undefined
   });
+
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -40,6 +43,21 @@ export default function EquipmentDashboard() {
     };
 
     fetchUser();
+  }, []);
+
+  useEffect(() => {
+    const fetchAmbientes = async () => {
+      try {
+        const res = await axios.get('http://127.0.0.1:8001/ambiente/ambiente/', {
+          headers: getAuthHeaders(),
+        });
+        setAmbientes(res.data);
+      } catch (error) {
+        console.error('Error cargando ambientes:', error);
+      }
+    };
+
+    fetchAmbientes();
   }, []);
 
   if (loading) {
@@ -67,33 +85,34 @@ export default function EquipmentDashboard() {
 
   // Filtrar equipos
   const filteredEquipment = equipment.filter(eq => {
-    const matchesSearch = 
-      eq.brand.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      eq.model.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      eq.position.toString().includes(searchTerm) ||
-      eq.characteristics.toLowerCase().includes(searchTerm.toLowerCase());
-    
-    const matchesSerial = eq.serialNumber.toLowerCase().includes(serialFilter.toLowerCase());
-    
-    return matchesSearch && matchesSerial;
-  });
+  const numeroSerie = eq.numero_serie?.toLowerCase() || '';
+  const caracteristicas = eq.caracteristicas?.toLowerCase() || '';
+  const tipo = eq.tipo?.toLowerCase() || '';
+  const estado = eq.estado?.toLowerCase() || '';
+  const term = searchTerm.toLowerCase();
 
-  const getStatusColor = (status: Equipment['status']) => {
+  return (
+    numeroSerie.includes(term) || 
+    caracteristicas.includes(term) ||
+    tipo.includes(term) ||
+    estado.includes(term)
+  );
+});
+
+
+  const getStatusColor = (status: Equipment['estado']) => {
     switch (status) {
-      case 'Disponible': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'En Uso': return 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200';
-      case 'Mantenimiento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'Dañado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
+      case 'disponible': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
+      case 'mantenimiento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
+      case 'dañado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
       default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
     }
   };
 
-  const getTypeIcon = (type: Equipment['type']) => {
+  const getTypeIcon = (type: Equipment['tipo']) => {
     switch (type) {
       case 'computador': return <Monitor className="h-4 w-4" />;
       case 'televisor': return <Tv className="h-4 w-4" />;
-      case 'videobeam': return <Projector className="h-4 w-4" />;
-      case 'sonido': return <Volume2 className="h-4 w-4" />;
       default: return <Monitor className="h-4 w-4" />;
     }
   };
@@ -101,41 +120,27 @@ export default function EquipmentDashboard() {
   // Funciones para manejar los modales
   const resetForm = () => {
     setFormData({
-      position: '',
-      brand: '',
-      model: '',
-      serialNumber: '',
-      status: 'Disponible',
-      type: 'computador',
-      characteristics: ''
+      numero_serie: '',
+      tipo: 'computador',
+      pulgadas: '',
+      caracteristicas: '',
+      estado: 'disponible',
     });
   };
 
-  const handleAddEquipment = () => {
-    resetForm();
-    setIsEditing(false);
-    setSelectedEquipment(null);
-    setIsModalOpen(true);
-  };
 
   const handleEditEquipment = (equipment: Equipment) => {
     setFormData({
-      position: equipment.position.toString(),
-      brand: equipment.brand,
-      model: equipment.model,
-      serialNumber: equipment.serialNumber,
-      status: equipment.status,
-      type: equipment.type,
-      characteristics: equipment.characteristics
+      posicion: equipment.posicion.toString(),
+      numero_serie: equipment.numero_serie,
+      tipo: equipment.tipo,
+      pulgadas: equipment.pulgadas,
+      caracteristicas: equipment.caracteristicas,
+      estado: equipment.estado,
     });
     setSelectedEquipment(equipment);
     setIsEditing(true);
     setIsModalOpen(true);
-  };
-
-  const handleDeleteEquipment = (equipment: Equipment) => {
-    setEquipmentToDelete(equipment);
-    setShowDeleteModal(true);
   };
 
   const closeModal = () => {
@@ -149,36 +154,23 @@ export default function EquipmentDashboard() {
     e.preventDefault();
     
     const equipmentData = {
-      position: parseInt(formData.position),
-      brand: formData.brand.trim(),
-      model: formData.model.trim(),
-      serialNumber: formData.serialNumber.trim(),
-      status: formData.status,
-      type: formData.type,
-      characteristics: formData.characteristics.trim(),
-      lastUpdate: new Date().toLocaleDateString('es-ES')
+      posicion: Number(formData.posicion),
+      numero_serie: (formData.numero_serie || '').trim(),
+      tipo: formData.tipo || 'computador',
+      pulgadas: formData.pulgadas,
+      caracteristicas: (formData.caracteristicas || '').trim(),
+      estado: formData.estado || 'disponible',
+      ambiente: formData.ambiente,
+      // última_actualización la pone el backend automáticamente
     };
+
+    console.log('Enviando equipo:', equipmentData); // 👀 usa esto para confirmar
 
     if (isEditing && selectedEquipment) {
       updateEquipment(selectedEquipment.id, equipmentData);
-    } else {
-      addEquipment(equipmentData);
     }
 
     closeModal();
-  };
-
-  const confirmDeleteEquipment = () => {
-    if (equipmentToDelete) {
-      deleteEquipment(equipmentToDelete.id);
-      setShowDeleteModal(false);
-      setEquipmentToDelete(null);
-    }
-  };
-
-  const cancelDeleteEquipment = () => {
-    setShowDeleteModal(false);
-    setEquipmentToDelete(null);
   };
 
   return (
@@ -188,41 +180,23 @@ export default function EquipmentDashboard() {
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           {t('equipmentDashboard')}
         </h1>
-        <button
-          onClick={handleAddEquipment}
-          className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg flex items-center space-x-2 transition-colors"
-        >
-          <Plus className="h-4 w-4" />
-          <span>{t('add')} Equipo</span>
-        </button>
       </div>
 
       {/* Filtros */}
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1">
           {/* Búsqueda general */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Buscar por marca, modelo, número o características..."
+              placeholder="Buscar por número de serie, tipo, estado o características..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
             />
           </div>
 
-          {/* Filtro por número de serie */}
-          <div className="relative">
-            <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-            <input
-              type="text"
-              placeholder="Filtrar por número de serie..."
-              value={serialFilter}
-              onChange={(e) => setSerialFilter(e.target.value)}
-              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-            />
-          </div>
         </div>
       </div>
 
@@ -236,16 +210,13 @@ export default function EquipmentDashboard() {
                   No. Equipo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                  No. Serie
+                </th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Tipo
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Marca Equipo
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Modelo
-                </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  No. Serie
+                  Pulgadas
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Estado
@@ -262,46 +233,36 @@ export default function EquipmentDashboard() {
               {filteredEquipment.map((eq) => (
                 <tr key={eq.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
-                    {eq.position === 0 ? 'TV' : eq.position}
+                    {eq.posicion}
+                  </td>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                    {eq.numero_serie}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
                     <div className="flex items-center space-x-2">
-                      {getTypeIcon(eq.type)}
-                      <span className="capitalize">{eq.type}</span>
+                      {getTypeIcon(eq.tipo)}
+                      <span className="capitalize">{eq.tipo}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {eq.brand}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                    {eq.model}
-                  </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white font-mono">
-                    {eq.serialNumber}
+                    {eq.pulgadas}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(eq.status)}`}>
-                      {eq.status}
+                    <span className={`capitalize inline-flex px-2 py-1 text-xs font-semibold rounded-full ${getStatusColor(eq.estado)}`}>
+                      {eq.estado}
                     </span>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-300">
-                    {eq.lastUpdate}
+                    {eq.ultima_actualizacion}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
-                    <div className="flex space-x-2">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-center">
+                    <div className="flex justify-center mr-6">
                       <button
                         onClick={() => handleEditEquipment(eq)}
                         className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                         title="Editar equipo"
                       >
                         <Edit className="h-4 w-4" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteEquipment(eq)}
-                        className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
-                        title="Eliminar equipo"
-                      >
-                        <Trash2 className="h-4 w-4" />
                       </button>
                     </div>
                   </td>
@@ -342,60 +303,10 @@ export default function EquipmentDashboard() {
                 </label>
                 <input
                   type="number"
-                  value={formData.position}
-                  onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                  value={formData.posicion}
+                  onChange={(e) => setFormData({ ...formData, posicion: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Ej: 1, 2, 3... (0 para TV)"
-                  required
-                  min="0"
-                  max="20"
-                />
-              </div>
-
-              {/* Tipo de equipo */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Tipo de Equipo
-                </label>
-                <select
-                  value={formData.type}
-                  onChange={(e) => setFormData({ ...formData, type: e.target.value as Equipment['type'] })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  required
-                >
-                  <option value="computador">Computador</option>
-                  <option value="televisor">Televisor</option>
-                  <option value="videobeam">Videobeam</option>
-                  <option value="sonido">Sonido</option>
-                </select>
-              </div>
-
-              {/* Marca */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Marca
-                </label>
-                <input
-                  type="text"
-                  value={formData.brand}
-                  onChange={(e) => setFormData({ ...formData, brand: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: HP, Dell, Lenovo"
-                  required
-                />
-              </div>
-
-              {/* Modelo */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Modelo
-                </label>
-                <input
-                  type="text"
-                  value={formData.model}
-                  onChange={(e) => setFormData({ ...formData, model: e.target.value })}
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Ej: OptiPlex 3070, Pavilion 15"
                   required
                 />
               </div>
@@ -407,11 +318,56 @@ export default function EquipmentDashboard() {
                 </label>
                 <input
                   type="text"
-                  value={formData.serialNumber}
-                  onChange={(e) => setFormData({ ...formData, serialNumber: e.target.value })}
+                  value={formData.numero_serie}
+                  onChange={(e) => setFormData({ ...formData, numero_serie: e.target.value })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   placeholder="Número de serie único"
                   required
+                />
+              </div>
+
+              {/* Tipo de equipo */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Tipo de Equipo
+                </label>
+                <select
+                  value={formData.tipo}
+                  onChange={(e) => setFormData({ ...formData, tipo: e.target.value as Equipment['tipo'] })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  required
+                >
+                  <option value="computador">Computador</option>
+                  <option value="televisor">Televisor</option>
+                </select>
+              </div>
+
+              {/* Pulgadas */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Pulgadas
+                </label>
+                <input
+                  type="text"
+                  value={formData.pulgadas}
+                  onChange={(e) => setFormData({ ...formData, pulgadas: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Ej: HP, Dell, Lenovo"
+                  required
+                />
+              </div>
+
+              {/* Características */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  Características
+                </label>
+                <textarea
+                  value={formData.caracteristicas}
+                  onChange={(e) => setFormData({ ...formData, caracteristicas: e.target.value })}
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                  placeholder="Especificaciones técnicas, accesorios, etc."
+                  rows={3}
                 />
               </div>
 
@@ -421,31 +377,40 @@ export default function EquipmentDashboard() {
                   Estado
                 </label>
                 <select
-                  value={formData.status}
-                  onChange={(e) => setFormData({ ...formData, status: e.target.value as Equipment['status'] })}
+                  value={formData.estado}
+                  onChange={(e) => setFormData({ ...formData, estado: e.target.value as Equipment['estado'] })}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
-                  <option value="Disponible">Disponible</option>
-                  <option value="En Uso">En Uso</option>
-                  <option value="Mantenimiento">Mantenimiento</option>
-                  <option value="Dañado">Dañado</option>
+                  <option value="disponible">Disponible</option>
+                  <option value="mantenimiento">Mantenimiento</option>
+                  <option value="dañado">Dañado</option>
                 </select>
               </div>
 
-              {/* Características */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Características
+                  Ambiente
                 </label>
-                <textarea
-                  value={formData.characteristics}
-                  onChange={(e) => setFormData({ ...formData, characteristics: e.target.value })}
+                <select
+                  value={formData.ambiente || ''}
+                  onChange={(e) =>
+                    setFormData({ ...formData, ambiente: Number(e.target.value) })
+                  }
+                  required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                  placeholder="Especificaciones técnicas, accesorios, etc."
-                  rows={3}
-                />
+                >
+                  <option value="" disabled>
+                    Selecciona un ambiente
+                  </option>
+                  {ambientes.map((amb) => (
+                    <option key={amb.id} value={amb.id}>
+                      {amb.nombre}
+                    </option>
+                  ))}
+                </select>
               </div>
+
 
               {/* Botones */}
               <div className="flex space-x-3 pt-4">
@@ -464,47 +429,6 @@ export default function EquipmentDashboard() {
                 </button>
               </div>
             </form>
-          </div>
-        </div>
-      )}
-
-      {/* Modal de Confirmación de Eliminación */}
-      {showDeleteModal && equipmentToDelete && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md mx-4">
-            <div className="text-center">
-              <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900 mb-4">
-                <Trash2 className="h-6 w-6 text-red-600 dark:text-red-400" />
-              </div>
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-2">
-                ADVERTENCIA
-              </h3>
-              <p className="text-gray-600 dark:text-gray-400 mb-4">
-                Está a punto de eliminar un equipo. Esta acción no se puede deshacer.
-              </p>
-              <div className="bg-gray-100 dark:bg-gray-700 rounded-lg p-3 mb-6">
-                <p className="text-sm font-medium text-gray-900 dark:text-white">
-                  {equipmentToDelete.position === 0 ? 'TV' : `Equipo #${equipmentToDelete.position}`} - {equipmentToDelete.brand} {equipmentToDelete.model}
-                </p>
-                <p className="text-xs text-gray-500 dark:text-gray-400">
-                  Serie: {equipmentToDelete.serialNumber}
-                </p>
-              </div>
-              <div className="flex space-x-3">
-                <button
-                  onClick={cancelDeleteEquipment}
-                  className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
-                >
-                  Cancelar
-                </button>
-                <button
-                  onClick={confirmDeleteEquipment}
-                  className="flex-1 px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-lg transition-colors"
-                >
-                  Eliminar Equipo
-                </button>
-              </div>
-            </div>
           </div>
         </div>
       )}
