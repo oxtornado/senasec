@@ -15,7 +15,7 @@ import Users from "./pages/Users";
 import Assignments from "./pages/Assignments";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { LanguageProvider } from "./contexts/LanguageContext";
+import { LanguageProvider } from './contexts/LanguageContext';
 import { EquipmentProvider } from "./contexts/EquipmentContext";
 import { AssignmentsProvider } from "./contexts/AssignmentsContext";
 import { ReportsProvider } from "./contexts/ReportsContext";
