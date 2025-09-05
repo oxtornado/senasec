@@ -16,10 +16,6 @@ dist-ssr
 # Archivos de configuración local
 .env
 
-# Archivos Docker
-Dockerfile
-docker-compose.yml
-docker-compose.*.yml
 
 # Base de datos SQLite3
 *.sqlite3
