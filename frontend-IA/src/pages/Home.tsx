@@ -9,10 +9,8 @@ import {
   Cloud,
   Bell,
   Mail,
-  Key,
   Cpu,
-  Wifi,
-  ChevronRight
+  Wifi
 } from "lucide-react";
 import { useLanguage } from "../contexts/LanguageContext";
 import LanguageSelector from "../components/LanguageSelector";
@@ -302,11 +300,11 @@ const Home = () => {
       {/* ventada de aviso de uso de datos del usuario*/}
       {showModal && (
                 <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-                    <div className="bg-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
+                    <div className="bg-white dark:bg-gray-900 dark:text-white rounded-2xl shadow-xl max-w-md w-full p-6 text-center">
                         <h2 className="text-xl font-semibold mb-4">
                             Aviso de privacidad
                         </h2>
-                        <p className="text-gray-700 mb-6">
+                        <p className="text-gray-700 mb-6 dark:text-white">
                             SENASEC usará su foto y acceso a la cámara para la
                             apertura de aulas.  
                             <br />

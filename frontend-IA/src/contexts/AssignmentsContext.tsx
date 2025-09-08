@@ -39,36 +39,159 @@ interface AssignmentsContextType {
 
 const AssignmentsContext = createContext<AssignmentsContextType | undefined>(undefined);
 
-// Datos exactos según especificaciones: solo 3 instructores con jornadas completas
+// Datos con programaciones específicas variadas por franjas horarias
 const initialAssignments: Assignment[] = [
+  // Jornada Mañana - Programaciones variadas
   {
     id: 1,
-    instructorName: 'Jorge Orlando Castro',
+    instructorName: 'Hugo Rodríguez',
     ficha: '2877795',
     status: 'Activo',
     assignmentDates: 'Lunes a Viernes',
-    schedule: '07:00 - 13:00',
+    schedule: '07:00 - 08:00',
     classroom: 'Aula de Sistemas 1',
     createdAt: '2024-08-05'
   },
   {
     id: 2,
-    instructorName: 'Esteban Hernández',
+    instructorName: 'Jorge Orlando Castro',
+    ficha: '2877796',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '08:00 - 09:00',
+    classroom: 'Aula de Sistemas 1',
+    createdAt: '2024-08-05'
+  },
+  {
+    id: 3,
+    instructorName: 'Hugo Rodríguez',
     ficha: '2877795',
     status: 'Activo',
     assignmentDates: 'Lunes a Viernes',
-    schedule: '13:30 - 18:00',
+    schedule: '09:00 - 10:00',
+    classroom: 'Aula de Sistemas 2',
+    createdAt: '2024-08-05'
+  },
+  {
+    id: 4,
+    instructorName: 'Esteban Hernández',
+    ficha: '2877797',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '10:00 - 11:00',
+    classroom: 'Aula de Sistemas 1',
+    createdAt: '2024-08-05'
+  },
+  {
+    id: 5,
+    instructorName: 'Jorge Orlando Castro',
+    ficha: '2877796',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '11:00 - 12:00',
+    classroom: 'Aula de Sistemas 2',
+    createdAt: '2024-08-05'
+  },
+  {
+    id: 6,
+    instructorName: 'Jorge Orlando Castro',
+    ficha: '2877796',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '12:00 - 13:00',
+    classroom: 'Aula de Sistemas 1',
+    createdAt: '2024-08-05'
+  },
+  // Jornada Tarde - Programaciones variadas
+  {
+    id: 7,
+    instructorName: 'Orlando Castro',
+    ficha: '2877796',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '13:30 - 14:30',
+    classroom: 'Aula de Sistemas 1',
+    createdAt: '2024-08-02'
+  },
+  {
+    id: 8,
+    instructorName: 'Esteban Hernández',
+    ficha: '2877797',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '14:30 - 15:30',
     classroom: 'Aula de Sistemas 2',
     createdAt: '2024-08-02'
   },
   {
-    id: 3,
+    id: 9,
+    instructorName: 'Orlando Castro',
+    ficha: '2877796',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '15:30 - 16:30',
+    classroom: 'Aula de Sistemas 1',
+    createdAt: '2024-08-02'
+  },
+  {
+    id: 10,
+    instructorName: 'Orlando Castro',
+    ficha: '2877796',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '16:30 - 17:30',
+    classroom: 'Aula de Sistemas 2',
+    createdAt: '2024-08-02'
+  },
+  {
+    id: 11,
     instructorName: 'Martín Castro',
+    ficha: '2877798',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '17:30 - 18:00',
+    classroom: 'Aula de Sistemas 1',
+    createdAt: '2024-08-02'
+  },
+  // Jornada Noche - Programaciones variadas
+  {
+    id: 12,
+    instructorName: 'Hugo Rodríguez',
     ficha: '2877795',
     status: 'Activo',
     assignmentDates: 'Lunes a Viernes',
-    schedule: '18:30 - 22:00',
-    classroom: 'Aula de Sistemas 3',
+    schedule: '18:00 - 19:00',
+    classroom: 'Aula de Sistemas 2',
+    createdAt: '2024-08-03'
+  },
+  {
+    id: 13,
+    instructorName: 'Hugo Rodríguez',
+    ficha: '2877795',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '19:00 - 20:00',
+    classroom: 'Aula de Sistemas 1',
+    createdAt: '2024-08-03'
+  },
+  {
+    id: 14,
+    instructorName: 'Hugo Rodríguez',
+    ficha: '2877795',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '20:00 - 21:00',
+    classroom: 'Aula de Sistemas 2',
+    createdAt: '2024-08-03'
+  },
+  {
+    id: 15,
+    instructorName: 'Jorge Orlando Castro',
+    ficha: '2877796',
+    status: 'Activo',
+    assignmentDates: 'Lunes a Viernes',
+    schedule: '21:00 - 22:00',
+    classroom: 'Aula de Sistemas 1',
     createdAt: '2024-08-03'
   }
 ];
@@ -78,12 +201,9 @@ export const AssignmentsProvider: React.FC<{ children: ReactNode }> = ({ childre
 
   // Cargar datos del localStorage al inicializar
   useEffect(() => {
-    const savedAssignments = localStorage.getItem('senasec_assignments');
-    if (savedAssignments) {
-      setAssignments(JSON.parse(savedAssignments));
-    } else {
-      setAssignments(initialAssignments);
-    }
+    // Forzar carga de nuevos datos - limpiar localStorage temporalmente
+    localStorage.removeItem('senasec_assignments');
+    setAssignments(initialAssignments);
   }, []);
 
   // Guardar en localStorage cuando cambien las asignaciones
@@ -239,7 +359,13 @@ export const AssignmentsProvider: React.FC<{ children: ReactNode }> = ({ childre
   };
 
   const deleteAssignment = (id: number) => {
-    setAssignments(prev => prev.filter(assignment => assignment.id !== id));
+    console.log('Intentando eliminar asignación con ID:', id);
+    console.log('Asignaciones antes de eliminar:', assignments);
+    setAssignments(prev => {
+      const filtered = prev.filter(assignment => assignment.id !== id);
+      console.log('Asignaciones después de eliminar:', filtered);
+      return filtered;
+    });
   };
 
   const value: AssignmentsContextType = {

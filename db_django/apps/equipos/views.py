@@ -7,4 +7,3 @@ from permissions.permissions import IsInventoryUser
 class EquipoViewSet(viewsets.ModelViewSet):
     queryset = Equipo.objects.all()  # Obtener todos los equipos
     serializer_class = EquipoSerializer  # Usar el serializador EquipoSerializer
-    permission_classes = [IsInventoryUser]  # Permisos personalizados para acceso solo a administradores e inventario

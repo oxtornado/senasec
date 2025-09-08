@@ -7,4 +7,3 @@ from permissions.permissions import IsInventoryUser
 class NovedadViewSet(viewsets.ModelViewSet):
     queryset = Novedad.objects.all()  # Obtener todas las novedades
     serializer_class = NovedadSerializer  # Usar el serializador NovedadSerializer
-    permission_classes = [IsInventoryUser]  # Permisos personalizados para acceso solo a administradores e inventario

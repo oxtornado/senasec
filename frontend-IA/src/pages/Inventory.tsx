@@ -1,47 +1,83 @@
-import { useState } from 'react';
-import { Monitor, Tv, DoorOpen, X, AlertCircle, CheckCircle, Clock, Wrench } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { Monitor, Tv, DoorOpen, X, AlertCircle, CheckCircle, Wrench } from 'lucide-react';
 import { useEquipment, Equipment } from '../contexts/EquipmentContext';
+import { useBreakpoints } from '../hooks/useMediaQuery';
+import { useLanguage } from '../contexts/LanguageContext';
+import { createNovelty } from '../services/novelty';
+import { useAmbiente } from '../contexts/EnvironmentContext';
+import { fetchAmbientes, Ambiente } from '../services/ambientes';
 
 const Inventory = () => {
-  const { equipment, getEquipmentByPosition } = useEquipment();
+  const { equipment } = useEquipment();
+  const { isMobile, isTablet } = useBreakpoints();
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
   const [selectedTV, setSelectedTV] = useState<boolean>(false);
   const [reportText, setReportText] = useState('');
-  
-  // Obtener el TV del contexto
-  const tvData = equipment.find(eq => eq.type === 'televisor') || {
-    brand: 'Samsung',
-    model: 'Smart TV 55" 4K',
-    serialNumber: 'SM017TV'
-  };
-  
-  // Usar equipos del contexto (solo computadores)
-  const equipmentData = equipment.filter(eq => eq.type === 'computador' && eq.position > 0);
-  
-  const getStatusColor = (status: string) => {
-    switch (status) {
-      case 'Disponible': return 'bg-green-500 hover:bg-green-600';
-      case 'En Uso': return 'bg-blue-500 hover:bg-blue-600';
-      case 'Mantenimiento': return 'bg-yellow-500 hover:bg-yellow-600';
-      case 'Dañado': return 'bg-red-500 hover:bg-red-600';
-      default: return 'bg-gray-500 hover:bg-gray-600';
+  const [ambientes, setAmbientes] = useState<Ambiente[]>([]);
+  const { ambiente, setAmbiente } = useAmbiente(); // Desde el contexto
+
+  useEffect(() => {
+    const loadAmbientes = async () => {
+      try {
+        const data = await fetchAmbientes();
+        setAmbientes(data);
+      } catch (err) {
+        console.error('Error cargando ambientes:', err);
+      }
+    };
+    loadAmbientes();
+  }, []);
+
+  const handleReportSubmit = async () => {
+    if (!ambiente) {
+      alert('Debe seleccionar un ambiente');
+      return;
+    }
+
+    try {
+      await createNovelty({
+        descripcion: reportText.trim(),
+        ambiente: ambiente.id,
+      });
+
+      setReportText('');
+    } catch (error) {
+      alert('Error al registrar la novedad');
     }
   };
   
-  const getStatusIcon = (status: string) => {
-    switch (status) {
-      case 'Disponible': return <CheckCircle className="h-4 w-4" />;
-      case 'En Uso': return <Clock className="h-4 w-4" />;
-      case 'Mantenimiento': return <Wrench className="h-4 w-4" />;
-      case 'Dañado': return <AlertCircle className="h-4 w-4" />;
+  // Obtener el TV del contexto
+  const tvData = equipment.find(eq => eq.tipo === 'televisor') || {
+    numero_serie: String(),
+    pulgadas: String(),
+    caracteristicas: String(),
+    ultima_actualizacion: String(),
+  };
+  
+  // Usar equipos del contexto (solo computadores)
+  const equipmentData = equipment.filter(eq => eq.tipo === 'computador' && eq.posicion > 0);
+  
+  const getStatusColor = (estado: string) => {
+    switch (estado) {
+      case 'disponible': return 'bg-green-500 hover:bg-green-600 text-white';
+      case 'mantenimiento': return 'bg-yellow-500 hover:bg-yellow-600 text-white';
+      case 'dañado': return 'bg-red-500 hover:bg-red-600 text-white';
+      default: return 'bg-gray-500 hover:bg-gray-600 text-white';
+    }
+  };
+  
+  const getStatusIcon = (estado: string) => {
+    switch (estado) {
+      case 'disponible': return <CheckCircle className="h-4 w-4" />;
+      case 'mantenimiento': return <Wrench className="h-4 w-4" />;
+      case 'dañado': return <AlertCircle className="h-4 w-4" />;
       default: return <Monitor className="h-4 w-4" />;
     }
   };
   
-  const getStatusText = (status: string) => {
-    switch (status) {
+  const getStatusText = (estado: string) => {
+    switch (estado) {
       case 'disponible': return 'Disponible';
-      case 'en_uso': return 'En Uso';
       case 'mantenimiento': return 'Mantenimiento';
       case 'dañado': return 'Dañado';
       default: return 'Desconocido';
@@ -51,45 +87,35 @@ const Inventory = () => {
   const handleEquipmentClick = (equipment: Equipment) => {
     setSelectedEquipment(equipment);
   };
-  
-  const handleReportSubmit = () => {
-    if (reportText.trim()) {
-      // Aquí se enviaría el reporte al backend
-      alert(`Reporte enviado: ${reportText}`);
-      setReportText('');
-    }
-  };
 
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="flex items-center space-x-4">
-          <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
-            <Monitor className="h-6 w-6 text-blue-600 dark:text-blue-300" />
-          </div>
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Ambientes – Aula de Sistemas 1
-            </h2>
-            <p className="text-sm text-gray-500 dark:text-gray-400">
-              Distribución y estado de equipos en el aula
-            </p>
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between space-y-4 sm:space-y-0">
+          <div className="flex items-center space-x-4">
+            <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
+              <Monitor className="h-6 w-6 text-blue-600 dark:text-blue-300" />
+            </div>
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
+                Ambientes – Aula de Sistemas 1
+              </h2>
+              <p className="text-sm text-gray-500 dark:text-gray-400">
+                Distribución y estado de equipos en el aula
+              </p>
+            </div>
           </div>
         </div>
       </div>
 
       {/* Leyenda de Estados */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-4">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-4">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Leyenda de Estados</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
             <span className="text-sm text-gray-700 dark:text-gray-300">Disponible</span>
-          </div>
-          <div className="flex items-center space-x-2">
-            <div className="w-4 h-4 bg-blue-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">En Uso</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-yellow-500 rounded"></div>
@@ -103,7 +129,7 @@ const Inventory = () => {
       </div>
 
       {/* Gráfico Esquemático del Aula */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="hidden md:block border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Distribución del Aula</h3>
 
         {/* Grid del Aula */}
@@ -111,13 +137,13 @@ const Inventory = () => {
           {/* Fila Superior */}
           <div className="absolute top-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
             {[6, 5, 4].map((pos) => {
-              const equipment = equipmentData.find(eq => eq.position === pos);
+              const equipment = equipmentData.find(eq => eq.posicion === pos);
               return (
                 <button
                   key={pos}
                   onClick={() => equipment && handleEquipmentClick(equipment)}
-                  className={`w-16 h-16 rounded-lg text-white font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
-                    equipment ? getStatusColor(equipment.status) : 'bg-gray-400'
+                  className={`w-16 h-16 rounded-lg font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
+                    equipment ? getStatusColor(equipment.estado) : 'bg-gray-400 text-white'
                   }`}
                 >
                   {pos}
@@ -126,19 +152,19 @@ const Inventory = () => {
             })}
 
             {/* Puerta */}
-            <div className="w-20 h-16 bg-yellow-400 rounded-lg flex items-center justify-center ml-8">
-              <DoorOpen className="h-8 w-8 text-yellow-800" />
-              <span className="text-xs font-bold text-yellow-800 ml-1">PUERTA</span>
+            <div className="w-20 h-16 bg-yellow-800 rounded-lg flex items-center justify-center ml-8">
+              <DoorOpen className="h-8 w-8 text-white" />
+              <span className="text-xs font-bold text-white ml-1">PUERTA</span>
             </div>
 
             {[3, 2, 1].map((pos) => {
-              const equipment = equipmentData.find(eq => eq.position === pos);
+              const equipment = equipmentData.find(eq => eq.posicion === pos);
               return (
                 <button
                   key={pos}
                   onClick={() => equipment && handleEquipmentClick(equipment)}
-                  className={`w-16 h-16 rounded-lg text-white font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
-                    equipment ? getStatusColor(equipment.status) : 'bg-gray-400'
+                  className={`w-16 h-16 rounded-lg font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
+                    equipment ? getStatusColor(equipment.estado) : 'bg-gray-400 text-white'
                   }`}
                 >
                   {pos}
@@ -150,13 +176,13 @@ const Inventory = () => {
           {/* Columna Izquierda - Acercada más al centro */}
           <div className="absolute left-8 top-1/2 transform -translate-y-1/2 flex flex-col space-y-4">
             {[7, 8].map((pos) => {
-              const equipment = equipmentData.find(eq => eq.position === pos);
+              const equipment = equipmentData.find(eq => eq.posicion === pos);
               return (
                 <button
                   key={pos}
                   onClick={() => equipment && handleEquipmentClick(equipment)}
-                  className={`w-16 h-16 rounded-lg text-white font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
-                    equipment ? getStatusColor(equipment.status) : 'bg-gray-400'
+                  className={`w-16 h-16 rounded-lg font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
+                    equipment ? getStatusColor(equipment.estado) : 'bg-gray-400 text-white'
                   }`}
                 >
                   {pos}
@@ -175,13 +201,13 @@ const Inventory = () => {
           {/* Fila Inferior */}
           <div className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4">
             {[9, 10, 11, 12, 13, 14, 15, 16].map((pos) => {
-              const equipment = equipmentData.find(eq => eq.position === pos);
+              const equipment = equipmentData.find(eq => eq.posicion === pos);
               return (
                 <button
                   key={pos}
                   onClick={() => equipment && handleEquipmentClick(equipment)}
-                  className={`w-16 h-16 rounded-lg text-white font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
-                    equipment ? getStatusColor(equipment.status) : 'bg-gray-400'
+                  className={`w-16 h-16 rounded-lg font-bold text-sm transition-all duration-200 transform hover:scale-105 ${
+                    equipment ? getStatusColor(equipment.estado) : 'bg-gray-400 text-white'
                   }`}
                 >
                   {pos}
@@ -203,11 +229,89 @@ const Inventory = () => {
         </div>
       </div>
 
+      {/* Versión móvil/tablet: Lista scrollable */}
+      <div className="block md:hidden bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Equipos del Aula</h3>
+
+        <div className="overflow-x-auto">
+          <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-300">
+            <thead className="text-xs uppercase bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
+              <tr>
+                <th className="px-4 py-4">Posición</th>
+                <th className="px-4 py-2">No.Serie</th>
+                <th className="px-4 py-2">Tipo</th>
+                <th className="px-4 py-2">Estado</th>
+              </tr>
+            </thead>
+            <tbody className='border-x border-gray-300 dark:border-gray-500'>
+              {equipmentData.map((eq) => (
+                <tr
+                  key={eq.posicion}
+                  className="border-b dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                  onClick={() => handleEquipmentClick(eq)}
+                >
+                  <td className="px-4 py-4 font-bold text-gray-900 dark:text-white">{eq.posicion}</td>
+                  <td className="px-4 py-2 font-mono">{eq.numero_serie}</td>
+                  <td className="capitalize px-4 py-2 font-semibold">{eq.tipo}</td>
+                  <td className="px-4 py-2">
+                    <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                      eq.estado === 'disponible' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                      eq.estado === 'mantenimiento' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                      'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                    }`}>
+                      {getStatusText(eq.estado)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+              {/* Fila para el TV */}
+              <tr
+                key="tv"
+                className="border-b dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 cursor-pointer"
+                onClick={() => setSelectedTV(true)}
+              >
+                <td className="px-4 py-4 font-bold text-gray-900 dark:text-white">0</td>
+                <td className="px-4 py-2 font-mono">HQPE3345</td>
+                <td className="px-4 py-2 capitalize font-semibold">Televisor</td>
+                <td className="px-4 py-2">
+                  <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
+                    Disponible
+                  </span>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+
       {/* Cuadro de Diálogo para Reportes */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Registre aquí la novedad
+          Registre aquí su novedad
         </h3>
+
+        {/* Select de ambiente */}
+        <div className="mb-4">
+          <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Ambiente</label>
+          <select
+            value={ambiente?.id || ''}
+            onChange={(e) => {
+              const selectedId = Number(e.target.value);
+              const selectedAmbiente = ambientes.find(a => a.id === selectedId);
+              if (selectedAmbiente) {
+                setAmbiente(selectedAmbiente);
+              }
+            }}
+            className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
+          >
+            <option value="">Seleccione el ambiente</option>
+            {ambientes.map((a) => (
+              <option key={a.id} value={a.id}>{a.nombre}</option>
+            ))}
+          </select>
+        </div>
+
         <div className="space-y-4">
           <textarea
             value={reportText}
@@ -215,22 +319,13 @@ const Inventory = () => {
             maxLength={500}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Registra si hay alguna novedad con algún equipo, daños o pérdidas. Máx. 500 caracteres"
+            placeholder="Registre si hay alguna novedad con algún equipo, daños o pérdidas. Máx. 500 caracteres"
           />
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500 dark:text-gray-400">
               {reportText.length}/500 caracteres
             </span>
             <div className="flex space-x-2">
-              <button
-                onClick={() => {
-                  alert('Aula sin novedad registrada correctamente');
-                  setReportText('');
-                }}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-500"
-              >
-                Aula S/N
-              </button>
               <button
                 onClick={handleReportSubmit}
                 disabled={!reportText.trim()}
@@ -249,7 +344,7 @@ const Inventory = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
             <div className="flex justify-between items-center mb-4">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                Equipo #{selectedEquipment.position}
+                Equipo #{selectedEquipment.posicion}
               </h3>
               <button
                 onClick={() => setSelectedEquipment(null)}
@@ -262,55 +357,33 @@ const Inventory = () => {
             <div className="space-y-4">
               {/* Estado */}
               <div className="flex items-center space-x-2">
-                {getStatusIcon(selectedEquipment.status)}
+                {getStatusIcon(selectedEquipment.estado)}
                 <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-                  selectedEquipment.status === 'disponible' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                  selectedEquipment.status === 'en_uso' ? 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200' :
-                  selectedEquipment.status === 'mantenimiento' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
+                  selectedEquipment.estado === 'disponible' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                  selectedEquipment.estado === 'mantenimiento' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
                   'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
                 }`}>
-                  {getStatusText(selectedEquipment.status)}
+                  {getStatusText(selectedEquipment.estado)}
                 </span>
               </div>
 
               {/* Información del Equipo */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Marca</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.brand}</p>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
+                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.numero_serie}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.model}</p>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
+                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.pulgadas}</p>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Serie</label>
-                  <p className="text-sm text-gray-900 dark:text-white font-mono">{selectedEquipment.serialNumber}</p>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
+                  <p className="text-sm text-gray-900 dark:text-white font-mono">{selectedEquipment.caracteristicas}</p>
                 </div>
-              </div>
-
-              {/* Accesorios */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Accesorios</label>
-                <div className="grid grid-cols-3 gap-2">
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
-                    selectedEquipment.accessories.screen ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  }`}>
-                    <Monitor className="h-3 w-3" />
-                    <span>Pantalla</span>
-                  </div>
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
-                    selectedEquipment.accessories.keyboard ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  }`}>
-                    <span>⌨️</span>
-                    <span>Teclado</span>
-                  </div>
-                  <div className={`flex items-center space-x-1 px-2 py-1 rounded text-xs ${
-                    selectedEquipment.accessories.mouse ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                  }`}>
-                    <span>🖱️</span>
-                    <span>Mouse</span>
-                  </div>
+                <div className='col-span-2'>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
+                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.ultima_actualizacion}</p>
                 </div>
               </div>
             </div>
@@ -338,16 +411,20 @@ const Inventory = () => {
               {/* Información del TV */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Marca</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{tvData.brand}</p>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
+                  <p className="text-sm text-gray-900 dark:text-white">{tvData.numero_serie}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Modelo</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{tvData.model}</p>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
+                  <p className="text-sm text-gray-900 dark:text-white">{tvData.pulgadas}</p>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de Serie</label>
-                  <p className="text-sm text-gray-900 dark:text-white font-mono">{tvData.serialNumber}</p>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
+                  <p className="text-sm text-gray-900 dark:text-white font-mono">{tvData.caracteristicas}</p>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
+                  <p className="text-sm text-gray-900 dark:text-white">{tvData.ultima_actualizacion}</p>
                 </div>
               </div>
             </div>

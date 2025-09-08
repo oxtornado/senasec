@@ -183,7 +183,7 @@ export default function EquipmentDashboard() {
       </div>
 
       {/* Filtros */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="grid grid-cols-1">
           {/* Búsqueda general */}
           <div className="relative">
@@ -204,7 +204,7 @@ export default function EquipmentDashboard() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+            <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   No. Equipo
@@ -229,7 +229,7 @@ export default function EquipmentDashboard() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="border border-gray-700 dark:border-gray-500 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredEquipment.map((eq) => (
                 <tr key={eq.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
