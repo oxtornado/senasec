@@ -62,23 +62,6 @@ class UsuarioSerializer(serializers.ModelSerializer):
         return data
     
 
-    def update(self, instance, validated_data):
-        # Verificar si el usuario intenta cambiar el documento
-        if 'documento' in validated_data:
-            request = self.context.get('request')
-            if request.user.rol != 'admin':
-                raise serializers.ValidationError("No tienes permiso para cambiar el documento.")
-            
-        # Actualizar el resto de los campos
-        for attr, value in validated_data.items():
-            if attr == 'password':
-                instance.set_password(value)
-            else:
-                setattr(instance, attr, value)
-        instance.save()
-        return instance
-    
-
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     username_field = 'email'  # <- Esto indica que usaremos el campo email para la autenticación
 

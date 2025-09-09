@@ -182,6 +182,7 @@ const Register = () => {
                         email={formData.email}
                         telefono={formData.phone}
                         password={formData.password}
+                        isEditing={false}
                       /> {/* integración del componente */}
             </div>
           </form>

@@ -125,6 +125,48 @@ def get_face_token_from_django(email: str) -> str:
         return response.json()["face_token"]
     return None
 
+
+@app.post("/update-face/")
+async def update_face(
+    email: str = Form(...),
+    images: List[UploadFile] = File(...)
+):
+    best_token = None
+    best_confidence = 0
+
+    for image in images:
+        contents = await image.read()
+        print(f"[ACTUALIZAR] Foto recibida: {image.filename}, tamaño: {len(contents)} bytes")
+        image.file.seek(0)  # reiniciar el puntero del archivo
+
+        files = {"image_file": (image.filename, image.file, image.content_type)}
+        data = {"api_key": API_KEY, "api_secret": API_SECRET}
+        response = requests.post(FACE_DETECT_URL, files=files, data=data)
+        result = response.json()
+
+        if result.get("faces"):
+            face_token = result["faces"][0]["face_token"]
+            best_token = face_token
+            break
+
+    if best_token:
+        # Enviar solo el face_token actualizado a Django
+        try:
+            response = requests.patch(
+                f"http://127.0.0.1:8001/users/update-face-token/",
+                json={"email": email, "face_token": best_token}
+            )
+            if response.status_code == 200:
+                return {"message": "Face token actualizado correctamente", "face_token": best_token}
+            else:
+                raise HTTPException(status_code=500, detail="Error al actualizar en Django")
+        except Exception as e:
+            print("Error conectando con Django:", e)
+            raise HTTPException(status_code=500, detail="Error de conexión con Django")
+    else:
+        raise HTTPException(status_code=400, detail="No se detectó ningún rostro válido")
+
+
 # endpoint que hace la comparacion e inicia sesion si(80%)
 @app.post("/login-face/")
 async def login_face(email: str = Form(...), image: UploadFile = File(...)):

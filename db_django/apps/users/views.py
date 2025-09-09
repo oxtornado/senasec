@@ -59,9 +59,24 @@ class LogoutView(APIView):
         except Exception as e:
             return Response({"error": "No se pudo cerrar la sesión."}, status=status.HTTP_400_BAD_REQUEST)
 
+
+@api_view(['PATCH'])
+def update_face_token(request):
+    email = request.data.get("email")
+    new_token = request.data.get("face_token")
+
+    if not email or not new_token:
+        return Response({"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = Usuario.objects.get(email=email)
+        user.face_token = new_token
+        user.save()
+        return Response({"message": "Token actualizado correctamente"}, status=status.HTTP_200_OK)
+    except Usuario.DoesNotExist:
+        return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+
 # api para el login facial
-
-
 @api_view(['GET'])
 def get_face_token(request):
     email = request.GET.get('email')

@@ -9,9 +9,10 @@ interface FaceCaptureProps {
     email: string;
     telefono: string;
     password: string;
+    isEditing?: boolean;
 }
 
-const FaceCapture: React.FC<FaceCaptureProps> = ({ username, documento, rol, email, telefono, password }) => {
+const FaceCapture: React.FC<FaceCaptureProps> = ({ username, documento, rol, email, telefono, password, isEditing = false, }) => {
     const webcamRef = useRef<Webcam>(null); // referencia para tomar capturas
     const [capturing, setCapturing] = useState(false); // 
     const [status, setStatus] = useState(''); // muestra msj del proceso, fots en backend, tomando fotos...
@@ -33,11 +34,19 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ username, documento, rol, ema
 
     setStatus('Enviando al backend...');
 
+    const endpoint = isEditing
+        ? 'http://localhost:8000/update-face/'
+        : 'http://localhost:8000/register-face/';
+
     try {
         const formData = new FormData();
         photos.forEach((photo, index) => {
             formData.append('images', photo, `face_${index}.jpg`);
     });
+
+    if (isEditing) {
+        formData.append('email', email); // para actualizar, se necesita el email
+    } else {
         // contenido del formulario de registro
         formData.append('username', username);
         formData.append('documento', documento);
@@ -45,9 +54,9 @@ const FaceCapture: React.FC<FaceCaptureProps> = ({ username, documento, rol, ema
         formData.append('email', email);
         formData.append('telefono', telefono);
         formData.append('password', password);
+    }
 
-    const response = await axios.post(
-        'http://localhost:8000/register-face/', formData, {
+    const response = await axios.post(endpoint, formData, {
         headers: { 'Content-Type': 'multipart/form-data' }
     });
 
