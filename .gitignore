@@ -1,25 +1,25 @@
 # Node dependencies
-frontend-IA/node_modules/
-frontend-IA/package-lock.json
-frontend-IA/yarn.lock
+node_modules/
+package-lock.json
+yarn.lock
 
 # Build output
-frontend-IA/dist/
-frontend-IA/build/
+dist/
+build/
 
 # Logs
-frontend-IA/npm-debug.log*
-frontend-IA/yarn-debug.log*
-frontend-IA/yarn-error.log*
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
 # Vite cache
-frontend-IA/.vite/
+.vite/
 
 # OS / Editor / IDE
-frontend-IA/.DS_Store
-frontend-IA/Thumbs.db
-frontend-IA/*.swp
-frontend-IA/*.swo
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
 
 # VSCode settings (optional)
 .vscode/
@@ -32,34 +32,33 @@ vite-env.d.ts
 # Docker
 *.pid
 *.log
-frontend-IA/docker-compose..yml
-frontend-IA/docker/
+docker-compose.override.yml
+.docker/
 
 # Optional: Ignore custom HTMLs for debug (if not needed in prod)
-frontend-IA/clear-storage.html
-frontend-IA/debug-login.html
+clear-storage.html
+debug-login.html
 
 # Optional: Ignore patch file
-frontend-IA/landing-page-changes.patch
+landing-page-changes.patch
 
 # Coverage / Testing
-frontend-IA/coverage/
+coverage/
 
 # Optional: Ignore output from deploy script (if any)
-frontend-IA/deploy.sh
+deploy.sh
 
 # Nginx config (if it's only for local dev)
-frontend-IA/nginx.conf
+nginx.conf
 
 # Typescript build output (if used)
 *.tsbuildinfo
 
 # Lint cache
-frontend-IA/eslintcache
+.eslintcache
 
 # Byte-compiled / optimized / DLL files
-backend-IA/__pycache__/
-db_django/__pycache__/
+__pycache__/
 *.py[cod]
 *$py.class
 
@@ -72,7 +71,6 @@ env/
 .env/
 
 # Archivos compilados de Python
-backend-IA/.pyc
-db_django/.pyc
+*.pyc
 
 
