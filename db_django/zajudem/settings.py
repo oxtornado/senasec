@@ -92,7 +92,7 @@ CORS_ALLOW_METHODS = [
 ]
 
 
-ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost', 'django']
 
 ROOT_URLCONF = 'zajudem.urls'
 
@@ -123,8 +123,8 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql', #Conexión al gestor de base de datos en este caso postgresql
         'NAME': 'senasec', #Nombre de la base de datos
         'USER': 'postgres', #Usuario de la base de datos
-        'PASSWORD': '0000', #Contraseña de la base de datos
-        'HOST': '127.0.0.1', #Host de la base de datos
+        'PASSWORD': 'miclave123', #Contraseña de la base de datos
+        'HOST': 'db', #Host de la base de datos
         'PORT': '5432', #Puerto por defecto para establecer la conexión
     }
 }

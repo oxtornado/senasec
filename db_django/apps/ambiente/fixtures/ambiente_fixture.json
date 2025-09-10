@@ -1,0 +1,11 @@
+[
+  {
+    "model": "ambiente.ambiente",
+    "pk": 1,
+    "fields": {
+      "nombre": "Sistemas 1",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10"
+    }
+  }
+]

@@ -27,7 +27,7 @@ FACE_COMPARE_URL = "https://api-us.faceplusplus.com/facepp/v3/compare" # endpoin
 # mandar los datos a django
 def enviar_a_django(data: dict):
     try:
-        response = requests.post("http://127.0.0.1:8001/users/usuarios/", json=data)
+        response = requests.post("http://django:8001/users/usuarios/", json=data)
         if response.status_code == 201:
             print("Datos guardados correctamente en Django.")
         else:
@@ -119,7 +119,7 @@ async def register_face(
 
 def get_face_token_from_django(email: str) -> str:
     """ Hace GET al backend de Django para obtener el face_token """
-    url = f"http://localhost:8001/api/get-face-token/?email={email}" 
+    url = f"http://django:8001/api/get-face-token/?email={email}" 
     response = requests.get(url)
     if response.status_code == 200:
         return response.json()["face_token"]
@@ -153,7 +153,7 @@ async def update_face(
         # Enviar solo el face_token actualizado a Django
         try:
             response = requests.patch(
-                f"http://127.0.0.1:8001/users/update-face-token/",
+                f"http://django:8001/users/update-face-token/",
                 json={"email": email, "face_token": best_token}
             )
             if response.status_code == 200:

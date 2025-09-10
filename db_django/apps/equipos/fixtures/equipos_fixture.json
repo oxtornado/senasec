@@ -1,0 +1,240 @@
+[
+  {
+    "model": "equipos.equipo",
+    "pk": 1,
+    "fields": {
+      "posicion": "0",
+      "numero_serie": "TV-0001",
+      "tipo": "televisor",
+      "pulgadas": 55,
+      "caracteristicas": "Smart TV 4K",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 2,
+    "fields": {
+      "posicion": "1",
+      "numero_serie": "PC-0001",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 3,
+    "fields": {
+      "posicion": "2",
+      "numero_serie": "PC-0002",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 4,
+    "fields": {
+      "posicion": "3",
+      "numero_serie": "PC-0003",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 5,
+    "fields": {
+      "posicion": "4",
+      "numero_serie": "PC-0004",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 6,
+    "fields": {
+      "posicion": "5",
+      "numero_serie": "PC-0005",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 7,
+    "fields": {
+      "posicion": "6",
+      "numero_serie": "PC-0006",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 8,
+    "fields": {
+      "posicion": "7",
+      "numero_serie": "PC-0007",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 9,
+    "fields": {
+      "posicion": "8",
+      "numero_serie": "PC-0008",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 10,
+    "fields": {
+      "posicion": "9",
+      "numero_serie": "PC-0009",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 11,
+    "fields": {
+      "posicion": "10",
+      "numero_serie": "PC-0010",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 12,
+    "fields": {
+      "posicion": "11",
+      "numero_serie": "PC-0011",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 13,
+    "fields": {
+      "posicion": "12",
+      "numero_serie": "PC-0012",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 14,
+    "fields": {
+      "posicion": "13",
+      "numero_serie": "PC-0013",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 15,
+    "fields": {
+      "posicion": "14",
+      "numero_serie": "PC-0014",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 16,
+    "fields": {
+      "posicion": "15",
+      "numero_serie": "PC-0015",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  },
+  {
+    "model": "equipos.equipo",
+    "pk": 17,
+    "fields": {
+      "posicion": "16",
+      "numero_serie": "PC-0016",
+      "tipo": "computador",
+      "pulgadas": 21,
+      "caracteristicas": "Intel i5, 8GB RAM, SSD",
+      "estado": "disponible",
+      "ultima_actualizacion": "2025-09-10",
+      "ambiente": 1
+    }
+  }
+]

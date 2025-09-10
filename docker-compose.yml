@@ -1,0 +1,56 @@
+services:
+  # PostgreSQL para Django
+  db:
+    image: postgres:14
+    environment:
+      POSTGRES_DB: senasec  # Cambia esto por el nombre de tu base de datos
+      POSTGRES_USER: postgres  # Cambia por el nombre de tu usuario
+      POSTGRES_PASSWORD: miclave123  # Cambia por la contraseña de tu base de datos
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    networks:
+      - app-network
+
+  # Django
+  django:
+    build:
+      context: ./db_django
+    volumes:
+      - ./db_django:/app     # 👈 Montamos la app Django
+    ports:
+      - "8001:8001"
+    # environment:
+    #   - DATABASE_URL=postgres://postgres:0000@db:5432/senasec
+    depends_on:
+      - db
+    networks:
+      - app-network
+
+  # FastAPI
+  backend:
+    build:
+      context: ./backend-ia
+    ports:
+      - "8000:8000"
+    depends_on:
+      - django
+    networks:
+      - app-network
+
+  # React (Frontend)
+  frontend:
+    build:
+      context: ./frontend-IA
+    ports:
+      - "5173:5173"  # Este es el puerto de desarrollo de React
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
+
+volumes:
+  postgres_data:

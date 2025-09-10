@@ -29,13 +29,6 @@ Thumbs.db
 .env.*.local
 vite-env.d.ts
 
-# Docker
-*.pid
-*.log
-Dockerfile
-docker-compose.yml
-.docker/
-
 # Optional: Ignore custom HTMLs for debug (if not needed in prod)
 clear-storage.html
 debug-login.html
