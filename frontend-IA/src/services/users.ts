@@ -33,4 +33,22 @@ export const updateUserAPI = async (id: number, data: Partial<Users>) => {
     }
 };
 
+export const deleteUserAPI = async (id: number) => {
+    try {
+        const res = await axios.delete(`${API_BASE}${id}/`, {
+            headers: getAuthHeaders()
+        });
+        console.log('Usuario eliminado:', res.data);
+        return res.data;
+    } catch (error: any) {
+        if (error.response) {
+            console.error('Error al eliminar usuario:', error.response.data);
+        } else {
+            console.error('Error desconocido:', error.message);
+        }
+        throw error;
+    }
+};
+
+
 export { getAuthHeaders };

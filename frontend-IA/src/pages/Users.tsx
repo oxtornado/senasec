@@ -1,11 +1,11 @@
 import { useState, useEffect } from 'react';
 import { useUser, Users } from '../contexts/UsersContext';
-import { Search, Filter, Edit, Trash2, X, User, Camera } from 'lucide-react';
+import { Search, Filter, Edit, Trash2, X, User } from 'lucide-react';
 import { getCurrentUser } from '../services/auth';
 import FaceCapture from '../components/FaceCapture'; // o la ruta correcta según tu estructura
 
 export default function UsersDashboard() {
-  const { users, updateUser } = useUser();
+  const { users, updateUser, deleteUser } = useUser();
   console.log("users from context:", users);
 
   const [loading, setLoading] = useState(true);
@@ -159,7 +159,7 @@ export default function UsersDashboard() {
 
   const confirmDeleteUser = () => {
     if (userToDelete) {
-      setUsers(users.filter(u => u.id !== userToDelete.id));
+      deleteUser(userToDelete.id);
       setShowDeleteModal(false);
       setUserToDelete(null);
     }
@@ -190,7 +190,7 @@ export default function UsersDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center space-x-4">
           <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
             <User className="h-6 w-6 text-blue-600 dark:text-blue-300" />
@@ -207,7 +207,7 @@ export default function UsersDashboard() {
       </div>
 
       {/* Filtros y Búsqueda */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex flex-col md:flex-row md:items-center md:gap-x-6 space-y-4 md:space-y-0">
           {/* Barra de búsqueda */}
           <div className="relative flex-1">
@@ -244,7 +244,7 @@ export default function UsersDashboard() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+            <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   Nombre completo
@@ -257,7 +257,7 @@ export default function UsersDashboard() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="border border-gray-700 dark:border-gray-500 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredUsers.map((userData) => (
                 <tr key={userData.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">

@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { fetchUsers, updateUserAPI } from '../services/users';
+import { fetchUsers, updateUserAPI, deleteUserAPI } from '../services/users';
 
 export interface Users {
     id: number;
@@ -17,6 +17,7 @@ export interface Users {
 interface UserContextType {
     users: Users[];
     updateUser: (id: number, updatedUser: Partial<Users>) => void;
+    deleteUser: (id: number) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -45,10 +46,21 @@ export const UserProvider: React.FC<{children: ReactNode }> = ({ children }) => 
         );
     };
 
+    const deleteUser = async (id: number) => {
+        try {
+            await deleteUserAPI(id);
+            setUser(prev => prev.filter(u => u.id !== id));
+        } catch (error) {
+            console.error('Error eliminando usuario:', error);
+        }
+    };
+
+
     return (
         <UserContext.Provider value={{
             users,
-            updateUser
+            updateUser,
+            deleteUser
         }}>
             {children}
         </UserContext.Provider>

@@ -32,7 +32,8 @@ vite-env.d.ts
 # Docker
 *.pid
 *.log
-docker-compose.override.yml
+Dockerfile
+docker-compose.yml
 .docker/
 
 # Optional: Ignore custom HTMLs for debug (if not needed in prod)
