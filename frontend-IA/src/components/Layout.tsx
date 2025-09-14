@@ -72,8 +72,39 @@ const Layout = () => {
         { name: t('users'), href: "/dashboard/users", icon: Users },
       ];
     }
+
+    // Si es jefe de inventarios, agregar opciones adicionales
+    if (currentUser.rol == "inventario") {
+      return [
+        ...baseNavigation,
+        { name: t('equipment'), href: "/dashboard/equipment", icon: Settings },
+      ];
+    }
     
     return baseNavigation;
+  };
+
+  const roleStyles = {
+    admin: {
+      label: t('ADMIN'),
+      className: 'bg-red-100 text-red-800 border border-red-400 dark:bg-red-900 dark:text-red-200 dark:border-none',
+    },
+    instructor: {
+      label: t('INSTRUCTOR'),
+      className: 'bg-blue-100 text-blue-800 border border-blue-400 dark:bg-blue-900 dark:text-blue-200 dark:border-none',
+    },
+    aseo: {
+      label: t('ASEO'),
+      className: 'bg-green-100 text-green-800 border border-green-400 dark:bg-green-900 dark:text-green-200 dark:border-none',
+    },
+    seguridad: {
+      label: t('SEGURIDAD'),
+      className: 'bg-yellow-100 text-yellow-800 border border-yellow-400 dark:bg-yellow-900 dark:text-yellow-200 dark:border-none',
+    },
+    inventario: {
+      label: t('INVENTARIO'),
+      className: 'bg-purple-100 text-purple-800 border border-purple-400 dark:bg-purple-900 dark:text-purple-200 dark:border-none',
+    },
   };
   
   const navigation = getNavigation();
@@ -129,16 +160,19 @@ const Layout = () => {
               {/* Desktop User Info */}
               {currentUser && (
                 <div className="hidden xl:flex xl:items-center xl:space-x-2">
-                  <span className="text-sm text-gray-600 dark:text-gray-300">
-                    {currentUser.full_name}
-                  </span>
-                  <span className={`px-2 py-1 text-xs rounded-full ${
-                    currentUser.rol == "admin" 
-                      ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
-                      : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                  }`}>
-                    {currentUser.rol == "admin" ? t('ADMIN') : t('USER')}
-                  </span>
+                  {(() => {
+                    const role = currentUser.rol;
+                    const roleInfo = roleStyles[role] || {
+                      label: t('USER'),
+                      className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+                    };
+
+                    return (
+                      <span className={`px-2 py-1 text-xs rounded-full ${roleInfo.className}`}>
+                        {roleInfo.label}
+                      </span>
+                    );
+                  })()}
                 </div>
               )}
               
@@ -217,13 +251,19 @@ const Layout = () => {
                         <p className="text-sm font-medium text-gray-900 dark:text-white">
                           {currentUser.username}
                         </p>
-                        <span className={`inline-block px-2 py-1 text-xs rounded-full mt-1 ${
-                          currentUser.rol == "admin" 
-                            ? 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200' 
-                            : 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200'
-                        }`}>
-                          {currentUser.rol == "admin" ? t('ADMIN') : t('USER')}
-                        </span>
+                        {(() => {
+                          const role = currentUser.rol;
+                          const roleInfo = roleStyles[role] || {
+                            label: t('USER'),
+                            className: 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200',
+                          };
+
+                          return (
+                            <span className={`inline-block px-2 py-1 text-xs rounded-full mt-1 ${roleInfo.className}`}>
+                              {roleInfo.label}
+                            </span>
+                          );
+                        })()}
                       </div>
                     </div>
                   </div>
@@ -278,7 +318,7 @@ const Layout = () => {
                       localStorage.removeItem('token');
                       window.location.href = '/login';
                     }}
-                    className="w-full flex items-center justify-center px-4 py-3 text-base font-medium text-red-600 bg-red-50 hover:bg-red-100 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800 rounded-md min-h-touch"
+                    className="w-full flex items-center justify-center px-4 py-3 text-base font-medium text-red-600 border border-red-400 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800 rounded-md min-h-touch dark:border-none"
                   >
                     Cerrar Sesión
                   </button>
@@ -289,21 +329,23 @@ const Layout = () => {
         )}
       </nav>
       
-      <main className="py-6 md:py-10">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 xl:px-8">
-          <Outlet />
-        </div>
-      </main>
-      <footer className="bg-white dark:bg-gray-800 border-t dark:border-gray-700">
-        <div className="mx-auto max-w-7xl px-4 sm:px-6 xl:px-8 py-6">
-          <div className="text-center text-sm text-gray-500 dark:text-gray-400">
-            <p>© 2024 SENASEC. {t("allRightsReserved")}</p>
-            <p>
-              {t("contact")}: soporte@senasec.com | {t("tel")}: (123) 456-7890
-            </p>
+      <div className="flex flex-col min-h-[calc(100vh-4rem)]">
+        <main className="flex-grow py-6 md:py-10">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 xl:px-8">
+            <Outlet />
           </div>
-        </div>
-      </footer>
+        </main>
+        <footer className="bg-white dark:bg-gray-800 border-t dark:border-gray-700">
+          <div className="mx-auto max-w-7xl px-4 sm:px-6 xl:px-8 py-6">
+            <div className="text-center text-sm text-gray-500 dark:text-gray-400">
+              <p>© 2024 SENASEC. {t("allRightsReserved")}</p>
+              <p>
+                {t("contact")}: soporte@senasec.com | {t("tel")}: (123) 456-7890
+              </p>
+            </div>
+          </div>
+        </footer>
+      </div>
     </div>
   );
 };

@@ -1,10 +1,13 @@
 import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Lock, Cloud, User, Mail, KeyRound, Phone} from 'lucide-react';
+// import { getCurrentUser } from '../services/auth';
 import toast from 'react-hot-toast';
 import FaceCapture from '../components/FaceCapture';
 
 const Register = () => {
+  // const [user, setUser] = useState<any>(null);
+  // const [loading, setLoading] = useState(true);
   const [formData, setFormData] = useState({
     name: '',
     documento: '',
@@ -13,6 +16,44 @@ const Register = () => {
     role: '',
     phone: '',
   });
+
+  // useEffect(() => {
+  //   const fetchUser = async () => {
+  //     try {
+  //       const userData = await getCurrentUser();
+  //       setUser(userData);
+  //     } catch (error) {
+  //       console.error('Error fetching user:', error);
+  //     } finally {
+  //       setLoading(false);
+  //     }
+  //   };
+
+  //   fetchUser();
+  // }, []);
+
+  // if (loading) {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen">
+  //       <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+  //     </div>
+  //   );
+  // }
+
+  // if (!user || user.rol !== "admin") {
+  //   return (
+  //     <div className="flex items-center justify-center min-h-screen">
+  //       <div className="text-center">
+  //         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
+  //           Acceso Restringido
+  //         </h2>
+  //         <p className="text-gray-600 dark:text-gray-400">
+  //           No tienes permisos para acceder a esta página.
+  //         </p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();

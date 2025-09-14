@@ -179,11 +179,11 @@ export default function UsersDashboard() {
   };
 
   const roleColors: Record<Users['rol'], string> = {
-    admin: 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200',
-    instructor: 'bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200',
-    seguridad: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200',
-    aseo: 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200',
-    inventario: 'bg-purple-100 text-purple-800 dark:bg-purple-900 dark:text-purple-200',
+    admin: 'bg-red-100 text-red-800 border border-red-400 dark:bg-red-900 dark:text-red-200 dark:border-none',
+    instructor: 'bg-blue-100 text-blue-800 border border-blue-400 dark:bg-blue-900 dark:text-blue-200 dark:border-none',
+    seguridad: 'bg-yellow-100 text-yellow-800 border border-yellow-400 dark:bg-yellow-900 dark:text-yellow-200 dark:border-none',
+    aseo: 'bg-green-100 text-green-800 border border-green-400 dark:bg-green-900 dark:text-green-200 dark:border-none',
+    inventario: 'bg-purple-100 text-purple-800 border border-purple-400 dark:bg-purple-900 dark:text-purple-200 dark:border-none',
   };
 
 
@@ -366,7 +366,9 @@ export default function UsersDashboard() {
                 >
                   <option value="">Seleccione rol</option>
                   {roles.map(role => (
-                    <option key={role} value={role}>{role}</option>
+                    <option key={role} value={role}>
+                      {role.charAt(0).toUpperCase() + role.slice(1)}
+                    </option>
                   ))}
                 </select>
               </div>

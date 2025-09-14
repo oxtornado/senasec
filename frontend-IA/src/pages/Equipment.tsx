@@ -68,7 +68,7 @@ export default function EquipmentDashboard() {
     );
   }
 
-  if (!user || user.rol !== "admin") {
+  if (!user || user.rol !== "admin" && user.rol !== "inventario") {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
@@ -102,10 +102,10 @@ export default function EquipmentDashboard() {
 
   const getStatusColor = (status: Equipment['estado']) => {
     switch (status) {
-      case 'disponible': return 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200';
-      case 'mantenimiento': return 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200';
-      case 'dañado': return 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200';
-      default: return 'bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200';
+      case 'disponible': return 'bg-green-100 text-green-800 border border-green-400 dark:bg-green-900 dark:text-green-200 dark:border-none';
+      case 'mantenimiento': return 'bg-yellow-100 text-yellow-800 border border-yellow-400 dark:bg-yellow-900 dark:text-yellow-200 dark:border-none';
+      case 'dañado': return 'bg-red-100 text-red-800 border border-red-400 dark:bg-red-900 dark:text-red-200 dark:border-none';
+      default: return 'bg-gray-100 text-gray-800 border border-gray-400 dark:bg-gray-900 dark:text-gray-200 dark:border-none';
     }
   };
 

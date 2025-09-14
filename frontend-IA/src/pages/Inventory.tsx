@@ -68,10 +68,10 @@ const Inventory = () => {
   
   const getStatusIcon = (estado: string) => {
     switch (estado) {
-      case 'disponible': return <CheckCircle className="h-4 w-4" />;
-      case 'mantenimiento': return <Wrench className="h-4 w-4" />;
-      case 'dañado': return <AlertCircle className="h-4 w-4" />;
-      default: return <Monitor className="h-4 w-4" />;
+      case 'disponible': return <CheckCircle className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 dark:text-white" />;
+      case 'mantenimiento': return <Wrench className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 dark:text-white" />;
+      case 'dañado': return <AlertCircle className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 dark:text-white" />;
+      default: return <Monitor className="h-4 w-4 md:h-5 md:w-5 lg:h-6 lg:w-6 dark:text-white" />;
     }
   };
   
@@ -271,7 +271,7 @@ const Inventory = () => {
                 onClick={() => setSelectedTV(true)}
               >
                 <td className="px-4 py-4 font-bold text-gray-900 dark:text-white">0</td>
-                <td className="px-4 py-2 font-mono">HQPE3345</td>
+                <td className="px-4 py-2 font-mono">TUVWZ29402</td>
                 <td className="px-4 py-2 capitalize font-semibold">Televisor</td>
                 <td className="px-4 py-2">
                   <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200">
@@ -341,16 +341,16 @@ const Inventory = () => {
       {/* Modal de Información del Equipo */}
       {selectedEquipment && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-6 md:p-10 lg:py-10 max-w-md w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 dark:text-white">
                 Equipo #{selectedEquipment.posicion}
               </h3>
               <button
                 onClick={() => setSelectedEquipment(null)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300"
               >
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 md:h-8 md:w-8" />
               </button>
             </div>
 
@@ -359,9 +359,9 @@ const Inventory = () => {
               <div className="flex items-center space-x-2">
                 {getStatusIcon(selectedEquipment.estado)}
                 <span className={`px-2 py-1 rounded-full text-sm font-medium ${
-                  selectedEquipment.estado === 'disponible' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
-                  selectedEquipment.estado === 'mantenimiento' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200' :
-                  'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
+                  selectedEquipment.estado === 'disponible' ? 'bg-green-100 text-green-800 border border-green-400 dark:bg-green-900 dark:text-green-200 dark:border-none' :
+                  selectedEquipment.estado === 'mantenimiento' ? 'bg-yellow-100 text-yellow-800 border border-yellow-400 dark:bg-yellow-900 dark:text-yellow-200 dark:border-none' :
+                  'bg-red-100 text-red-800 border border-red-400 dark:bg-red-900 dark:text-red-200 dark:border-none'
                 }`}>
                   {getStatusText(selectedEquipment.estado)}
                 </span>
@@ -370,20 +370,20 @@ const Inventory = () => {
               {/* Información del Equipo */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.numero_serie}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{selectedEquipment.numero_serie}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.pulgadas}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{selectedEquipment.pulgadas}</p>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
-                  <p className="text-sm text-gray-900 dark:text-white font-mono">{selectedEquipment.caracteristicas}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white font-mono">{selectedEquipment.caracteristicas}</p>
                 </div>
                 <div className='col-span-2'>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{selectedEquipment.ultima_actualizacion}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{selectedEquipment.ultima_actualizacion}</p>
                 </div>
               </div>
             </div>
@@ -394,16 +394,16 @@ const Inventory = () => {
       {/* Modal de Información del TV */}
       {selectedTV && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 sm:p-6 md:p-10 lg:py-10 max-w-md w-full sm:max-w-xl md:max-w-3xl lg:max-w-4xl mx-4">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+              <h3 className="text-lg sm:text-xl md:text-2xl lg:text-3xl font-semibold text-gray-900 dark:text-white">
                 Televisor del Aula
               </h3>
               <button
                 onClick={() => setSelectedTV(false)}
                 className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-200"
               >
-                <X className="h-6 w-6" />
+                <X className="h-6 w-6 md:h-8 md:w-8" />
               </button>
             </div>
             
@@ -411,20 +411,20 @@ const Inventory = () => {
               {/* Información del TV */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{tvData.numero_serie}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{tvData.numero_serie}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{tvData.pulgadas}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{tvData.pulgadas}</p>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
-                  <p className="text-sm text-gray-900 dark:text-white font-mono">{tvData.caracteristicas}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white font-mono">{tvData.caracteristicas}</p>
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
-                  <p className="text-sm text-gray-900 dark:text-white">{tvData.ultima_actualizacion}</p>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
+                  <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{tvData.ultima_actualizacion}</p>
                 </div>
               </div>
             </div>
