@@ -1,54 +1,35 @@
 import React, { useState, useEffect } from 'react';
-import { Search, Plus, Edit, Trash2, User, Calendar, Clock, X, Filter, AlertTriangle } from 'lucide-react';
+import axios from 'axios';
+import { Search, Plus, Edit, Trash2, User, Calendar, Clock, X } from 'lucide-react';
 import { getCurrentUser } from '../services/auth';
-import { useAssignments, Assignment } from '../contexts/AssignmentsContext';
+import { getAuthHeaders } from '../services/assignments';
+import { useAssignments, Assignments, AssignmentsInput } from '../contexts/AssignmentsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const Assignments = () => {
+export default function AssignmentsDashboard() {
+  const { assignments, createAssignment, updateAssignment, deleteAssignment } = useAssignments();
+  console.log("assignments from context:", assignments);
+
   const { t } = useLanguage();
-  const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
-  const [selectedInstructor, setSelectedInstructor] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
-  const [selectedAssignment, setSelectedAssignment] = useState<Assignment | null>(null);
-  const [scheduleError, setScheduleError] = useState('');
-  const [formData, setFormData] = useState<Omit<Assignment, 'id' | 'createdAt'>>({
-    instructorName: '',
-    ficha: '',
-    status: 'Inactivo',
-    assignmentDates: '',
-    schedule: '',
-    classroom: ''
-  });
-
-  // Usar el contexto de asignaciones
-  const { assignments, addAssignment, updateAssignment, deleteAssignment, validateScheduleConflict, isCleaningTime } = useAssignments();
-
-  const uniqueInstructors = [...new Set(assignments.map(a => a.instructorName))];
-  const classrooms = ['Aula de Sistemas 1', 'Aula de Sistemas 2', 'Aula de Sistemas 3', 'Aula de Diseño', 'Aula de Redes'];
-  // Jornadas completas para asignación manual + franjas específicas
-  const scheduleOptions = [
-    // Jornadas completas (para asignación manual)
-    '07:00 - 13:00',  // Jornada mañana completa
-    '13:30 - 18:00',  // Jornada tarde completa
-    '18:00 - 22:00',  // Jornada noche completa (corregido)
-    // Franjas específicas (para asignaciones detalladas)
-    '07:00 - 08:00', '08:00 - 09:00', '09:00 - 10:00', '10:00 - 11:00', '11:00 - 12:00', '12:00 - 13:00',
-    '13:30 - 14:30', '14:30 - 15:30', '15:30 - 16:30', '16:30 - 17:30', '17:30 - 18:00',
-    '18:00 - 19:00', '19:00 - 20:00', '20:00 - 21:00', '21:00 - 22:00'
-  ];
-  // Nota: 13:00-13:30 está reservado para aseo y no debe usarse para asignaciones
+  const [selectedAssignment, setSelectedAssignment] = useState<Assignments | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [assignmentToDelete, setAssignmentToDelete] = useState<Assignments | null>(null);
+  const [users, setUsers] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
+  const [fichas, setFichas] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
+  const [ambientes, setAmbientes] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
 
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const currentUser = await getCurrentUser();
-        setUser(currentUser);
+        const userData = await getCurrentUser();
+        setUser(userData);
       } catch (error) {
         console.error('Error fetching user:', error);
-        setUser(null);
       } finally {
         setLoading(false);
       }
@@ -56,6 +37,60 @@ const Assignments = () => {
 
     fetchUser();
   }, []);
+
+  useEffect(() => {
+    const fetchUsers = async () => {
+      try {
+        const res = await axios.get('http://127.0.0.1:8001/users/usuarios/', {
+          headers: getAuthHeaders(),
+        });
+        setUsers(res.data);
+      } catch (error) {
+        console.error('Error cargando usuarios:', error);
+      }
+    };
+
+    fetchUsers();
+  }, []);
+
+  useEffect(() => {
+    const fetchFichas = async () => {
+      try {
+        const res = await axios.get('http://127.0.0.1:8001/fichas/fichas/', {
+          headers: getAuthHeaders(),
+        });
+        setFichas(res.data);
+      } catch (error) {
+        console.error('Error cargando fichas:', error);
+      }
+    };
+
+    fetchFichas();
+  }, []);
+
+  useEffect(() => {
+    const fetchAmbientes = async () => {
+      try {
+        const res = await axios.get('http://127.0.0.1:8001/ambiente/ambiente/', {
+          headers: getAuthHeaders(),
+        });
+        setAmbientes(res.data);
+      } catch (error) {
+        console.error('Error cargando ambientes:', error);
+      }
+    };
+
+    fetchAmbientes();
+  }, []);
+
+  const [formData, setFormData] = useState<Partial<AssignmentsInput>>({
+    usuario_id: 0,
+    ficha_id: 0,
+    ambiente_id: 0,
+    dia: '',
+    hora_inicio: '',
+    hora_fin: ''
+  });
 
   if (loading) {
     return (
@@ -81,82 +116,102 @@ const Assignments = () => {
   }
 
   // Filtrar asignaciones
-  const filteredAssignments = assignments.filter(assignment => {
-    const matchesSearch = assignment.instructorName.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesInstructor = selectedInstructor === '' || assignment.instructorName === selectedInstructor;
-    return matchesSearch && matchesInstructor;
-  });
+  const filteredAssignments = assignments.filter(a => {
+  const username = a.usuario.username.toLowerCase() || '';
+  const term = searchTerm.toLowerCase();
+  return username.includes(term);
+});
+
+  // Funciones para manejar los modales
+  const resetForm = () => {
+    setFormData({
+      usuario_id: 0,
+      ambiente_id: 0,
+      ficha_id: 0,
+      dia: '',
+      hora_inicio: '',
+      hora_fin: ''
+    });
+  };
+
+  const handleInputChange = (field: keyof typeof formData, value: any) => {
+    setFormData((prev) => ({ ...prev, [field]: value }));
+  };
 
   const handleCreateAssignment = () => {
+    setFormData({
+      usuario_id: 0,
+      ficha_id: 0,
+      ambiente_id: 0,
+      dia: '',
+      hora_inicio: '',
+      hora_fin: ''
+    });
+    setSelectedAssignment(null);
+    setIsEditing(false);
+    setIsModalOpen(true);
+  };
+
+  const handleEditAssignment = (assignment: Assignments) => {
+    setFormData({
+      usuario_id: assignment.usuario.id,
+      ficha_id: assignment.ficha.id,
+      ambiente_id: assignment.ambiente.id,
+      dia: assignment.dia,
+      hora_inicio: assignment.hora_inicio,
+      hora_fin: assignment.hora_fin
+    });
+    setSelectedAssignment(assignment);
+    setIsEditing(true);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
     setIsEditing(false);
     setSelectedAssignment(null);
-    setFormData({
-      instructorName: '',
-      ficha: '',
-      status: 'Inactivo',
-      assignmentDates: '',
-      schedule: '',
-      classroom: ''
-    });
-    setScheduleError('');
-    setIsModalOpen(true);
-  };
-
-  const handleEditAssignment = (assignment: Assignment) => {
-    setIsEditing(true);
-    setSelectedAssignment(assignment);
-    setFormData({
-      instructorName: assignment.instructorName,
-      ficha: assignment.ficha,
-      status: assignment.status,
-      assignmentDates: assignment.assignmentDates,
-      schedule: assignment.schedule,
-      classroom: assignment.classroom
-    });
-    setScheduleError('');
-    setIsModalOpen(true);
-  };
-
-  const handleDeleteAssignment = (id: number) => {
-    console.log('handleDeleteAssignment llamado con ID:', id);
-    if (window.confirm(t('confirmDeleteAssignment'))) {
-      console.log('Usuario confirmó eliminación');
-      deleteAssignment(id);
-    } else {
-      console.log('Usuario canceló eliminación');
-    }
+    resetForm();
   };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setScheduleError('');
+    
+    const assignmentData = {
+      usuario_id: formData.usuario_id || 0,
+      ambiente_id: formData.ambiente_id || 0,
+      ficha_id: formData.ficha_id || 0,
+      dia: (formData.dia || '').trim(),
+      hora_inicio: (formData.hora_inicio || '').trim(),
+      hora_fin: (formData.hora_fin || '').trim(),
+    };
 
-    // Validar horario de aseo
-    if (isCleaningTime(formData.schedule)) {
-      setScheduleError(t('cleaningTimeError'));
-      return;
-    }
-
-    // Validar conflictos de horario
-    if (validateScheduleConflict(formData.schedule, formData.classroom, selectedAssignment?.id)) {
-      setScheduleError(t('scheduleConflictError'));
-      return;
-    }
+    console.log('Enviando programación:', assignmentData); // 👀 usa esto para confirmar
 
     if (isEditing && selectedAssignment) {
-      updateAssignment(selectedAssignment.id, formData);
+      updateAssignment(selectedAssignment.id, assignmentData);
     } else {
-      addAssignment(formData);
+      createAssignment(assignmentData);
     }
 
-    setIsModalOpen(false);
+    closeModal();
   };
 
-  const handleInputChange = (field: keyof typeof formData, value: string) => {
-    setFormData(prev => ({ ...prev, [field]: value }));
-    if (field === 'schedule' || field === 'classroom') {
-      setScheduleError('');
+  const handleDeleteAssignment = (assignment: Assignments) => {
+    setAssignmentToDelete(assignment);
+    setShowDeleteModal(true);
+  };
+  
+  const confirmDeleteAssignment = () => {
+    if (assignmentToDelete) {
+      deleteAssignment(assignmentToDelete.id);
+      setShowDeleteModal(false);
+      setAssignmentToDelete(null);
     }
+  };
+  
+  const cancelDeleteAssignment = () => {
+    setShowDeleteModal(false);
+    setAssignmentToDelete(null);
   };
 
   return (
@@ -169,10 +224,10 @@ const Assignments = () => {
           </div>
           <div>
             <h1 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
-              {t('instructorAssignments')}
+              {t('assignmentTitle')}
             </h1>
             <p className="text-gray-600 dark:text-gray-400">
-              {t('assignmentManagement')}
+              {t('assignmentDescription')}
             </p>
           </div>
         </div>
@@ -180,29 +235,15 @@ const Assignments = () => {
         {/* Búsqueda y filtros */}
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
           <div className="flex flex-col sm:flex-row gap-4 flex-1">
-            <div className="relative">
+            <div className="relative w-full">
               <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
               <input
                 type="text"
-                placeholder={t('searchInstructor')}
+                placeholder={t('assignmentSearch')}
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
               />
-            </div>
-            
-            <div className="relative">
-              <Filter className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <select
-                value={selectedInstructor}
-                onChange={(e) => setSelectedInstructor(e.target.value)}
-                className="pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white appearance-none"
-              >
-                <option value="">{t('allInstructors')}</option>
-                {uniqueInstructors.map(instructor => (
-                  <option key={instructor} value={instructor}>{instructor}</option>
-                ))}
-              </select>
             </div>
           </div>
 
@@ -210,8 +251,8 @@ const Assignments = () => {
             onClick={handleCreateAssignment}
             className="flex items-center space-x-2 px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
           >
-            <Plus className="h-4 w-4" />
-            <span>{t('assignInstructor')}</span>
+            <Plus className="h-5 w-5" />
+            <span>{t('assignmentButton')}</span>
           </button>
         </div>
       </div>
@@ -223,10 +264,10 @@ const Assignments = () => {
             <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  {t('instructor')}
+                  {t('assignmentUsername')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  {t('status')}
+                  {t('assignmentEnvironment')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {t('assignmentDates')}
@@ -248,35 +289,30 @@ const Assignments = () => {
                       </div>
                       <div className="ml-4">
                         <div className="text-sm font-medium text-gray-900 dark:text-white">
-                          {assignment.instructorName}
+                          {assignment.usuario.username}
                         </div>
                         <div className="text-sm text-gray-500 dark:text-gray-400">
-                          {t('assignedGroup')}: {assignment.ficha}
+                          {t('assignedGroup')}: {assignment.ficha.numero}
                         </div>
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                      assignment.status === 'Activo' 
-                        ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' 
-                        : 'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200'
-                    }`}>
-                      {assignment.status}
-                    </span>
+                    <div className="text-sm text-gray-900 dark:text-white">
+                      <div className="text-md text-gray-500 dark:text-gray-400 mt-1">
+                        {assignment.ambiente.nombre}
+                      </div>
+                    </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="text-sm text-gray-900 dark:text-white">
                       <div className="flex items-center">
                         <Calendar className="h-4 w-4 text-gray-400 mr-1" />
-                        {assignment.assignmentDates}
+                        {assignment.dia}
                       </div>
                       <div className="flex items-center mt-1">
                         <Clock className="h-4 w-4 text-gray-400 mr-1" />
-                        {assignment.schedule}
-                      </div>
-                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-1">
-                        {assignment.classroom}
+                        {assignment.hora_inicio} - {assignment.hora_fin}
                       </div>
                     </div>
                   </td>
@@ -290,7 +326,7 @@ const Assignments = () => {
                         <Edit className="h-4 w-4" />
                       </button>
                       <button
-                        onClick={() => handleDeleteAssignment(assignment.id)}
+                        onClick={() => handleDeleteAssignment(assignment)}
                         className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                         title={t('deleteAssignment')}
                       >
@@ -307,7 +343,7 @@ const Assignments = () => {
         {filteredAssignments.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              {t('noAssignmentsFound')}
+              {t('assignmentNotFound')}
             </p>
           </div>
         )}
@@ -319,7 +355,7 @@ const Assignments = () => {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {isEditing ? t('editInstructorAssignment') : t('assignInstructorToClassroom')}
+                {isEditing ? t('assignmentUpdate') : t('assignmentCreate')}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -330,139 +366,161 @@ const Assignments = () => {
             </div>
             
             <form onSubmit={handleSubmit} className="space-y-4">
-              {/* Nombre del instructor */}
+              {/* INSTRUCTOR */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('instructorName')}
-                </label>
-                <input
-                  type="text"
-                  value={formData.instructorName}
-                  onChange={(e) => handleInputChange('instructorName', e.target.value)}
-                  placeholder={t('enterInstructorName')}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              {/* Ficha que imparte */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('groupCode')}
-                </label>
-                <input
-                  type="text"
-                  value={formData.ficha}
-                  onChange={(e) => handleInputChange('ficha', e.target.value)}
-                  placeholder={t('enterGroupCode')}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                />
-              </div>
-
-              {/* Estado de la asignación */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('assignmentStatus')}
+                  {t('assignmentUser')}
                 </label>
                 <select
-                  value={formData.status}
-                  onChange={(e) => handleInputChange('status', e.target.value as 'Activo' | 'Inactivo')}
+                  value={formData.usuario_id}
+                  onChange={(e) => handleInputChange('usuario_id', Number(e.target.value))}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="Inactivo">{t('inactive')}</option>
-                  <option value="Activo">{t('active')}</option>
+                  <option value="">{t('assignmentSelectedUser')}</option>
+                  {users.map(i => (
+                    <option key={i.id} value={i.id}>{i.username}</option>
+                  ))}
                 </select>
               </div>
 
-              {/* Fecha de asignación */}
+              {/* FICHA */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('assignmentDates')}
+                  {t('assignmentGroup')}
                 </label>
                 <select
-                  value={formData.assignmentDates}
-                  onChange={(e) => handleInputChange('assignmentDates', e.target.value)}
+                  value={formData.ficha_id}
+                  onChange={(e) => handleInputChange('ficha_id', Number(e.target.value))}
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">{t('selectAssignmentDays')}</option>
-                  {/* Opciones por rangos */}
-                  <option value="Lunes a Viernes">Lunes a Viernes</option>
-                  <option value="Lunes a Miércoles">Lunes a Miércoles</option>
-                  <option value="Jueves a Sábado">Jueves a Sábado</option>
-                  <option value="Lunes a Domingo">Lunes a Domingo</option>
-                  {/* Días individuales */}
-                  <option value="Lunes">Lunes</option>
-                  <option value="Martes">Martes</option>
-                  <option value="Miércoles">Miércoles</option>
-                  <option value="Jueves">Jueves</option>
-                  <option value="Viernes">Viernes</option>
-                  <option value="Sábados">Sábados</option>
-                  <option value="Domingos">Domingos</option>
+                  <option value="">{t('assignmentSelectedGroup')}</option>
+                  {fichas.map(f => (
+                    <option key={f.id} value={f.id}>{f.numero}</option>
+                  ))}
                 </select>
+              </div>
+
+              {/* AMBIENTE */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('assignmentEnvironmentInput')}
+                </label>
+                <select
+                  value={formData.ambiente_id}
+                  onChange={(e) => handleInputChange('ambiente_id', Number(e.target.value))}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                >
+                  <option value="">{t('assignmentSelectedEnvironment')}</option>
+                  {ambientes.map(a => (
+                    <option key={a.id} value={a.id}>{a.nombre}</option>
+                  ))}
+                </select>
+              </div>
+
+              {/* DÍA */}
+              <div>
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                  {t('assignmentDayInput')}
+                </label>
+                <input
+                  type="date"
+                  value={formData.dia}
+                  onChange={(e) => handleInputChange('dia', e.target.value)}
+                  required
+                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                />
               </div>
 
               {/* Horario */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Horario
-                </label>
-                <select
-                  value={formData.schedule}
-                  onChange={(e) => handleInputChange('schedule', e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                >
-                  <option value="">Seleccione horario</option>
-                  {scheduleOptions.map(schedule => (
-                    <option key={schedule} value={schedule}>{schedule}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Aula */}
-              <div>
-                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Aula asignada
-                </label>
-                <select
-                  value={formData.classroom}
-                  onChange={(e) => handleInputChange('classroom', e.target.value)}
-                  required
-                  className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
-                >
-                  <option value="">Seleccione aula</option>
-                  {classrooms.map(classroom => (
-                    <option key={classroom} value={classroom}>{classroom}</option>
-                  ))}
-                </select>
-              </div>
-
-              {/* Error de horario */}
-              {scheduleError && (
-                <div className="flex items-center space-x-2 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
-                  <AlertTriangle className="h-4 w-4 text-red-600 dark:text-red-400" />
-                  <span className="text-sm text-red-600 dark:text-red-400">{scheduleError}</span>
+              <div className='flex gap-4'>
+                <div className='flex-1'>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('assignmentStartHourInput')}
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.hora_inicio}
+                    onChange={(e) => handleInputChange('hora_inicio', e.target.value)}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                  />
                 </div>
-              )}
 
-              {/* Botón de acción */}
+                <div className='flex-1'>
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+                    {t('assignmentEndHourInput')}
+                  </label>
+                  <input
+                    type="time"
+                    value={formData.hora_fin}
+                    onChange={(e) => handleInputChange('hora_fin', e.target.value)}
+                    required
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
+                  />
+                </div>
+              </div>
+
+              {/* BOTÓN */}
               <div className="pt-4">
                 <button
                   type="submit"
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                  {isEditing ? 'Actualizar' : 'Guardar'}
+                  {isEditing ? t('assignmentUpdateButton') : t('assignmentCreateButton')}
                 </button>
               </div>
             </form>
           </div>
         </div>
       )}
+
+      {/* Modal de Confirmación de Eliminación */}
+      {showDeleteModal && assignmentToDelete && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-sm w-full mx-4">
+            <div className="text-center">
+              <div className="mb-4">
+                <div className="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-100 dark:bg-red-900">
+                  <svg className="h-6 w-6 text-red-600 dark:text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+                  </svg>
+                </div>
+              </div>
+              
+              <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
+                {t('assignmentWarning')}
+              </h3>
+              
+              <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
+                {t('assignmentWarningDescription')}
+              </p>
+              
+              <div className="text-sm text-gray-700 dark:text-gray-300 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
+                <strong>{t('assignmentWarningAssignment')}</strong><br />
+                {assignmentToDelete.usuario.username}
+              </div>
+              
+              <div className="flex space-x-3 justify-center">
+                <button
+                  onClick={cancelDeleteAssignment}
+                  className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
+                >
+                  {t('assignmentWarningCancel')}
+                </button>
+                <button
+                  onClick={confirmDeleteAssignment}
+                  className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
+                >
+                  {t('assignmentWarningDelete')}
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
-
-export default Assignments;

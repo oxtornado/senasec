@@ -19,7 +19,7 @@ import { UserProvider } from "./contexts/UsersContext";
 import { AmbienteProvider } from "./contexts/EnvironmentContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { EquipmentProvider } from "./contexts/EquipmentContext";
-import { AssignmentsProvider } from "./contexts/AssignmentsContext";
+import { AssignmentProvider } from "./contexts/AssignmentsContext";
 import { ReportsProvider } from "./contexts/ReportsContext";
 
 function App() {
@@ -28,7 +28,7 @@ function App() {
       <UserProvider>
         <AmbienteProvider>
           <EquipmentProvider>
-            <AssignmentsProvider>
+            <AssignmentProvider>
               <ReportsProvider>
               <Router>
             <Routes>
@@ -57,7 +57,7 @@ function App() {
             </Routes>
               </Router>
               </ReportsProvider>
-            </AssignmentsProvider>
+            </AssignmentProvider>
           </EquipmentProvider>
         </AmbienteProvider>
       </UserProvider>

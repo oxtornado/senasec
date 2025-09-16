@@ -1,13 +1,15 @@
 import { useState } from 'react';
-import { useAssignments } from '../contexts/AssignmentsContext';
 import { Clock, Users, Calendar, BookOpen, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useAssignments} from '../contexts/AssignmentsContext';
 import { useLanguage } from '../contexts/LanguageContext';
 
-const Loans = () => {
+export default function LoansDashboard() {
   // Obtener datos del contexto de asignaciones
-  const { t } = useLanguage();
-  const { schedules } = useAssignments();
-  
+  const { assignments } = useAssignments();
+  console.log("🧠 Assignments REALES", JSON.stringify(assignments, null, 2));
+
+  const { t, language } = useLanguage();
+
   // Estado para manejar la semana actual
   const [currentWeek, setCurrentWeek] = useState(new Date());
   
@@ -47,68 +49,98 @@ const Loans = () => {
   const currentYear = currentWeek.getFullYear();
   const isCurrentWeek = getWeekNumber(new Date()) === weekNumber && new Date().getFullYear() === currentYear;
 
-  // Solo las 3 jornadas completas + horario de aseo
+  // Franjas horarias específicas por hora
   const timeSlots = [
-    { time: '07:00 - 13:00', label: 'JORNADA MAÑANA', icon: '🌅', gradient: 'from-slate-500 to-slate-600' },
-    { time: '13:00 - 13:30', label: 'HORARIO DE ASEO', icon: '🧹', gradient: 'from-amber-500 to-orange-500' },
-    { time: '13:30 - 18:00', label: 'JORNADA TARDE', icon: '☀️', gradient: 'from-blue-600 to-slate-600' },
-    { time: '18:30 - 22:00', label: 'JORNADA NOCHE', icon: '🌙', gradient: 'from-indigo-600 to-slate-700' }
+    // Jornada Mañana
+    { time: '07:00 - 08:00', label: '07:00 - 08:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '08:00 - 09:00', label: '08:00 - 09:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '09:00 - 10:00', label: '09:00 - 10:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '10:00 - 11:00', label: '10:00 - 11:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '11:00 - 12:00', label: '11:00 - 12:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    { time: '12:00 - 13:00', label: '12:00 - 13:00', icon: '🌅', gradient: 'from-blue-500 to-blue-600' },
+    // Horario de Aseo
+    { time: '13:00 - 13:30', label: t('cleaningTime'), icon: '🧹', gradient: 'from-amber-500 to-orange-500' },
+    // Jornada Tarde
+    { time: '13:30 - 14:30', label: '13:30 - 14:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '14:30 - 15:30', label: '14:30 - 15:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '15:30 - 16:30', label: '15:30 - 16:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '16:30 - 17:30', label: '16:30 - 17:30', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    { time: '17:30 - 18:00', label: '17:30 - 18:00', icon: '☀️', gradient: 'from-green-500 to-green-600' },
+    // Jornada Noche
+    { time: '18:00 - 19:00', label: '18:00 - 19:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' },
+    { time: '19:00 - 20:00', label: '19:00 - 20:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' },
+    { time: '20:00 - 21:00', label: '20:00 - 21:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' },
+    { time: '21:00 - 22:00', label: '21:00 - 22:00', icon: '🌙', gradient: 'from-purple-500 to-purple-600' }
   ];
   
   const days = [
-    { name: 'LUNES', short: 'LUN', color: 'from-slate-600 to-slate-700' },
-    { name: 'MARTES', short: 'MAR', color: 'from-gray-600 to-slate-600' },
-    { name: 'MIÉRCOLES', short: 'MIÉ', color: 'from-zinc-600 to-gray-600' },
-    { name: 'JUEVES', short: 'JUE', color: 'from-stone-600 to-zinc-600' },
-    { name: 'VIERNES', short: 'VIE', color: 'from-neutral-600 to-stone-600' },
-    { name: 'SÁBADO', short: 'SÁB', color: 'from-gray-700 to-slate-700' }
+    { name: t('monday'), short: t('mon'), color: 'from-slate-600 to-slate-700' },
+    { name: t('tuesday'), short: t('tue'), color: 'from-gray-600 to-slate-600' },
+    { name: t('wednesday'), short: t('wed'), color: 'from-zinc-600 to-gray-600' },
+    { name: t('thursday'), short: t('thu'), color: 'from-stone-600 to-zinc-600' },
+    { name: t('friday'), short: t('fri'), color: 'from-neutral-600 to-stone-600' },
+    { name: t('saturday'), short: t('sat'), color: 'from-gray-700 to-slate-700' }
   ];
   
-  // Formatear fecha para mostrar
-  const formatDate = (date: Date) => {
-    return date.toLocaleDateString('es-ES', { 
+  const formatDate = (date: Date, language: string) => {
+    const locale = language === 'es' ? 'es-ES' : 'en-US';
+    return date.toLocaleDateString(locale, { 
       day: '2-digit', 
       month: '2-digit'
     });
   };
 
+
+  // Convierte una hora "HH:MM:SS" o "HH:MM" a minutos
+  const timeToMinutes = (timeStr: string) => {
+    const [hours, minutes] = timeStr.split(':').map(Number);
+    return hours * 60 + minutes;
+  };
+
+
   // Función para obtener información de la clase en una jornada y día específico
-  const getClassForSlot = (dayName: string, timeSlot: string) => {
-    // Verificar si es horario de aseo
-    if (timeSlot === '13:00 - 13:30') {
-      return {
-        subject: 'ASEO - COLABORADOR DE TURNO',
-        teacher: '',
-        code: 'AULAS DE SISTEMAS',
-        type: 'aseo'
-      };
+  const getClassForSlot = (day: Date, timeSlot: string) => {
+    const formattedDate = day.toLocaleDateString("sv-SE"); // e.g. "2025-09-15"
+    const [startSlot, endSlot] = timeSlot.split(' - ');
+    const slotStartMin = timeToMinutes(startSlot);
+    const slotEndMin = timeToMinutes(endSlot);
+
+    console.log("🗓 Slot Date:", formattedDate);
+    console.log("⏰ Slot Time:", timeSlot, `(${slotStartMin} - ${slotEndMin})`);
+    console.log("📝 Total assignments:", assignments.length);
+
+    // Vamos a recorrer todos los assignments del día y ver cuál encaja
+    for (const a of assignments) {
+      console.log("🎯 Checking assignment:");
+      console.log("📅 Dia:", a.dia);
+      console.log("🕐 Inicio:", a.hora_inicio, "| Fin:", a.hora_fin);
+      
+      const assignStartMin = timeToMinutes(a.hora_inicio);
+      const assignEndMin = timeToMinutes(a.hora_fin);
+
+      console.log("🧮 Assign mins:", assignStartMin, "-", assignEndMin);
+
+      // Lógica de cruce
+      const isSameDate = a.dia === formattedDate;
+      const overlaps = assignStartMin < slotEndMin && assignEndMin > slotStartMin;
+
+      console.log("📌 isSameDate:", isSameDate, "| overlaps:", overlaps);
+
+      if (isSameDate && overlaps) {
+        console.log("✅ MATCH FOUND!");
+        return {
+          subject: `${a?.ficha?.numero || 'Sin ficha'}`,
+          teacher: a?.usuario?.username || 'Sin instructor',
+          code: a?.ambiente?.nombre ? `${a.ambiente.nombre}` : 'Sin ambiente',
+          type: 'programacion',
+          rol: a?.usuario?.rol || null,
+          assignment: a
+        };
+      }
     }
 
-    // Buscar asignación para este día y jornada
-    const assignment = schedules.find(schedule => {
-      // Verificar si el día coincide
-      const dayMatches = (
-        (schedule.assignmentDates === 'Lunes a Viernes' && 
-         ['lunes', 'martes', 'miércoles', 'jueves', 'viernes'].includes(dayName.toLowerCase())) ||
-        schedule.assignmentDates.toLowerCase().includes(dayName.toLowerCase())
-      );
-      
-      if (!dayMatches) return false;
-      
-      // Verificar si la jornada coincide exactamente
-      return schedule.schedule === timeSlot;
-    });
-
-    if (assignment) {
-      return {
-        subject: `FICHA ${assignment.ficha}`,
-        teacher: assignment.instructorName.toUpperCase(),
-        code: assignment.classroom,
-        type: 'instructor'
-      };
-    }
-
-    return null;
+    console.log("❌ No match found for this slot.");
+    return null; // No hay clase asignada en esa franja
   };
 
   // Función para obtener el estilo de la celda con diseño mejorado
@@ -117,7 +149,7 @@ const Loans = () => {
       return 'bg-gradient-to-br from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 text-gray-500 dark:text-gray-400 border border-gray-200 dark:border-gray-700 hover:shadow-md transition-all duration-300';
     }
 
-    if (classInfo.type === 'aseo') {
+    if (classInfo.rol === 'aseo') {
       return `bg-gradient-to-br ${timeSlot.gradient} text-white font-semibold border-2 border-amber-300 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300`;
     }
 
@@ -139,14 +171,14 @@ const Loans = () => {
                 <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {t('schedulesDashboard')}
                 </h1>
-                <p className="text-gray-600 dark:text-gray-400 mt-1">Sistema de horarios sincronizado en tiempo real</p>
+                <p className="text-gray-600 dark:text-gray-400 mt-1">{t('realTimeScheduleSystem')}</p>
               </div>
             </div>
-            <div className="flex items-center space-x-3">
-              <div className="flex items-center space-x-2 bg-green-100 dark:bg-green-900 px-4 py-2 rounded-full">
+            <div className="flex items-center space-x-8">
+              {/* <div className="flex items-center space-x-2 bg-green-100 dark:bg-green-900 px-4 py-2 rounded-full">
                 <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="text-sm font-medium text-green-700 dark:text-green-300">SINCRONIZADO</span>
-              </div>
+                <span className="text-sm font-medium text-green-700 dark:text-green-300">{t('synchronized')}</span>
+              </div> */}
               <div className={`px-4 py-2 rounded-full ${
                 isCurrentWeek 
                   ? 'bg-blue-100 dark:bg-blue-900' 
@@ -157,12 +189,12 @@ const Loans = () => {
                     ? 'text-blue-700 dark:text-blue-300' 
                     : 'text-gray-700 dark:text-gray-300'
                 }`}>
-                  {isCurrentWeek ? 'SEMANA ACTUAL' : `SEMANA ${weekNumber}`}
+                  {isCurrentWeek ? t('currentWeek') : `${t('week')} ${weekNumber}`}
                 </span>
               </div>
               <div className="bg-purple-100 dark:bg-purple-900 px-4 py-2 rounded-full">
                 <span className="text-sm font-medium text-purple-700 dark:text-purple-300">
-                  AÑO {currentYear}
+                  {t('programmingYear')} {currentYear}
                 </span>
               </div>
             </div>
@@ -174,20 +206,20 @@ const Loans = () => {
       <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <BookOpen className="h-5 w-5 mr-2 text-blue-600" />
-          Leyenda de Estados
+          {t('statusLegend')}
         </h3>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-slate-50 to-slate-100 dark:from-slate-800 dark:to-slate-900 rounded-xl">
-            <div className="w-6 h-6 bg-gradient-to-r from-slate-600 to-slate-700 rounded-lg shadow-lg"></div>
-            <span className="font-medium text-slate-700 dark:text-slate-300">Instructor Asignado</span>
+            <div className="w-6 h-6 bg-gradient-to-r from-slate-600 to-slate-700 dark:from-gray-300 dark:to-gray-400 rounded-lg shadow-lg"></div>
+            <span className="font-medium text-slate-700 dark:text-slate-300">{t('assignedInstructor')}</span>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-900 dark:to-orange-900 rounded-xl">
             <div className="w-6 h-6 bg-gradient-to-r from-amber-500 to-orange-500 rounded-lg shadow-lg"></div>
-            <span className="font-medium text-amber-700 dark:text-amber-300">Horario de Aseo</span>
+            <span className="font-medium text-amber-700 dark:text-amber-300">{t('cleaningTime')}</span>
           </div>
           <div className="flex items-center space-x-3 p-4 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-800 dark:to-gray-900 rounded-xl">
-            <div className="w-6 h-6 bg-gradient-to-r from-gray-300 to-gray-400 rounded-lg shadow-lg"></div>
-            <span className="font-medium text-gray-700 dark:text-gray-300">Disponible</span>
+            <div className="w-6 h-6 bg-gradient-to-r from-gray-300 to-gray-400 dark:from-slate-600 dark:to-slate-700 rounded-lg shadow-lg"></div>
+            <span className="font-medium text-gray-700 dark:text-gray-300">{t('programmingAvailable')}</span>
           </div>
         </div>
       </div>
@@ -198,20 +230,20 @@ const Loans = () => {
           <div className="flex items-center justify-between">
             <h2 className="text-xl font-bold text-white flex items-center">
               <Clock className="h-6 w-6 mr-3" />
-              Horario Semanal de Jornadas
+              {t('weeklySchedule')}
             </h2>
             <div className="flex items-center space-x-4">
               <div className="text-white text-right">
-                <div className="text-sm opacity-90">Semana {weekNumber} de {currentYear}</div>
+                <div className="text-sm opacity-90">{t('week')} {weekNumber} {t('of')} {currentYear}</div>
                 <div className="text-xs opacity-75">
-                  {formatDate(weekDates[0])} - {formatDate(weekDates[5])}
+                  {formatDate(weekDates[0], language)} - {formatDate(weekDates[5], language)}
                 </div>
               </div>
               <div className="flex items-center space-x-2">
                 <button
                   onClick={() => navigateWeek('prev')}
                   className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-200"
-                  title="Semana anterior"
+                  title={t('previousWeek')}
                 >
                   <ChevronLeft className="h-4 w-4 text-white" />
                 </button>
@@ -223,14 +255,14 @@ const Loans = () => {
                       : 'bg-white/20 hover:bg-white/30 text-white'
                   }`}
                   disabled={isCurrentWeek}
-                  title="Ir a semana actual"
+                  title={t('goToCurrentWeek')}
                 >
-                  HOY
+                  {t('today')}
                 </button>
                 <button
                   onClick={() => navigateWeek('next')}
                   className="p-2 bg-white/20 hover:bg-white/30 rounded-lg transition-colors duration-200"
-                  title="Semana siguiente"
+                  title={t('nextWeek')}
                 >
                   <ChevronRight className="h-4 w-4 text-white" />
                 </button>
@@ -247,7 +279,7 @@ const Loans = () => {
                 <th className="w-52 px-4 py-4 text-left font-bold text-gray-900 dark:text-white border-r border-gray-200 dark:border-gray-700">
                   <div className="flex items-center space-x-2">
                     <Clock className="h-4 w-4" />
-                    <span>JORNADA</span>
+                    <span>{t('journal')}</span>
                   </div>
                 </th>
                 {days.map((day, index) => {
@@ -260,16 +292,15 @@ const Loans = () => {
                           ? 'from-green-500 to-green-600 ring-2 ring-green-300' 
                           : day.color
                       } text-white px-2 py-2 rounded-lg shadow-lg transform hover:scale-105 transition-all duration-300`}>
-                        <div className="font-bold text-sm">{day.short}</div>
-                        <div className="text-xs opacity-90">{day.name}</div>
+                        <div className="font-bold text-sm">{day.name}</div>
                         {dayDate && (
                           <div className="text-xs opacity-80 mt-1 font-medium">
-                            {formatDate(dayDate)}
+                            {formatDate(dayDate, language)}
                           </div>
                         )}
                         {isToday && (
                           <div className="text-xs opacity-90 font-bold">
-                            HOY
+                            {t('today')}
                           </div>
                         )}
                       </div>
@@ -294,8 +325,9 @@ const Loans = () => {
                       </div>
                     </div>
                   </td>
-                  {days.map((day) => {
-                    const classInfo = getClassForSlot(day.name, timeSlot.time);
+                  {days.map((day, index) => {
+                    const classInfo = getClassForSlot(weekDates[index], timeSlot.time);
+                    console.log("💡 classInfo", classInfo);
                     return (
                       <td key={`${day.name}-${timeSlot.time}`} className="w-44 px-2 py-6 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0">
                         <div className={`min-h-[80px] rounded-xl p-3 ${getCellStyle(classInfo, timeSlot)} flex flex-col justify-center`}>
@@ -311,7 +343,7 @@ const Loans = () => {
                               <div className="text-xs opacity-80">{classInfo.code}</div>
                             </div>
                           ) : (
-                            <div className="text-xs font-medium">DISPONIBLE</div>
+                            <div className="text-xs font-medium">{t('programmingStatus')}</div>
                           )}
                         </div>
                       </td>
@@ -323,55 +355,6 @@ const Loans = () => {
           </table>
         </div>
       </div>
-
-      {/* Resumen mejorado */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
-        <h3 className="text-xl font-bold text-gray-900 dark:text-white mb-6 flex items-center">
-          <Users className="h-6 w-6 mr-3 text-blue-600" />
-          Resumen de Asignaciones Activas
-        </h3>
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {schedules.length > 0 ? (
-            schedules.map((schedule, index) => (
-              <div key={index} className="bg-gradient-to-br from-slate-50 via-gray-50 to-zinc-50 dark:from-slate-800 dark:via-gray-800 dark:to-zinc-800 p-6 rounded-xl border-2 border-slate-200 dark:border-slate-600 shadow-lg hover:shadow-xl transform hover:scale-105 transition-all duration-300">
-                <div className="flex items-center space-x-3 mb-4">
-                  <div className="w-12 h-12 bg-gradient-to-r from-slate-600 to-slate-700 rounded-full flex items-center justify-center">
-                    <Users className="h-6 w-6 text-white" />
-                  </div>
-                  <div>
-                    <div className="font-bold text-slate-900 dark:text-slate-100">{schedule.instructorName}</div>
-                    <div className="text-sm text-slate-700 dark:text-slate-300">Instructor</div>
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Ficha:</span>
-                    <span className="font-semibold text-slate-800 dark:text-slate-200">{schedule.ficha}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Horario:</span>
-                    <span className="font-semibold text-slate-700 dark:text-slate-300">{schedule.schedule}</span>
-                  </div>
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-gray-600 dark:text-gray-400">Días:</span>
-                    <span className="font-semibold text-slate-600 dark:text-slate-400">{schedule.assignmentDates}</span>
-                  </div>
-                </div>
-              </div>
-            ))
-          ) : (
-            <div className="col-span-full text-center py-12">
-              <div className="w-24 h-24 bg-gray-100 dark:bg-gray-800 rounded-full flex items-center justify-center mx-auto mb-4">
-                <Calendar className="h-12 w-12 text-gray-400" />
-              </div>
-              <p className="text-gray-500 dark:text-gray-400 text-lg">No hay asignaciones activas</p>
-              <p className="text-gray-400 dark:text-gray-500 text-sm mt-2">Las asignaciones aparecerán aquí cuando se creen</p>
-            </div>
-          )}
-        </div>
-      </div>
     </div>
   );
 };
-
-export default Loans;
