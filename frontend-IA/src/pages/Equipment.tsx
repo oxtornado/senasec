@@ -73,10 +73,10 @@ export default function EquipmentDashboard() {
       <div className="flex items-center justify-center min-h-screen">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-4">
-            Acceso Restringido
+            {t('equipmentrestrictedAccess')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            No tienes permisos para acceder a esta página.
+            {t('equipment do not have permission to access')}
           </p>
         </div>
       </div>
@@ -207,25 +207,25 @@ export default function EquipmentDashboard() {
             <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  No. Equipo
+                  {t('equipmentNumberEquipment')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  No. Serie
+                  {t('equipmentNumberSerial')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Tipo
+                  {t('equipmentType')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Pulgadas
+                  {t('equipmentInches')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Estado
+                  {t('equipmentStatus')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Última Actualización
+                  {t('equipmentLastUpdate')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Acciones
+                  {t('equipmentActions')}
                 </th>
               </tr>
             </thead>
@@ -274,7 +274,7 @@ export default function EquipmentDashboard() {
 
         {filteredEquipment.length === 0 && (
           <div className="text-center py-12">
-            <p className="text-gray-500 dark:text-gray-400">No se encontraron equipos que coincidan con los filtros.</p>
+            <p className="text-gray-500 dark:text-gray-400">{t('equipmentNoequipmentwasfoundthatmatchedthefilters')}</p>
           </div>
         )}
       </div>
@@ -299,7 +299,7 @@ export default function EquipmentDashboard() {
               {/* Número de posición */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Número de Equipo
+                  {t('equipmentNumberEquipment')}
                 </label>
                 <input
                   type="number"
@@ -314,7 +314,7 @@ export default function EquipmentDashboard() {
               {/* Número de serie */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Número de Serie
+                  {t('equipmentNumberSerial')}
                 </label>
                 <input
                   type="text"
@@ -329,7 +329,7 @@ export default function EquipmentDashboard() {
               {/* Tipo de equipo */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Tipo de Equipo
+                  {t('equipmentType')}
                 </label>
                 <select
                   value={formData.tipo}
@@ -345,7 +345,7 @@ export default function EquipmentDashboard() {
               {/* Pulgadas */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Pulgadas
+                  {t('equipmentInches')}
                 </label>
                 <input
                   type="text"
@@ -360,7 +360,7 @@ export default function EquipmentDashboard() {
               {/* Características */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Características
+                  {t('equipmentCharacteristics')}
                 </label>
                 <textarea
                   value={formData.caracteristicas}
@@ -374,7 +374,7 @@ export default function EquipmentDashboard() {
               {/* Estado */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Estado
+                  {t('equipmentStatus')}
                 </label>
                 <select
                   value={formData.estado}
@@ -382,7 +382,7 @@ export default function EquipmentDashboard() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                   required
                 >
-                  <option value="disponible">Disponible</option>
+                  <option value="disponible"> {t('equipmentavailable')}</option>
                   <option value="mantenimiento">Mantenimiento</option>
                   <option value="dañado">Dañado</option>
                 </select>
@@ -390,7 +390,7 @@ export default function EquipmentDashboard() {
 
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Ambiente
+                {t('equipmentEnvironment')}
                 </label>
                 <select
                   value={formData.ambiente || ''}
@@ -401,8 +401,7 @@ export default function EquipmentDashboard() {
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
                 >
                   <option value="" disabled>
-                    Selecciona un ambiente
-                  </option>
+                  {t('equipmentSelectionEnvironment')}              </option>
                   {ambientes.map((amb) => (
                     <option key={amb.id} value={amb.id}>
                       {amb.nombre}
@@ -419,7 +418,7 @@ export default function EquipmentDashboard() {
                   onClick={closeModal}
                   className="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors"
                 >
-                  Cancelar
+                  {t('equipmentCancel')}
                 </button>
                 <button
                   type="submit"

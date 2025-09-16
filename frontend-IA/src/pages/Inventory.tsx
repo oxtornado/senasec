@@ -8,6 +8,7 @@ import { useAmbiente } from '../contexts/EnvironmentContext';
 import { fetchAmbientes, Ambiente } from '../services/ambientes';
 
 const Inventory = () => {
+  const { t } = useLanguage();
   const { equipment } = useEquipment();
   const { isMobile, isTablet } = useBreakpoints();
   const [selectedEquipment, setSelectedEquipment] = useState<Equipment | null>(null);
@@ -99,10 +100,10 @@ const Inventory = () => {
             </div>
             <div>
               <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-                Ambientes – Aula de Sistemas 1
+                {t('environmentTitle')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Distribución y estado de equipos en el aula
+                {t('environmentDescription')}
               </p>
             </div>
           </div>
@@ -111,26 +112,26 @@ const Inventory = () => {
 
       {/* Leyenda de Estados */}
       <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-4">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3">Leyenda de Estados</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-3"> {t('environmentLeyendStatus')}</h3>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-green-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">Disponible</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('environmentAvailableStatus')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-yellow-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">Mantenimiento</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('environmentMaintenenaceStatus')}</span>
           </div>
           <div className="flex items-center space-x-2">
             <div className="w-4 h-4 bg-red-500 rounded"></div>
-            <span className="text-sm text-gray-700 dark:text-gray-300">Dañado</span>
+            <span className="text-sm text-gray-700 dark:text-gray-300">{t('environmentDamaged')}</span>
           </div>
         </div>
       </div>
 
       {/* Gráfico Esquemático del Aula */}
       <div className="hidden md:block border border-gray-300 dark:border-gray-500 bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Distribución del Aula</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('environmentClassroomDistribution')}</h3>
 
         {/* Grid del Aula */}
         <div className="relative bg-gray-50 dark:bg-gray-700 p-8 rounded-lg" style={{ minHeight: '500px' }}>
@@ -154,7 +155,7 @@ const Inventory = () => {
             {/* Puerta */}
             <div className="w-20 h-16 bg-yellow-800 rounded-lg flex items-center justify-center ml-8">
               <DoorOpen className="h-8 w-8 text-white" />
-              <span className="text-xs font-bold text-white ml-1">PUERTA</span>
+              <span className="text-xs font-bold text-white ml-1">{t('environmentDistributionDoor')}</span>
             </div>
 
             {[3, 2, 1].map((pos) => {
@@ -194,7 +195,7 @@ const Inventory = () => {
           {/* Área Central - Espacio libre */}
           <div className="absolute left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2">
             <div className="w-32 h-16 border-2 border-gray-300 dark:border-gray-500 rounded-lg flex items-center justify-center">
-              <span className="text-gray-500 dark:text-gray-400 text-sm">Área Libre</span>
+              <span className="text-gray-500 dark:text-gray-400 text-sm">{t('environmentDistributionFreeArea')}</span>
             </div>
           </div>
 
@@ -231,16 +232,16 @@ const Inventory = () => {
 
       {/* Versión móvil/tablet: Lista scrollable */}
       <div className="block md:hidden bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">Equipos del Aula</h3>
+        <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">{t('environmentClassroomEquipment')}</h3>
 
         <div className="overflow-x-auto">
           <table className="min-w-full text-sm text-left text-gray-500 dark:text-gray-300">
             <thead className="text-xs uppercase bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300">
               <tr>
-                <th className="px-4 py-4">Posición</th>
-                <th className="px-4 py-2">No.Serie</th>
-                <th className="px-4 py-2">Tipo</th>
-                <th className="px-4 py-2">Estado</th>
+                <th className="px-4 py-4">{t('environmentpositionEquipment')}</th>
+                <th className="px-4 py-2">{t('environmentSerialEquipment')}</th>
+                <th className="px-4 py-2">{t('environmentTypeEquipment')}</th>
+                <th className="px-4 py-2">{t('environmentStatusEquipment')}</th>
               </tr>
             </thead>
             <tbody className='border-x border-gray-300 dark:border-gray-500'>
@@ -288,12 +289,12 @@ const Inventory = () => {
       {/* Cuadro de Diálogo para Reportes */}
       <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4">
-          Registre aquí su novedad
+          {t('environmentRegisterNovelty')}
         </h3>
 
         {/* Select de ambiente */}
         <div className="mb-4">
-          <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">Ambiente</label>
+          <label className="block mb-1 text-sm text-gray-700 dark:text-gray-300">{t('environmentOfEnvironment')}</label>
           <select
             value={ambiente?.id || ''}
             onChange={(e) => {
@@ -305,7 +306,7 @@ const Inventory = () => {
             }}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Seleccione el ambiente</option>
+            <option value="">{t('environmentSelectEnvironment')}</option>
             {ambientes.map((a) => (
               <option key={a.id} value={a.id}>{a.nombre}</option>
             ))}
@@ -331,7 +332,7 @@ const Inventory = () => {
                 disabled={!reportText.trim()}
                 className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:bg-gray-400 disabled:cursor-not-allowed"
               >
-                Enviar
+                {t('environmentSubmitReport')}
               </button>
             </div>
           </div>
@@ -370,19 +371,19 @@ const Inventory = () => {
               {/* Información del Equipo */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentNoSerial')}✅</label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{selectedEquipment.numero_serie}</p>
                 </div>
                 <div>
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentSize')}</label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{selectedEquipment.pulgadas}</p>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentCharacteristics')} 🧐</label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white font-mono">{selectedEquipment.caracteristicas}</p>
                 </div>
                 <div className='col-span-2'>
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentlastupdate')}🔵 </label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{selectedEquipment.ultima_actualizacion}</p>
                 </div>
               </div>
@@ -411,19 +412,19 @@ const Inventory = () => {
               {/* Información del TV */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Número de serie ✅</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentNoSerial')} ✅</label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{tvData.numero_serie}</p>
                 </div>
                 <div>
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Pulgadas</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentSize')}</label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{tvData.pulgadas}</p>
                 </div>
                 <div className="col-span-2">
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Características 🧐</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentCharacteristics')} 🧐</label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white font-mono">{tvData.caracteristicas}</p>
                 </div>
                 <div>
-                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">Última actualización 🔵</label>
+                  <label className="block text-sm lg:text-xl font-medium text-gray-700 dark:text-gray-300">{t('environmentlastupdate')}🔵</label>
                   <p className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-900 dark:text-white">{tvData.ultima_actualizacion}</p>
                 </div>
               </div>
