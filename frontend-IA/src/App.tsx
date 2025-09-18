@@ -20,7 +20,7 @@ import { AmbienteProvider } from "./contexts/EnvironmentContext";
 import { LanguageProvider } from "./contexts/LanguageContext";
 import { EquipmentProvider } from "./contexts/EquipmentContext";
 import { AssignmentProvider } from "./contexts/AssignmentsContext";
-import { ReportsProvider } from "./contexts/ReportsContext";
+import { ReporteProvider } from "./contexts/ReportsContext";
 
 function App() {
   return (
@@ -29,7 +29,7 @@ function App() {
         <AmbienteProvider>
           <EquipmentProvider>
             <AssignmentProvider>
-              <ReportsProvider>
+              <ReporteProvider>
               <Router>
             <Routes>
               {/* Rutas públicas */}
@@ -56,7 +56,7 @@ function App() {
               <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
               </Router>
-              </ReportsProvider>
+              </ReporteProvider>
             </AssignmentProvider>
           </EquipmentProvider>
         </AmbienteProvider>

@@ -90,6 +90,8 @@ export default function LoansDashboard() {
     });
   };
 
+  const renderedSlots = new Set(); // Set con claves únicas tipo "2025-09-15-07:00"
+
 
   // Convierte una hora "HH:MM:SS" o "HH:MM" a minutos
   const timeToMinutes = (timeStr: string) => {
@@ -161,14 +163,14 @@ export default function LoansDashboard() {
       {/* Header mejorado */}
       <div className="relative">
         <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-purple-600 to-indigo-600 rounded-2xl opacity-10"></div>
-        <div className="relative bg-white dark:bg-gray-900 rounded-2xl shadow-2xl p-8">
-          <div className="flex items-center justify-between">
+        <div className="relative bg-white dark:bg-gray-800 rounded-2xl shadow-2xl p-8">
+          <div className="flex flex-wrap xl:flex-nowrap items-start justify-between gap-4">
             <div className="flex items-center space-x-4">
               <div className="p-3 bg-gradient-to-r from-blue-500 to-purple-600 rounded-xl">
                 <Calendar className="h-8 w-8 text-white" />
               </div>
               <div>
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                   {t('schedulesDashboard')}
                 </h1>
                 <p className="text-gray-600 dark:text-gray-400 mt-1">{t('realTimeScheduleSystem')}</p>
@@ -203,7 +205,7 @@ export default function LoansDashboard() {
       </div>
 
       {/* Leyenda mejorada */}
-      <div className="bg-white dark:bg-gray-900 rounded-2xl shadow-xl p-6">
+      <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-xl p-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white mb-4 flex items-center">
           <BookOpen className="h-5 w-5 mr-2 text-blue-600" />
           {t('statusLegend')}
@@ -312,8 +314,9 @@ export default function LoansDashboard() {
             
             {/* Cuerpo */}
             <tbody className="divide-y divide-gray-200 dark:divide-gray-700">
-              {timeSlots.map((timeSlot) => (
+              {timeSlots.map((timeSlot, rowIndex) => (
                 <tr key={timeSlot.time} className="hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors duration-200">
+                  {/* Columna de la hora */}
                   <td className="w-52 px-4 py-6 border-r border-gray-200 dark:border-gray-700">
                     <div className={`bg-gradient-to-r ${timeSlot.gradient} text-white p-3 rounded-xl shadow-lg`}>
                       <div className="flex items-center space-x-2">
@@ -325,26 +328,61 @@ export default function LoansDashboard() {
                       </div>
                     </div>
                   </td>
-                  {days.map((day, index) => {
-                    const classInfo = getClassForSlot(weekDates[index], timeSlot.time);
-                    console.log("💡 classInfo", classInfo);
+
+                  {days.map((day, dayIndex) => {
+                    const dayDate = weekDates[dayIndex];
+                    const slotKey = `${dayDate.toISOString().split('T')[0]}-${timeSlot.time}`;
+
+                    if (renderedSlots.has(slotKey)) {
+                      return null;
+                    }
+
+                    const classInfo = getClassForSlot(dayDate, timeSlot.time);
+
+                    let rowSpan = 1;
+
+                    if (classInfo) {
+                      const startMin = timeToMinutes(classInfo.assignment.hora_inicio);
+                      const endMin = timeToMinutes(classInfo.assignment.hora_fin);
+                      const duration = endMin - startMin;
+                      rowSpan = Math.max(1, duration / 60);
+
+                      // Marcar todos los slots que cubre este assignment
+                      for (let i = 0; i < rowSpan; i++) {
+                        const nextSlot = timeSlots[rowIndex + i];
+                        if (nextSlot) {
+                          const coveredKey = `${dayDate.toISOString().split('T')[0]}-${nextSlot.time}`;
+                          renderedSlots.add(coveredKey);
+                        }
+                      }
+                    }
+
                     return (
-                      <td key={`${day.name}-${timeSlot.time}`} className="w-44 px-2 py-6 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0">
-                        <div className={`min-h-[80px] rounded-xl p-3 ${getCellStyle(classInfo, timeSlot)} flex flex-col justify-center`}>
-                          {classInfo ? (
-                            <div className="space-y-1">
-                              <div className="font-bold text-xs">{classInfo.subject}</div>
-                              {classInfo.teacher && (
-                                <div className="text-xs opacity-90 flex items-center justify-center">
-                                  <Users className="h-3 w-3 mr-1" />
-                                  {classInfo.teacher}
-                                </div>
-                              )}
-                              <div className="text-xs opacity-80">{classInfo.code}</div>
-                            </div>
-                          ) : (
-                            <div className="text-xs font-medium">{t('programmingStatus')}</div>
-                          )}
+                      <td
+                        key={`${day.name}-${timeSlot.time}`}
+                        rowSpan={rowSpan}
+                        className="w-44 px-2 py-0 text-center border-r border-gray-200 dark:border-gray-700 last:border-r-0 align-middle"
+                      >
+                        <div className="w-full h-full flex">
+                          <div
+                            style={{ height: `${rowSpan * 80}px` }} // 👈 Aquí está la clave
+                            className={`flex flex-col justify-center items-center text-center w-full p-3 rounded-xl ${getCellStyle(classInfo, timeSlot)}`}
+                          >
+                            {classInfo ? (
+                              <div className="space-y-1">
+                                <div className="font-bold text-xs">{classInfo.subject}</div>
+                                {classInfo.teacher && (
+                                  <div className="text-xs opacity-90 flex items-center justify-center">
+                                    <Users className="h-3 w-3 mr-1" />
+                                    {classInfo.teacher}
+                                  </div>
+                                )}
+                                <div className="text-xs opacity-80">{classInfo.code}</div>
+                              </div>
+                            ) : (
+                              <div className="text-xs font-medium">{t('programmingStatus')}</div>
+                            )}
+                          </div>
                         </div>
                       </td>
                     );
