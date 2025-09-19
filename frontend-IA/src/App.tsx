@@ -21,6 +21,7 @@ import { LanguageProvider } from "./contexts/LanguageContext";
 import { EquipmentProvider } from "./contexts/EquipmentContext";
 import { AssignmentsProvider } from "./contexts/AssignmentsContext";
 import { ReportsProvider } from "./contexts/ReportsContext";
+import  LoginAula  from "./pages/LoginAula";
 
 function App() {
   return (
@@ -36,7 +37,8 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
-              
+              <Route path="/loginaula" element={<LoginAula />} />
+
               {/* Rutas protegidas con Layout */}
               <Route path="/dashboard" element={
                 <ProtectedRoute>

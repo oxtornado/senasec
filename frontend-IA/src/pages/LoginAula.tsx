@@ -1,36 +1,30 @@
 import React, { useState } from 'react';
+import { Lock, Cloud } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { Lock, Cloud, Camera } from 'lucide-react';
 import toast from 'react-hot-toast';
-// @ts-ignore
-import { login } from '../services/auth';
 import LoginFace from '../components/LoginFace';
 
-const Login = () => {
+const LoginAula: React.FC = () => {
     const navigate = useNavigate();
+    const [status, setStatus] = useState<string>("");
 
-    const [password, setPassword] = useState('');
-    const [loading, setLoading] = useState(false);
-    const [faceValidated, setFaceValidated] = useState(false);
-
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
-        setLoading(true);
-
-        if (!faceValidated) {
-            toast.error("Debes validar tu rostro antes de continuar");
-            setLoading(false);
-            return;
-        }
-
-        try {
-            await login(password);
-            toast.success('Inicio de sesión exitoso');
+    // Callback que viene desde LoginFace.tsx
+    const handleFaceLoginResult = (result: { success: boolean; error?: string }) => {
+        if (result.success) {
+            setStatus("✅ Inicio de sesión exitoso");
+            toast.success("Bienvenido 👋");
             navigate('/dashboard/inventory');
-        } catch (error) {
-            toast.error('Contraseña incorrecta');
-        } finally {
-            setLoading(false);
+        } else {
+            if (result.error === "no_match") {
+                setStatus("❌ Rostro no coincide con el registrado");
+                toast.error("Rostro no coincide");
+            } else if (result.error === "server_error") {
+                setStatus("⚠️ Error en el servidor");
+                toast.error("Error en el servidor");
+            } else {
+                setStatus("❌ Error en el inicio de sesión");
+                toast.error("No se pudo iniciar sesión");
+            }
         }
     };
 
@@ -53,38 +47,19 @@ const Login = () => {
 
             <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white dark:bg-gray-800 py-8 px-4 shadow sm:rounded-lg sm:px-10">
-                    <form className="space-y-6" onSubmit={handleSubmit}>
-                        
-                        {/* Facial login */}
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 dark:text-white mb-2">
-                                Sesión facial
-                            </label>
+                    {/* Aquí se inyecta el componente de LoginFace */}
+                    <LoginFace/>
 
-                            {/* Pasamos callback para actualizar faceValidated */}
-                            <LoginFace/>
-
-                            {!faceValidated && (
-                                <p className="mt-2 text-sm text-red-500">Debes validar tu rostro</p>
-                            )}
-                        </div>
-
-                        <div className="flex items-center justify-between">
-                            <div className="text-sm">
-                                <button
-                                    type="button"
-                                    onClick={() => toast("Se usará recuperación alternativa")}
-                                    className="font-medium text-blue-600 hover:text-blue-500 flex items-center"
-                                >
-                                    <Camera className="w-4 h-4 mr-1" /> No puedo iniciar sesión facialmente
-                                </button>
-                            </div>
-                        </div>
-                    </form>
+                    {status && (
+                        <p className="mt-4 text-center text-sm font-medium 
+                                      text-gray-700 dark:text-white">
+                            {status}
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
     );
 };
 
-export default Login;
+export default LoginAula;
