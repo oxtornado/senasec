@@ -186,8 +186,73 @@ const translations = {
     
     // Reports
     reportsDescription: "Análisis y reportes del sistema",
-    reportsComingSoon: "Este dashboard estará disponible próximamente con reportes detallados del sistema."
+    reportsComingSoon: "Este dashboard estará disponible próximamente con reportes detallados del sistema.",
+
+    //inventorty
+
+    environmentTitle: "Gestión de Ambientes",
+    environmentLeyendStatus: "Leyenda de estados",
+    environmentDescription: "Lista de ambientes de Sistemas 1",
+    environmentAvailableStatus: "Disponible",
+    environmentMaintenenaceStatus: "Mantenimiento",
+    environmentDamaged: "Dañado",
+    environmentClassroomDistribution: "Distribución de aulas",
+    environmentDistributionDoor: "Puerta",
+    environmentDistributionFreeArea: "Área libre",
+    environmentClassroomEquipment: "Equipos del aula",
+    environmentpositionEquipment: "Numero de equipo",
+    environmentSerialEquipment: "Número de serie",
+    environmentTypeEquipment: "Tipo de equipo",
+    environmentStatusEquipment: "Estado del equipo",
+    environmentRegisterNovelty: "Registrar novedad",
+    environmentOfEnvironment: "ambiente",
+    environmentSelectEnvironment: "Seleccione un ambiente",
+    environmentSubmitReport: "Enviar",
+    environmentNoSerial: "Número de serie",
+    environmentSize: "Tamaño",
+    environmentCharacteristics: "Características",
+    environmentlastupdate: "Última actualización",
+
+    //equipment
+    equipmentrestrictedAccess: "Acceso Restringido",
+    equipmentdonothavepermissiontoaccess: "No tienes permiso para acceder a este módulo",
+    equipmentNumberEquipment: "Número de Equipo",
+    equipmentNumberSerial: "Número de Serie",
+    equipmentType: "Tipo",
+    equipmentInches: "Pulgadas",
+    equipmentStatus: "Estado",
+    equipmentLastUpdate: "Última Actualización",
+    equipmentActions: "Acciones",
+    equipmentNoequipmentwasfoundthatmatchedthefilters: "No se encontró ningún equipo que coincidiera con los filtros",
+    equipmentCharacteristics: "Características",
+    equipmentavailable: "Disponible",
+    equipmentMaintenenace: "Mantenimiento",
+    equipmentDamaged: "Dañado",
+    equipmentEnvironment: "Ambiente",
+    equipmentSelectionEnvironment: "Seleccione un ambiente",
+    equipmentCancel: "Cancelar",
+
+    //users
+    usermanagement: "Gestión de Usuarios",
+    userManageSENASECsystemusers: "Administracion de usuarios del sistema SENASEC",
+    userAllRoles: "Todos los roles",
+    userfullname: "Nombre completo",
+    userRole: "Rol",
+    userActions: "Acciones",
+    userNoUsersWereFoundMatchingSearchCriteria: "No se encontraron usuarios que coincidan con los criterios de búsqueda.",
+    useremail: "Correo",
+    userphone: "Teléfono",
+    userFaceCapture: "Captura facial",
+    userWarning: "ADVERTENCIA",
+    userYouareAboutDeleteUserThisActionCannotUndone: "Está a punto de borrar un usuario. Esta acción no se puede deshacer.",
+    userToDelete: "Usuario a eliminar:",
+    userCancel: "Cancelar",
+    userDeleteUser: "Borrar usuario",
+    
   },
+
+
+
   en: {
     // Navigation
     dashboard: "Dashboard",
@@ -372,7 +437,71 @@ const translations = {
     
     // Reports
     reportsDescription: "System analysis and reports",
-    reportsComingSoon: "This dashboard will be available soon with detailed system reports."
+    reportsComingSoon: "This dashboard will be available soon with detailed system reports.",
+
+
+    //inventory    ,
+    environmentTitle:  "Environment Management",
+    environmentLeyendStatus: "Status Legend",
+    environmentDescription: "List of Systems 1 environments",
+    environmentAvailableStatus: "Available",
+    environmentMaintenenaceStatus: "Maintenance",
+    environmentDamaged: "Damaged",
+    environmentClassroomDistribution: "Classroom Distribution",
+    environmentDistributionDoor: "Door",
+    environmentDistributionFreeArea: "Free Area",
+    environmentClassroomEquipment: "Classroom Equipment",
+    environmentpositionEquipment: "Equipment Number",
+    environmentSerialEquipment: "Serial Number",
+    environmentTypeEquipment: "Equipment Type",
+    environmentStatusEquipment: "Equipment Status",
+    environmentRegisterNovelty: "Register Novelty",
+    environmentOfEnvironment: "environment",
+    environmentSelectEnvironment: "Select an environment",
+    environmentSubmitReport: "Submit",
+    environmentNoSerial: "Serial Number",
+    environmentSize: "Size",
+    environmentCharacteristics: "Characteristics",
+    environmentlastupdate: "Last Update",
+
+
+     //equipment
+    equipmentrestrictedAccess: "Restricted Access",
+    equipmentdonothavepermissiontoaccess: "You do not have permission to access this module",
+    equipmentNumberEquipment: "Equipment Number",
+    equipmentNumberSerial: "Number Serial",
+    equipmentType: "Type",
+    equipmentInches: "Inches",
+    equipmentStatus: "Status",
+    equipmentLastUpdate: "Last Update",
+    equipmentActions: "Actions",
+    equipmentNoequipmentwasfoundthatmatchedthefilters: "No equipment was found that matched the filters",
+    equipmentCharacteristics: "Characteristics",
+    equipmentavailable: "Available",
+    equipmentMaintenenace: "Maintenance",
+    equipmentDamaged: "Damaged",
+    equipmentEnvironment: "Environment",
+    equipmentSelectionEnvironment: "Select an environment",
+    equipmentCancel: "Cancel",
+
+    //users
+    usermanagement: "User Management",
+    userManageSENASECsystemusers: "Management of SENASEC system users",
+    userAllRoles: "All Roles",
+    userfullname: "Full Name",
+    userRole: "Role",
+    userActions: "Actions",
+    userNoUsersWereFoundMatchingSearchCriteria: "No users were found matching search criteria.",
+    useremail: "Email",
+    userphone: "Phone",
+    userFaceCapture: "Face Capture",
+    userWarning: "WARNING",
+    userYouareAboutDeleteUserThisActionCannotUndone: "You are about to delete a user. This action cannot be undone.",
+    userToDelete: "User to delete:",
+    userCancel: "Cancel",
+    userDeleteUser: "Delete User",
+
+    
   }
 };
 

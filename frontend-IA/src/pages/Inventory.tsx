@@ -244,6 +244,11 @@ const Inventory = () => {
                 <th className="px-4 py-2">{t('environmentStatusEquipment')}</th>
               </tr>
             </thead>
+
+
+
+
+            
             <tbody className='border-x border-gray-300 dark:border-gray-500'>
               {equipmentData.map((eq) => (
                 <tr
