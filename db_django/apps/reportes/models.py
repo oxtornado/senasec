@@ -8,7 +8,7 @@ class Reporte(models.Model): # Creando el modelo Programacion
         ('pendiente', 'Pendiente'),
     ]
 
-    programacion = models.OneToOneField(Programacion, on_delete=models.CASCADE, related_name='reportes') # Relacionando Programacion
+    programacion = models.OneToOneField(Programacion, on_delete=models.CASCADE, related_name='reporte') # Relacionando Programacion
     entrada_usuario = models.TimeField() # Campo para la hora de inicio
     salida_usuario = models.TimeField() # Campo para la hora de fin
     estado = models.CharField(max_length=15, choices=ESTADOS, default='pendiente')  # Estado de la ficha
