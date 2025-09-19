@@ -11,6 +11,11 @@ from permissions.permissions import IsAdminUser, IsOwnerOrAdmin  # Importa la cl
 from rest_framework.decorators import api_view # api de login facial
 
 
+class UsuarioListView(generics.ListAPIView):
+    queryset = Usuario.objects.all()
+    serializer_class = UsuarioSerializer
+    permission_classes = [IsAdminUser]  # only admins can see the list
+
 # Vista para Ver el Perfil del Usuario Autenticado
 class ProfileView(APIView):  # Hereda de APIView para definir una vista más personalizada
     permission_classes = [permissions.IsAuthenticated]  # Solo usuarios autenticados pueden acceder
@@ -86,5 +91,21 @@ def get_face_token(request):
     try:
         user = Usuario.objects.get(email=email)
         return Response({"face_token": user.face_token}, status=status.HTTP_200_OK)
+    except Usuario.DoesNotExist:
+        return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+    
+@api_view(['PATCH'])
+def reset_password(request):
+    email = request.data.get("email")
+    new_password = request.data.get("new_password")
+
+    if not email or not new_password:
+        return Response({"error": "Datos incompletos"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = Usuario.objects.get(email=email)
+        user.set_password(new_password)  # hash the password properly
+        user.save()
+        return Response({"message": "Contraseña actualizada correctamente"}, status=status.HTTP_200_OK)
     except Usuario.DoesNotExist:
         return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
