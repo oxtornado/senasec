@@ -13,6 +13,7 @@ import Loans from "./pages/Loans";
 import Reports from "./pages/Reports";
 import Users from "./pages/Users";
 import Assignments from "./pages/Assignments";
+import ForgotPassword from "./pages/ForgotPassword";
 import Layout from "./components/Layout";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { UserProvider } from "./contexts/UsersContext";
@@ -36,6 +37,7 @@ function App() {
               <Route path="/" element={<Home />} />
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
+              <Route path="/forgot-password" element={<ForgotPassword />}/>
               
               {/* Rutas protegidas con Layout */}
               <Route path="/dashboard" element={
