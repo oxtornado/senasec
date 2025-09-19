@@ -1,0 +1,26 @@
+{
+    "julian@gmail.com": {
+        "username": "julian",
+        "email": "julian@gmail.com",
+        "rol": "security",
+        "telefono": "12345678",
+        "contrasena": "1034400103",
+        "face_token": "68d2e3b889efc880e2f99c80d93059b3"
+    },
+    "paula@gmail.com": {
+        "username": "paula",
+        "email": "paula@gmail.com",
+        "rol": "instructor",
+        "telefono": "12333445",
+        "contrasena": "paula",
+        "face_token": "1bbea601026c89cfbb4ef38145ae9b17"
+    },
+    "prueba@gmail.com": {
+        "username": "prueba",
+        "email": "prueba@gmail.com",
+        "rol": "security",
+        "telefono": "3144406238",
+        "contrasena": "prueba",
+        "face_token": "98e8c2ad42b010642a3a2bf9b19a0844"
+    }
+}
