@@ -76,7 +76,7 @@ export default function EquipmentDashboard() {
             {t('equipmentrestrictedAccess')}
           </h2>
           <p className="text-gray-600 dark:text-gray-400">
-            {t('equipment do not have permission to access')}
+            {t('equipmentdonothavepermissiontoaccess')}
           </p>
         </div>
       </div>
@@ -383,8 +383,8 @@ export default function EquipmentDashboard() {
                   required
                 >
                   <option value="disponible"> {t('equipmentavailable')}</option>
-                  <option value="mantenimiento">Mantenimiento</option>
-                  <option value="dañado">Dañado</option>
+                  <option value="mantenimiento">{t('equipmentMaintenenace')}</option>
+                  <option value="dañado">{t('equipmentDamaged')}</option>
                 </select>
               </div>
 

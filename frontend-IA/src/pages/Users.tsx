@@ -1,11 +1,13 @@
 import { useState, useEffect } from 'react';
 import { useUser, Users } from '../contexts/UsersContext';
 import { Search, Filter, Edit, Trash2, X, User } from 'lucide-react';
+import { useLanguage } from '../contexts/LanguageContext';
 import { getCurrentUser } from '../services/auth';
 import FaceCapture from '../components/FaceCapture'; // o la ruta correcta según tu estructura
 
 export default function UsersDashboard() {
   const { users, updateUser, deleteUser } = useUser();
+  const { t } = useLanguage();
   console.log("users from context:", users);
 
   const [loading, setLoading] = useState(true);
@@ -197,10 +199,10 @@ export default function UsersDashboard() {
           </div>
           <div>
             <h2 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Gestión de Usuarios
+              {t('usermanagement')}
             </h2>
             <p className="text-sm text-gray-500 dark:text-gray-400">
-              Administrar usuarios del sistema SENASEC
+              {t('userManageSENASECsystemusers')}
             </p>
           </div>
         </div>
@@ -229,7 +231,7 @@ export default function UsersDashboard() {
               onChange={(e) => setRoleFilter(e.target.value)}
               className="w-full pl-10 pr-8 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white appearance-none"
             >
-              <option value="todos">Todos los roles</option>
+              <option value="todos">{t('userAllRoles')}</option>
               {roles.map(role => (
                 <option key={role} value={role}>
                   {role.charAt(0).toUpperCase() + role.slice(1)}
@@ -247,13 +249,13 @@ export default function UsersDashboard() {
             <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Nombre completo
+                  {t('userfullname')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Rol
+                  {t('userRole')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Acciones
+                  {t('userActions')}
                 </th>
               </tr>
             </thead>
@@ -300,7 +302,7 @@ export default function UsersDashboard() {
         {filteredUsers.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">
-              No se encontraron usuarios que coincidan con los criterios de búsqueda.
+              {t('userNoUsersWereFoundMatchingSearchCriteria')} 
             </p>
           </div>
         )}
@@ -326,7 +328,7 @@ export default function UsersDashboard() {
               {/* Nombre completo */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Nombre completo
+                  {t('userfullname')}
                 </label>
                 <input
                   type="text"
@@ -341,7 +343,7 @@ export default function UsersDashboard() {
               {/* Correo electrónico */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Correo electrónico
+                  {t('useremail')}
                 </label>
                 <input
                   type="email"
@@ -356,7 +358,7 @@ export default function UsersDashboard() {
               {/* Rol */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Rol
+                  {t('userRole')}
                 </label>
                 <select
                   value={formData.rol}
@@ -376,7 +378,7 @@ export default function UsersDashboard() {
               {/* Teléfono */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  Teléfono
+                  {t('userphone')}
                 </label>
                 <input
                   type="tel"
@@ -406,7 +408,7 @@ export default function UsersDashboard() {
               {/* Captura facial */}
               <div className="space-y-2">
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
-                  Captura facial
+                  {t('userFaceCapture')}
                 </label>
                 <FaceCapture
                   username={formData.username ?? ''}
@@ -452,15 +454,15 @@ export default function UsersDashboard() {
               </div>
               
               <h3 className="text-lg font-bold text-gray-900 dark:text-white mb-2">
-                ADVERTENCIA
+                {t('userWarning')}
               </h3>
               
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                Está a punto de borrar un usuario. Esta acción no se puede deshacer.
+                {t('userYouareAboutDeleteUserThisActionCannotUndone.')}
               </p>
               
               <div className="text-sm text-gray-700 dark:text-gray-300 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-                <strong>Usuario a eliminar:</strong><br />
+                <strong>{t('userToDelete')}:</strong><br />
                 {userToDelete.username}
               </div>
               
@@ -469,13 +471,13 @@ export default function UsersDashboard() {
                   onClick={cancelDeleteUser}
                   className="px-4 py-2 bg-gray-300 text-gray-700 rounded-md hover:bg-gray-400 focus:outline-none focus:ring-2 focus:ring-gray-500"
                 >
-                  Cancelar
+                  {t('userCancel')}
                 </button>
                 <button
                   onClick={confirmDeleteUser}
                   className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-red-500"
                 >
-                  Borrar usuario
+                  {t('userDeleteUser')}
                 </button>
               </div>
             </div>
