@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
 import { Lock, Cloud } from "lucide-react";
 
 const ForgotPassword = () => {
@@ -7,6 +8,7 @@ const ForgotPassword = () => {
   const [code, setCode] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const navigate = useNavigate();
 
   const [verified, setVerified] = useState(false);
   const [password, setPassword] = useState("");
@@ -95,9 +97,12 @@ const ForgotPassword = () => {
         new_password: password,
       });
       setMessage("Contraseña actualizada con éxito");
-      setVerified(false);
-      setPassword("");
-      setConfirmPassword("");
+      
+      // Navigate to login page after successful password reset
+      setTimeout(() => {
+        navigate('/login');
+      }, 2000); // 2 second delay to show success message
+      
     } catch (err: any) {
       setMessage(err.response?.data?.error || "Error al actualizar contraseña");
     } finally {
