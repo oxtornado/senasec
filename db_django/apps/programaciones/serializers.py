@@ -3,6 +3,7 @@ from .models import Programacion
 from apps.users.models import Usuario
 from apps.ambiente.models import Ambiente
 from apps.fichas.models import Ficha
+from apps.reportes.models import Reporte
 from apps.users.serializers import UsuarioSerializer
 from apps.ambiente.serializers import AmbienteSerializer
 from apps.fichas.serializers import FichaSerializer
@@ -18,6 +19,8 @@ class ProgramacionSerializer(serializers.ModelSerializer): # Serializador para e
     ambiente_id = serializers.PrimaryKeyRelatedField(queryset=Ambiente.objects.all(), write_only=True)
     ficha_id = serializers.PrimaryKeyRelatedField(queryset=Ficha.objects.all(), write_only=True)
 
+    tiene_reporte = serializers.SerializerMethodField()
+
     class Meta:
         model = Programacion
         fields = [
@@ -27,8 +30,12 @@ class ProgramacionSerializer(serializers.ModelSerializer): # Serializador para e
             'ficha', 'ficha_id',
             'dia',
             'hora_inicio',
-            'hora_fin'
+            'hora_fin',
+            'tiene_reporte',
         ]
+
+    def get_tiene_reporte(self, obj):
+        return Reporte.objects.filter(programacion=obj).exists()
 
     def create(self, validated_data):
         # Extraemos los objetos de los campos de escritura

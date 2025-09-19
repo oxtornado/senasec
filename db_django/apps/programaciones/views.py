@@ -4,6 +4,8 @@ from .serializers import ProgramacionSerializer  # Importando el serializador Pr
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.exceptions import PermissionDenied
 from permissions.permissions import IsAdminUser  # Importando permisos personalizados
+from rest_framework.response import Response
+from rest_framework.decorators import action
 
 
 # ViewSet para el modelo Programacion
@@ -12,16 +14,19 @@ class ProgramacionViewSet(viewsets.ModelViewSet):
     serializer_class = ProgramacionSerializer  # Usar el serializador ProgramacionSerializer
     permission_classes = [IsAuthenticated]  # Requiere autenticación y ser propietario
 
-    # def get_queryset(self):
-    #     # Verificar si el usuario está autenticado
-    #     if self.request.user.is_authenticated:
-    #         # Si el usuario es administrador, devolver todas las programaciones
-    #         if self.request.user.rol == 'admin':  # Asegúrate de que el campo 'rol' exista en el modelo de usuario
-    #             return Programacion.objects.all()
-    #         # Si no es administrador, devolver solo las programaciones del usuario logueado
-    #         return Programacion.objects.filter(asignacion__usuario=self.request.user)
-    #     # Si el usuario no está autenticado, devolver un queryset vacío
-    #     raise PermissionDenied(detail="Debe iniciar sesión para ver sus programaciones.")
+    @action(detail=False, methods=['get'], url_path='mias')
+    def mis_programaciones(self, request):
+        user = request.user
+
+        # Si es administrador, devuelve todas
+        if user.rol == 'admin':
+            programaciones = Programacion.objects.all()
+        else:
+            # Si es usuario común, solo las suyas
+            programaciones = Programacion.objects.filter(usuario=user)
+
+        serializer = self.get_serializer(programaciones, many=True)
+        return Response(serializer.data)
     
     def create(self, request, *args, **kwargs):
         if request.user.rol != 'admin':

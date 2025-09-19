@@ -217,7 +217,7 @@ export default function AssignmentsDashboard() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center space-x-3 mb-4">
           <div className="flex-shrink-0 h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
             <Calendar className="h-6 w-6 text-purple-600 dark:text-purple-300" />
@@ -261,7 +261,7 @@ export default function AssignmentsDashboard() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+            <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                   {t('assignmentUsername')}
@@ -277,7 +277,7 @@ export default function AssignmentsDashboard() {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="border border-gray-700 dark:border-gray-500 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredAssignments.map((assignment) => (
                 <tr key={assignment.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
