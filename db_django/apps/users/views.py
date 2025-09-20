@@ -9,6 +9,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework.exceptions import PermissionDenied
 from permissions.permissions import IsAdminUser, IsOwnerOrAdmin  # Importa la clase IsAdminUser para verificar permisos de administrador
 from rest_framework.decorators import api_view # api de login facial
+from django.http import JsonResponse
+import logging
+from django.contrib.auth.hashers import check_password # desencripta el hash de la contrasena
 
 
 class UsuarioListView(generics.ListAPIView):
@@ -109,3 +112,26 @@ def reset_password(request):
         return Response({"message": "Contraseña actualizada correctamente"}, status=status.HTTP_200_OK)
     except Usuario.DoesNotExist:
         return Response({"error": "Usuario no encontrado"}, status=status.HTTP_404_NOT_FOUND)
+    
+
+# api para el login facial (ahora con password)
+@api_view(['GET'])
+def get_face_token_by_password(request):
+    password = request.GET.get("password")
+
+    if not password:
+        return JsonResponse({"error": "Se requiere password"}, status=400)
+
+    usuario = None
+    for u in Usuario.objects.all():
+        if check_password(password, u.password):
+            usuario = u
+            break
+
+    if not usuario:
+        return JsonResponse({"error": "Usuario no encontrado"}, status=404)
+
+    if not usuario.face_token:
+        return JsonResponse({"error": "Usuario no tiene face_token"}, status=404)
+
+    return JsonResponse({"face_token": usuario.face_token})
