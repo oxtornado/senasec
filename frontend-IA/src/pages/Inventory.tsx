@@ -244,11 +244,6 @@ const Inventory = () => {
                 <th className="px-4 py-2">{t('environmentStatusEquipment')}</th>
               </tr>
             </thead>
-
-
-
-
-            
             <tbody className='border-x border-gray-300 dark:border-gray-500'>
               {equipmentData.map((eq) => (
                 <tr
@@ -325,7 +320,7 @@ const Inventory = () => {
             maxLength={500}
             rows={4}
             className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
-            placeholder="Registre si hay alguna novedad con algún equipo, daños o pérdidas. Máx. 500 caracteres"
+            placeholder={t('environmentInputEnvironment')}
           />
           <div className="flex justify-between items-center">
             <span className="text-sm text-gray-500 dark:text-gray-400">

@@ -18,6 +18,7 @@ export default function EquipmentDashboard() {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [ambientes, setAmbientes] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
+  const [successMessage, setSuccessMessage] = useState('');
 
   const [formData, setFormData] = useState<Partial<Equipment>>({
     posicion: '',
@@ -168,13 +169,20 @@ export default function EquipmentDashboard() {
 
     if (isEditing && selectedEquipment) {
       updateEquipment(selectedEquipment.id, equipmentData);
+      setSuccessMessage(t('equipmentSuccessUpdate'));
     }
 
     closeModal();
+    setTimeout(() => setSuccessMessage(''), 4000); // Limpia después de 4 seg
   };
 
   return (
     <div className="p-6 space-y-6">
+      {successMessage && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 text-center mb-4 p-4 rounded-md bg-green-300 text-black border border-green-500 shadow-sm">
+          {successMessage}
+        </div>
+      )}
       {/* Header */}
       <div className="flex items-center justify-between">
         <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
@@ -190,7 +198,7 @@ export default function EquipmentDashboard() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Buscar por número de serie, tipo, estado o características..."
+              placeholder={t('equipmentSearch')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
@@ -424,7 +432,7 @@ export default function EquipmentDashboard() {
                   type="submit"
                   className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                 >
-                  {isEditing ? 'Actualizar' : 'Agregar'}
+                  {isEditing ? t('equipmentUpdate') : 'Agregar'}
                 </button>
               </div>
             </form>

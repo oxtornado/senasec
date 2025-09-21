@@ -124,10 +124,10 @@ export default function ReportesDashboard() {
 
     if (isEditing && selectedReporte) {
       updateReporte(selectedReporte.id, reporteData);
-      setSuccessMessage('¡Reporte actualizado exitosamente!');
+      setSuccessMessage(t('reportSuccessUpdate'));
     } else {
       createReporte(reporteData);
-      setSuccessMessage('¡Reporte creado exitosamente!');
+      setSuccessMessage(t('reportSuccessCreate'));
     }
 
     closeModal();
@@ -144,7 +144,7 @@ export default function ReportesDashboard() {
       deleteReporte(reporteToDelete.id);
       setShowDeleteModal(false);
       setReporteToDelete(null);
-      setSuccessMessage('¡Reporte eliminado exitosamente!');
+      setSuccessMessage(t('reportSuccessDelete'));
       setTimeout(() => setSuccessMessage(''), 4000); // Limpia después de 4 seg
     }
   };
@@ -192,8 +192,8 @@ export default function ReportesDashboard() {
         </div>
       )}
       {/* Header */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-        <div className="flex items-center justify-between">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between space-y-4 lg:space-y-0">
           <div className="flex items-center space-x-4">
             <div className="p-3 rounded-full bg-blue-100 dark:bg-blue-900">
               <Calendar className="h-6 w-6 text-blue-600 dark:text-blue-300" />
@@ -203,7 +203,7 @@ export default function ReportesDashboard() {
                 {t('reportsDashboard')}
               </h2>
               <p className="text-sm text-gray-500 dark:text-gray-400">
-                Gestión y seguimiento de reportes de funcionarios
+                {t('reportsDescription')}
               </p>
             </div>
           </div>
@@ -213,28 +213,28 @@ export default function ReportesDashboard() {
               className="flex items-center px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
             >
               <Download className="h-4 w-4 mr-2" />
-              Exportar
+              {t('reportExportButton')}
             </button>
             <button
               onClick={handleCreateReporte}
               className="flex items-center px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
             >
               <Plus className="h-4 w-4 mr-2" />
-              Crear reporte
+              {t('reportCreateButton')}
             </button>
           </div>
         </div>
       </div>
 
       {/* Filtros y búsqueda */}
-      <div className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+      <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
           {/* Búsqueda por funcionario */}
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <input
               type="text"
-              placeholder="Buscar por usuario..."
+              placeholder={t('reportSearchUser')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
@@ -247,25 +247,27 @@ export default function ReportesDashboard() {
             onChange={(e) => setStatusFilter(e.target.value)}
             className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
           >
-            <option value="">Todos los estados</option>
-            <option value="completo">Completo</option>
-            <option value="pendiente">Pendiente</option>
-            <option value="revisado">Revisado</option>
+            <option value="">{t('reportStatusFilter')}</option>
+            <option value="completo">{t('reportStatusComplete')}</option>
+            <option value="pendiente">{t('reportStatusPending')}</option>
+            <option value="revisado">{t('reportStatusReviewed')}</option>
           </select>
 
           {/* Rango de fechas */}
-          <div className="flex space-x-2 w-full">
+          <div>
             <input
               type="date"
               value={dateRange.start}
               onChange={(e) => setDateRange(prev => ({ ...prev, start: e.target.value }))}
-              className="w-full max-w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
+          </div>
+          <div>
             <input
               type="date"
               value={dateRange.end}
               onChange={(e) => setDateRange(prev => ({ ...prev, end: e.target.value }))}
-              className="w-full max-w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
             />
           </div>
         </div>
@@ -275,32 +277,32 @@ export default function ReportesDashboard() {
       <div className="bg-white dark:bg-gray-800 rounded-lg shadow overflow-hidden">
         <div className="overflow-x-auto">
           <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-            <thead className="bg-gray-50 dark:bg-gray-700">
+            <thead className="bg-gray-200 dark:bg-gray-700">
               <tr>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  No. Programación
+                  {t('reportProgrammingNumber')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Usuario
+                  {t('reportUser')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Fecha
+                  {t('reportDate')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Hora Entrada
+                  {t('reportStartHour')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Hora Salida
+                  {t('reportEndHour')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Estado
+                  {t('reportStatus')}
                 </th>
                 <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                  Acciones
+                  {t('actions')}
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+            <tbody className="border border-gray-700 dark:border-gray-500 bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {filteredReportes.map((reporte) => (
                 <tr key={reporte.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
@@ -367,10 +369,10 @@ export default function ReportesDashboard() {
           <div className="text-center py-12">
             <Calendar className="h-16 w-16 text-gray-400 mx-auto mb-4" />
             <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">
-              No hay reportes
+              {t('reportNotFoundTitle')}
             </h3>
             <p className="text-gray-500 dark:text-gray-400">
-              No se encontraron reportes que coincidan con los criterios de búsqueda.
+              {t('reportNotFoundDescription')}
             </p>
           </div>
         )}
@@ -382,7 +384,7 @@ export default function ReportesDashboard() {
           <div className="bg-white dark:bg-gray-800 rounded-lg shadow-xl p-6 max-w-md w-full mx-4 max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-6">
               <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
-                {isEditing ? t('reporteUpdate') : t('reporteCreate')}
+                {isEditing ? t('reportUpdate') : t('reportCreate')}
               </h3>
               <button
                 onClick={() => setIsModalOpen(false)}
@@ -396,7 +398,7 @@ export default function ReportesDashboard() {
               {/* PROGRAMACIÓN */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('reporteProgrammingNumber')}
+                  {t('reportProgrammingNumber')}
                 </label>
                 <select
                   value={formData.programacion}
@@ -404,7 +406,7 @@ export default function ReportesDashboard() {
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">{t('reporteSelectedProgramming')}</option>
+                  <option value="">{t('reportProgrammingNumberInput')}</option>
                   {programaciones.map(p => (
                     <option key={p.id} value={p.id}>
                       #{p.id.toString().padStart(3, '0')} - {p.usuario.username}
@@ -417,7 +419,7 @@ export default function ReportesDashboard() {
               <div className='flex gap-4'>
                 <div className='flex-1'>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('reporteStartHourInput')}
+                    {t('reportStartHour')}
                   </label>
                   <input
                     type="time"
@@ -430,7 +432,7 @@ export default function ReportesDashboard() {
 
                 <div className='flex-1'>
                   <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                    {t('reporteEndHourInput')}
+                    {t('reportEndHour')}
                   </label>
                   <input
                     type="time"
@@ -445,7 +447,7 @@ export default function ReportesDashboard() {
               {/* ESTADO */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {t('reporteStatus')}
+                  {t('reportStatus')}
                 </label>
                 <select
                   value={formData.estado}
@@ -453,7 +455,7 @@ export default function ReportesDashboard() {
                   required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 >
-                  <option value="">{t('reporteSelectStatus')}</option>
+                  <option value="">{t('reportStatusInput')}</option>
                   {estados.map(estado => (
                     <option key={estado} value={estado}>
                       {estado.charAt(0).toUpperCase() + estado.slice(1)}
@@ -468,7 +470,7 @@ export default function ReportesDashboard() {
                   type="submit"
                   className="w-full px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
                 >
-                  {isEditing ? t('reporteUpdateButton') : t('reporteCreateButton')}
+                  {isEditing ? t('reportUpdate') : t('reportCreateButton')}
                 </button>
               </div>
             </form>
@@ -485,31 +487,31 @@ export default function ReportesDashboard() {
                 <Trash2 className="h-6 w-6 text-red-600 dark:text-red-300" />
               </div>
               <h3 className="text-lg font-medium text-gray-900 dark:text-white">
-                {t('reporteWarning')}
+                {t('reportWarning')}
               </h3>
             </div>
 
-            <p className="flex justify-center text-gray-500 dark:text-gray-400 mb-6">
-              {t('reporteWarningDescription')}
+            <p className="flex justify-center text-center text-gray-500 dark:text-gray-400 mb-6">
+              {t('reportWarningDescription')}
             </p>
 
             <div className="text-center text-sm text-gray-700 dark:text-gray-300 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">
-              <strong>{t('reporteWarningAssignment')}</strong><br />
+              <strong>{t('reportWarningAssignment')}</strong><br />
               #{reporteToDelete.programacion}
             </div>
 
-            <div className="flex justify-end space-x-3">
+            <div className="flex justify-center space-x-3">
               <button
                 onClick={cancelDeleteReporte}
                 className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-100 dark:bg-gray-700 rounded-lg hover:bg-gray-200 dark:hover:bg-gray-600"
               >
-                {t('reporteWarningCancel')}
+                {t('reportWarningCancel')}
               </button>
               <button
                 onClick={confirmDeleteReporte}
                 className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
               >
-                {t('reporteWarningDelete')}
+                {t('reportWarningDelete')}
               </button>
             </div>
           </div>

@@ -19,6 +19,7 @@ export default function UsersDashboard() {
   const [selectedUser, setSelectedUser] = useState<Users | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [userToDelete, setUserToDelete] = useState<Users | null>(null);
+  const [successMessage, setSuccessMessage] = useState('');
 
   const roles = ['admin', 'instructor', 'seguridad', 'aseo', 'inventario'];
 
@@ -149,9 +150,11 @@ export default function UsersDashboard() {
 
     if (isEditing && selectedUser) {
       updateUser(selectedUser.id, userData);
+      setSuccessMessage(t('userSuccessUpdate'));
     }
 
     closeModal();
+    setTimeout(() => setSuccessMessage(''), 4000); // Limpia después de 4 seg
   };
 
   const handleDeleteUser = (user: Users) => {
@@ -164,6 +167,8 @@ export default function UsersDashboard() {
       deleteUser(userToDelete.id);
       setShowDeleteModal(false);
       setUserToDelete(null);
+      setSuccessMessage(t('userSuccessDelete'));
+      setTimeout(() => setSuccessMessage(''), 4000); // Limpia después de 4 seg
     }
   };
 
@@ -191,6 +196,11 @@ export default function UsersDashboard() {
 
   return (
     <div className="space-y-6">
+      {successMessage && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 text-center mb-4 p-4 rounded-md bg-green-300 text-black border border-green-500 shadow-sm">
+          {successMessage}
+        </div>
+      )}
       {/* Header */}
       <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center space-x-4">
@@ -216,7 +226,7 @@ export default function UsersDashboard() {
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
             <input
               type="text"
-              placeholder="Buscar usuarios por documento, email..."
+              placeholder={t('userSearch')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
@@ -393,13 +403,13 @@ export default function UsersDashboard() {
               {/* Contraseña */}
               <div>
                 <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                  {isEditing ? 'Nueva contraseña (opcional)' : 'Contraseña'}
+                  {isEditing ? t('usernewpassword') : t('userpassword')}
                 </label>
                 <input
                   type="password"
                   value={formData.password}
                   onChange={(e) => handleInputChange('password', e.target.value)}
-                  placeholder={isEditing ? 'Ingrese nueva contraseña' : 'Ingrese contraseña'}
+                  placeholder={isEditing ? t('userplaceholdernewpassword') : t('userplaceholderpassword')}
                   required={!isEditing}
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:text-white"
                 />
@@ -432,7 +442,7 @@ export default function UsersDashboard() {
                       : 'bg-orange-600 hover:bg-orange-700 focus:ring-orange-500'
                   }`}
                 >
-                  {isEditing ? 'Actualizar' : 'Crear usuario'}
+                  {isEditing ? t('userUpdateButton') : t('userCreateButton')}
                 </button>
               </div>
             </form>
@@ -458,7 +468,7 @@ export default function UsersDashboard() {
               </h3>
               
               <p className="text-sm text-gray-500 dark:text-gray-400 mb-6">
-                {t('userYouareAboutDeleteUserThisActionCannotUndone.')}
+                {t('userWarningDescription')}
               </p>
               
               <div className="text-sm text-gray-700 dark:text-gray-300 mb-6 p-3 bg-gray-50 dark:bg-gray-700 rounded-md">

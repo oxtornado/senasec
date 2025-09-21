@@ -22,6 +22,7 @@ export default function AssignmentsDashboard() {
   const [users, setUsers] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
   const [fichas, setFichas] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
   const [ambientes, setAmbientes] = useState<any[]>([]); // Puedes tipar mejor si tienes el modelo
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -189,11 +190,14 @@ export default function AssignmentsDashboard() {
 
     if (isEditing && selectedAssignment) {
       updateAssignment(selectedAssignment.id, assignmentData);
+      setSuccessMessage(t('assignmentSuccessUpdate'));
     } else {
       createAssignment(assignmentData);
+      setSuccessMessage(t('assignmentSuccessCreate'));
     }
 
     closeModal();
+    setTimeout(() => setSuccessMessage(''), 4000); // Limpia después de 4 seg
   };
 
   const handleDeleteAssignment = (assignment: Assignments) => {
@@ -206,6 +210,8 @@ export default function AssignmentsDashboard() {
       deleteAssignment(assignmentToDelete.id);
       setShowDeleteModal(false);
       setAssignmentToDelete(null);
+      setSuccessMessage(t('assignmentSuccessDelete'));
+      setTimeout(() => setSuccessMessage(''), 4000); // Limpia después de 4 seg
     }
   };
   
@@ -216,6 +222,11 @@ export default function AssignmentsDashboard() {
 
   return (
     <div className="space-y-6">
+      {successMessage && (
+        <div className="fixed top-5 left-1/2 transform -translate-x-1/2 z-50 text-center mb-4 p-4 rounded-md bg-green-300 text-black border border-green-500 shadow-sm">
+          {successMessage}
+        </div>
+      )}
       {/* Header */}
       <div className="bg-gray-200 dark:bg-gray-800 rounded-lg shadow p-6">
         <div className="flex items-center space-x-3 mb-4">

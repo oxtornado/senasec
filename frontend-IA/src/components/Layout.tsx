@@ -295,12 +295,12 @@ const Layout = () => {
                 {/* Mobile Controls */}
                 <div className="pt-6 border-t dark:border-gray-700 space-y-4">
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Idioma</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('language')}</span>
                     <LanguageSelector />
                   </div>
                   
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Tema</span>
+                    <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{t('theme')}</span>
                     <button
                       onClick={toggleDarkMode}
                       className="p-2 rounded-md text-gray-600 hover:bg-gray-100 dark:text-gray-300 dark:hover:bg-gray-700 min-h-touch"
@@ -320,7 +320,7 @@ const Layout = () => {
                     }}
                     className="w-full flex items-center justify-center px-4 py-3 text-base font-medium text-red-600 border border-red-400 bg-red-100 hover:bg-red-200 dark:bg-red-900 dark:text-red-200 dark:hover:bg-red-800 rounded-md min-h-touch dark:border-none"
                   >
-                    Cerrar Sesión
+                    {t('logout')}
                   </button>
                 </div>
               </div>
