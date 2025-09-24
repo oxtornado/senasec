@@ -10,6 +10,7 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@types/xlsx": "^0.0.35",
     "axios": "^1.11.0",
     "clsx": "^2.1.0",
     "i18next": "^25.3.4",
@@ -20,7 +21,7 @@
     "react-dom": "^18.3.1",
     "react-hot-toast": "^2.4.1",
     "react-i18next": "^15.6.1",
-    "react-router-dom": "^6.22.3",
+    "react-router-dom": "^6.30.1",
     "react-webcam": "^7.2.0",
     "xlsx": "^0.18.5"
   },
