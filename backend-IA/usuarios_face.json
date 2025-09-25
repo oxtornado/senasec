@@ -1,11 +1,11 @@
 {
     "julian@gmail.com": {
-        "username": "julian",
+        "username": "Julian_Camacho",
         "email": "julian@gmail.com",
-        "rol": "security",
-        "telefono": "12345678",
-        "contrasena": "1034400103",
-        "face_token": "68d2e3b889efc880e2f99c80d93059b3"
+        "rol": "aseo",
+        "telefono": "3144406238",
+        "password": "julian123",
+        "face_token": "5b745868a81333b9603454302fef0611"
     },
     "paula@gmail.com": {
         "username": "paula",
@@ -18,9 +18,65 @@
     "prueba@gmail.com": {
         "username": "prueba",
         "email": "prueba@gmail.com",
-        "rol": "security",
-        "telefono": "3144406238",
-        "contrasena": "prueba",
-        "face_token": "98e8c2ad42b010642a3a2bf9b19a0844"
+        "rol": "instructor",
+        "telefono": "3203284830",
+        "password": "prueba123",
+        "face_token": "f988043ecbf72444282f5068f80ae267"
+    },
+    "nicolasagamezmelo1@gmail.com": {
+        "username": "Nicolas_Agamez",
+        "email": "nicolasagamezmelo1@gmail.com",
+        "rol": "admin",
+        "telefono": "3046001209",
+        "password": "nico1234",
+        "face_token": "efec4ce5a94db7d801ec87f1ad2f0d78"
+    },
+    "emiliano@gmail.com": {
+        "username": "Emiliano_Perilla",
+        "email": "emiliano@gmail.com",
+        "rol": "seguridad",
+        "telefono": "3137840987",
+        "password": "emiliano123",
+        "face_token": "fd27f36d56c2ff4c2a52338c313c09e1"
+    },
+    "daniel@gmail.com": {
+        "username": "Daniel_Duarte",
+        "email": "daniel@gmail.com",
+        "rol": "inventario",
+        "telefono": "3044208908",
+        "password": "daniel123",
+        "face_token": "a7ba022c7cbf74cc992b0f7c187ca129"
+    },
+    "esteban@gmail.com": {
+        "username": "Esteban_Hernandez",
+        "email": "esteban@gmail.com",
+        "rol": "instructor",
+        "telefono": "3056842367",
+        "password": "esteban123",
+        "face_token": "1fb9c002634fb3579ff2e7bcb625a357"
+    },
+    "sofia@gmail.com": {
+        "username": "Sofia_Suarez",
+        "email": "sofia@gmail.com",
+        "rol": "aseo",
+        "telefono": "3046804809",
+        "password": "sofia123",
+        "face_token": "240c9fbbf5e7c20ee6dafaeeaf641c03"
+    },
+    "jose@gmail.com": {
+        "username": "Jose_Edwin",
+        "email": "jose@gmail.com",
+        "rol": "instructor",
+        "telefono": "3405673969",
+        "password": "jose1234",
+        "face_token": "14e7af70a1dc43997048f3917d9b5233"
+    },
+    "orlando@gmail.com": {
+        "username": "Jorge_Orlando",
+        "email": "orlando@gmail.com",
+        "rol": "instructor",
+        "telefono": "3058574134",
+        "password": "orlando1234",
+        "face_token": "92dd4327ffb9f1e355efad828d19ea58"
     }
 }
