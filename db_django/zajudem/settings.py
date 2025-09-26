@@ -121,10 +121,10 @@ WSGI_APPLICATION = 'zajudem.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql', #Conexión al gestor de base de datos en este caso postgresql
-        'NAME': 'senasec', #Nombre de la base de datos
-        'USER': 'postgres', #Usuario de la base de datos
-        'PASSWORD': '0000', #Contraseña de la base de datos
-        'HOST': '127.0.0.1', #Host de la base de datos
+        'NAME': 'neondb', #Nombre de la base de datos
+        'USER': 'neondb_owner', #Usuario de la base de datos
+        'PASSWORD': 'npg_kZXm34juTrlc', #Contraseña de la base de datos
+        'HOST': 'ep-polished-dew-adbyd56j-pooler.c-2.us-east-1.aws.neon.tech', #Host de la base de datos
         'PORT': '5432', #Puerto por defecto para establecer la conexión
     }
 }
