@@ -403,7 +403,6 @@ export default function ReportesDashboard() {
                 <select
                   value={formData.programacion}
                   onChange={(e) => handleInputChange('programacion', Number(e.target.value))}
-                  required
                   className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-purple-500 dark:bg-gray-700 dark:text-white"
                 >
                   <option value="">{t('reportProgrammingNumberInput')}</option>

@@ -15,6 +15,8 @@ const translations = {
     menu: "Menú",
     language: "Idioma",
     theme: "Tema",
+    allRightsReserved: "Todos los derechos reservados",
+    contact: "Contacto",
     
     // Días de la semana
     monday: "Lunes",
@@ -317,6 +319,8 @@ const translations = {
     menu: "Menu",
     language: "Language",
     theme: "Theme",
+    allRightsReserved: "All rights reserved",
+    contact: "Contact",
     
     // Days of the week
     monday: "Monday",
