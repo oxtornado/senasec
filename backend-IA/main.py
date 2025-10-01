@@ -77,7 +77,7 @@ def get_face_token_by_password(password: str) -> str:
 
 # Obtener face_token desde Django por password
 def get_face_token_from_django_by_password(password: str) -> str:
-    url = f"https://backend-senasec-usyv.onrender.com/usuarios/api/get-face-token-by-password/?password={password}"    
+    url = f"https://backend-senasec-usyv.onrender.com/api/get-face-token-by-password/?password={password}"    
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
@@ -157,7 +157,7 @@ async def update_face(
         # Enviar solo el face_token actualizado a Django
         try:
             response = requests.patch(
-                f"https://backend-senasec-usyv.onrender.com/usuarios/update-face-token/",
+                f"https://backend-senasec-usyv.onrender.com/update-face-token/",
                 json={"email": email, "face_token": best_token}
             )
             if response.status_code == 200:
@@ -212,6 +212,13 @@ async def login_face(password: str = Form(...), image: UploadFile = File(...)):
     confidence = compare_result.get("confidence", 0)
 
     if confidence > 80:
+        try:
+            door_resp = requests.post("http://10.215.215.201/door/success", timeout=5)
+            if door_resp.status_code != 200:
+                print("⚠️ Error enviando señal a la puerta:", door_resp.text)
+        except Exception as e:
+            print("❌ Fallo conectando con la puerta:", e)
+
         return {
             "message": "Inicio de sesión facial exitoso",
             "confidence": confidence,
