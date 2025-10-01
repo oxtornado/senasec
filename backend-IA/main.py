@@ -92,6 +92,56 @@ def get_face_token_from_django_by_password(password: str) -> str:
     return None
 
 
+@app.post("/login-face/")
+async def login_face(password: str = Form(...), image: UploadFile = File(...)):
+    # 1. Obtener face_token desde Django
+    stored_token = get_face_token_from_django_by_password(password)
+
+    if not stored_token:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado o sin face_token.")
+
+    # 2. Leer imagen recibida
+    contents = await image.read()
+    files = {"image_file": (image.filename, contents, image.content_type)}
+    data = {"api_key": API_KEY, "api_secret": API_SECRET}
+
+    # 3. Detectar rostro
+    detect_resp = requests.post(FACE_DETECT_URL, files=files, data=data)
+    detect_data = detect_resp.json()
+
+    if not detect_data.get("faces"):
+        raise HTTPException(status_code=400, detail="No se detectó ningún rostro en la imagen.")
+
+    login_face_token = detect_data["faces"][0]["face_token"]
+
+    # 4. Comparar con el token guardado
+    compare_data = {
+        "api_key": API_KEY,
+        "api_secret": API_SECRET,
+        "face_token1": stored_token,
+        "face_token2": login_face_token
+    }
+    compare_resp = requests.post(FACE_COMPARE_URL, data=compare_data)
+    compare_result = compare_resp.json()
+
+    confidence = compare_result.get("confidence", 0)
+
+    if confidence > 80:
+        # En lugar de enviar comando, almacenarlo
+        pending_commands["esp_door_01"] = "success"
+        
+        return {
+            "message": "Inicio de sesión facial exitoso",
+            "confidence": confidence,
+            "face_token": stored_token
+        }
+    else:
+        pending_commands["esp_door_01"] = "failed"
+        raise HTTPException(
+            status_code=401,
+            detail={"error": "Rostro no coincide", "confidence": confidence}
+        )
+
 # Agregar esto ANTES de tus otros endpoints
 @app.get("/debug-endpoints")
 async def debug_endpoints():
@@ -261,56 +311,6 @@ def send_to_door(endpoint):
         return False
     
 
-# Modifica tu endpoint de login-face
-@app.post("/login-face/")
-async def login_face(password: str = Form(...), image: UploadFile = File(...)):
-    # 1. Obtener face_token desde Django
-    stored_token = get_face_token_from_django_by_password(password)
-
-    if not stored_token:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado o sin face_token.")
-
-    # 2. Leer imagen recibida
-    contents = await image.read()
-    files = {"image_file": (image.filename, contents, image.content_type)}
-    data = {"api_key": API_KEY, "api_secret": API_SECRET}
-
-    # 3. Detectar rostro
-    detect_resp = requests.post(FACE_DETECT_URL, files=files, data=data)
-    detect_data = detect_resp.json()
-
-    if not detect_data.get("faces"):
-        raise HTTPException(status_code=400, detail="No se detectó ningún rostro en la imagen.")
-
-    login_face_token = detect_data["faces"][0]["face_token"]
-
-    # 4. Comparar con el token guardado
-    compare_data = {
-        "api_key": API_KEY,
-        "api_secret": API_SECRET,
-        "face_token1": stored_token,
-        "face_token2": login_face_token
-    }
-    compare_resp = requests.post(FACE_COMPARE_URL, data=compare_data)
-    compare_result = compare_resp.json()
-
-    confidence = compare_result.get("confidence", 0)
-
-    if confidence > 80:
-        # En lugar de enviar comando, almacenarlo
-        pending_commands["esp_door_01"] = "success"
-        
-        return {
-            "message": "Inicio de sesión facial exitoso",
-            "confidence": confidence,
-            "face_token": stored_token
-        }
-    else:
-        pending_commands["esp_door_01"] = "failed"
-        raise HTTPException(
-            status_code=401,
-            detail={"error": "Rostro no coincide", "confidence": confidence}
-        )
 
 # Endpoint para que el ESP8266 consulte comandos
 @app.get("/check-command")
