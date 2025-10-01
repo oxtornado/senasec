@@ -304,3 +304,17 @@ async def check_command():
         # No hay comandos pendientes
         from fastapi.responses import Response
         return Response(status_code=204)
+
+@app.get("/")
+async def root():
+    return {
+        "message": "SenaSec API Online",
+        "endpoints": [
+            "/register-face/",
+            "/update-face/", 
+            "/login-face/",
+            "/update-ip",
+            "/check-command",
+            "/device-status"
+        ]
+    }
