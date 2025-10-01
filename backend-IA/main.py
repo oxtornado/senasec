@@ -8,6 +8,8 @@ import os
 
 app = FastAPI()
 
+pending_commands = {}
+
 device_ips = {
     "esp_door_01": None  # Inicialmente desconocida
 }
@@ -246,23 +248,34 @@ async def login_face(password: str = Form(...), image: UploadFile = File(...)):
     confidence = compare_result.get("confidence", 0)
 
     if confidence > 80:
-        # Enviar comando a la puerta
-        success = send_to_door("door/success")
+        # En lugar de enviar comando, almacenarlo
+        pending_commands["esp_door_01"] = "success"
         
         return {
             "message": "Inicio de sesión facial exitoso",
             "confidence": confidence,
-            "face_token": stored_token,
-            "door_activated": success
+            "face_token": stored_token
         }
     else:
-        # Opcional: Activar LED rojo en caso de fallo
-        send_to_door("door/failed")
-        
+        pending_commands["esp_door_01"] = "failed"
         raise HTTPException(
             status_code=401,
             detail={"error": "Rostro no coincide", "confidence": confidence}
         )
+
+# Endpoint para que el ESP8266 consulte comandos
+@app.get("/check-command")
+async def check_command():
+    command = pending_commands.get("esp_door_01")
+    
+    if command:
+        # Limpiar el comando después de enviarlo
+        pending_commands["esp_door_01"] = None
+        return command
+    else:
+        # No hay comandos pendientes
+        from fastapi.responses import Response
+        return Response(status_code=204)
 
 # Endpoint para verificar el estado del dispositivo
 @app.get("/device-status")
