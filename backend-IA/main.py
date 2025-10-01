@@ -92,6 +92,23 @@ def get_face_token_from_django_by_password(password: str) -> str:
     return None
 
 
+# Agregar esto ANTES de tus otros endpoints
+@app.get("/debug-endpoints")
+async def debug_endpoints():
+    """Verificar qué endpoints están realmente registrados"""
+    routes = []
+    for route in app.routes:
+        routes.append({
+            "path": getattr(route, "path", "N/A"),
+            "methods": getattr(route, "methods", "N/A"),
+            "name": getattr(route, "name", "N/A")
+        })
+    return {"routes": routes}
+
+@app.post("/test-login-face")
+async def test_login_face():
+    """Endpoint simple para testear"""
+    return {"message": "test-login-face funciona"}
 
 # Registro facial con email 
 @app.post("/register-face/")
