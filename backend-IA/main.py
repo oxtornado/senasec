@@ -186,10 +186,38 @@ async def update_ip(data: dict):
     if device_id and ip_address:
         device_ips[device_id] = ip_address
         print(f"✅ IP actualizada para {device_id}: {ip_address}")
-        return {"message": "IP actualizada correctamente"}
+        print(f"📋 Estado actual de IPs: {device_ips}")
+        return {"message": "IP actualizada correctamente", "device_id": device_id, "ip": ip_address}
     else:
         raise HTTPException(status_code=400, detail="Datos incompletos")
 
+# Endpoint mejorado para que el ESP8266 consulte comandos
+@app.get("/check-command")
+async def check_command():
+    command = pending_commands.get("esp_door_01")
+    
+    if command:
+        print(f"📤 Enviando comando al ESP: {command}")
+        # Limpiar el comando después de enviarlo
+        pending_commands["esp_door_01"] = None
+        return command
+    else:
+        # No hay comandos pendientes
+        from fastapi.responses import Response
+        return Response(status_code=204)
+
+# Endpoint para verificar el estado del dispositivo (útil para debugging)
+@app.get("/device-status")
+async def get_device_status():
+    ip = device_ips.get("esp_door_01")
+    has_command = pending_commands.get("esp_door_01") is not None
+    return {
+        "device_id": "esp_door_01",
+        "ip_address": ip,
+        "status": "online" if ip else "offline",
+        "pending_command": pending_commands.get("esp_door_01"),
+        "has_pending_command": has_command
+    }
 # Función para enviar comando a la puerta
 def send_to_door(endpoint):
     ip = device_ips.get("esp_door_01")
@@ -276,13 +304,3 @@ async def check_command():
         # No hay comandos pendientes
         from fastapi.responses import Response
         return Response(status_code=204)
-
-# Endpoint para verificar el estado del dispositivo
-@app.get("/device-status")
-async def get_device_status():
-    ip = device_ips.get("esp_door_01")
-    return {
-        "device_id": "esp_door_01",
-        "ip_address": ip,
-        "status": "online" if ip else "offline"
-    }
