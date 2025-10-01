@@ -191,20 +191,23 @@ async def update_ip(data: dict):
     else:
         raise HTTPException(status_code=400, detail="Datos incompletos")
 
-# Endpoint mejorado para que el ESP8266 consulte comandos
-@app.get("/check-command")
-async def check_command():
-    command = pending_commands.get("esp_door_01")
-    
-    if command:
-        print(f"📤 Enviando comando al ESP: {command}")
-        # Limpiar el comando después de enviarlo
-        pending_commands["esp_door_01"] = None
-        return command
-    else:
-        # No hay comandos pendientes
-        from fastapi.responses import Response
-        return Response(status_code=204)
+# Endpoint temporal para testing
+@app.post("/test-command")
+async def test_command(command: str = "success"):
+    pending_commands["esp_door_01"] = command
+    print(f"🧪 Comando de prueba establecido: '{command}'")
+    return {
+        "message": f"Comando '{command}' establecido para el próximo poll",
+        "pending_commands": pending_commands
+    }
+
+@app.get("/debug-commands")
+async def debug_commands():
+    return {
+        "pending_commands": pending_commands,
+        "device_status": "esp_door_01" in device_ips,
+        "device_ip": device_ips.get("esp_door_01")
+    }
 
 # Endpoint para verificar el estado del dispositivo (útil para debugging)
 @app.get("/device-status")
