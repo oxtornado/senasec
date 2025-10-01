@@ -1,3 +1,4 @@
+from fastapi.responses import Response
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware #evitar problemas de CORS
 from typing import List
