@@ -8,6 +8,9 @@ import os
 
 app = FastAPI()
 
+origin = [ 
+    "https://sb1-jrlgmdcl-1.vercel.app" 
+]
 # aplicando la configuracion de CORS
 app.add_middleware(
     CORSMiddleware,
@@ -27,7 +30,7 @@ FACE_COMPARE_URL = "https://api-us.faceplusplus.com/facepp/v3/compare" # endpoin
 # Mandar datos a Django
 def enviar_a_django(data: dict):
     try:
-        response = requests.post("http://127.0.0.1:8001/users/usuarios/", json=data)
+        response = requests.post("https://backend-senasec-usyv.onrender.com/usuarios/", json=data)
         if response.status_code == 201:
             print("Datos guardados correctamente en Django.")
         else:
@@ -75,7 +78,7 @@ def get_face_token_by_password(password: str) -> str:
 
 # Obtener face_token desde Django por password
 def get_face_token_from_django_by_password(password: str) -> str:
-    url = f"http://localhost:8001/users/api/get-face-token-by-password/?password={password}"    
+    url = f"https://backend-senasec-usyv.onrender.com/usuarios/api/get-face-token-by-password/?password={password}"    
     response = requests.get(url)
     if response.status_code == 200:
         data = response.json()
@@ -155,7 +158,7 @@ async def update_face(
         # Enviar solo el face_token actualizado a Django
         try:
             response = requests.patch(
-                f"http://127.0.0.1:8001/users/update-face-token/",
+                f"https://backend-senasec-usyv.onrender.com/usuarios/update-face-token/",
                 json={"email": email, "face_token": best_token}
             )
             if response.status_code == 200:
