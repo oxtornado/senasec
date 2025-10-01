@@ -1,4 +1,4 @@
-from fastapi import FastAPI, File, UploadFile, UploadFile, Form, HTTPException
+from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware #evitar problemas de CORS
 from typing import List
 import requests
@@ -7,6 +7,10 @@ import json # para guardar los datos localmente
 import os
 
 app = FastAPI()
+
+device_ips = {
+    "esp_door_01": None  # Inicialmente desconocida
+}
 
 origin = [ 
     "https://sb1-jrlgmdcl-1.vercel.app" 
@@ -171,26 +175,56 @@ async def update_face(
         raise HTTPException(status_code=400, detail="No se detectó ningún rostro válido")
 
 
-# Login facial con password
+# Nuevo endpoint para recibir IPs del ESP8266
+@app.post("/update-ip")
+async def update_ip(data: dict):
+    device_id = data.get("device_id")
+    ip_address = data.get("ip_address")
+    
+    if device_id and ip_address:
+        device_ips[device_id] = ip_address
+        print(f"✅ IP actualizada para {device_id}: {ip_address}")
+        return {"message": "IP actualizada correctamente"}
+    else:
+        raise HTTPException(status_code=400, detail="Datos incompletos")
+
+# Función para enviar comando a la puerta
+def send_to_door(endpoint):
+    ip = device_ips.get("esp_door_01")
+    if not ip:
+        print("❌ IP del dispositivo desconocida")
+        return False
+    
+    try:
+        url = f"http://{ip}/{endpoint}"
+        print(f"🔗 Enviando comando a: {url}")
+        response = requests.get(url, timeout=10)
+        if response.status_code == 200:
+            print("✅ Comando enviado exitosamente")
+            return True
+        else:
+            print(f"⚠️ Error en respuesta: {response.status_code}")
+            return False
+    except Exception as e:
+        print(f"❌ Error conectando con el dispositivo: {e}")
+        return False
+    
+
+# Modifica tu endpoint de login-face
 @app.post("/login-face/")
 async def login_face(password: str = Form(...), image: UploadFile = File(...)):
     # 1. Obtener face_token desde Django
     stored_token = get_face_token_from_django_by_password(password)
 
-    # 2. Si no lo encuentra en Django, intentar en JSON local (backup)
-    # if not stored_token:
-    #     stored_token = get_face_token_by_password(password)
-
-    # 3. Validar existencia
     if not stored_token:
         raise HTTPException(status_code=404, detail="Usuario no encontrado o sin face_token.")
 
-    # 4. Leer imagen recibida
+    # 2. Leer imagen recibida
     contents = await image.read()
     files = {"image_file": (image.filename, contents, image.content_type)}
     data = {"api_key": API_KEY, "api_secret": API_SECRET}
 
-    # 5. Detectar rostro
+    # 3. Detectar rostro
     detect_resp = requests.post(FACE_DETECT_URL, files=files, data=data)
     detect_data = detect_resp.json()
 
@@ -199,7 +233,7 @@ async def login_face(password: str = Form(...), image: UploadFile = File(...)):
 
     login_face_token = detect_data["faces"][0]["face_token"]
 
-    # 6. Comparar con el token guardado
+    # 4. Comparar con el token guardado
     compare_data = {
         "api_key": API_KEY,
         "api_secret": API_SECRET,
@@ -212,20 +246,30 @@ async def login_face(password: str = Form(...), image: UploadFile = File(...)):
     confidence = compare_result.get("confidence", 0)
 
     if confidence > 80:
-        try:
-            door_resp = requests.post("http://10.215.215.201/door/success", timeout=5)
-            if door_resp.status_code != 200:
-                print("⚠️ Error enviando señal a la puerta:", door_resp.text)
-        except Exception as e:
-            print("❌ Fallo conectando con la puerta:", e)
-
+        # Enviar comando a la puerta
+        success = send_to_door("door/success")
+        
         return {
             "message": "Inicio de sesión facial exitoso",
             "confidence": confidence,
-            "face_token": stored_token
+            "face_token": stored_token,
+            "door_activated": success
         }
     else:
+        # Opcional: Activar LED rojo en caso de fallo
+        send_to_door("door/failed")
+        
         raise HTTPException(
             status_code=401,
             detail={"error": "Rostro no coincide", "confidence": confidence}
         )
+
+# Endpoint para verificar el estado del dispositivo
+@app.get("/device-status")
+async def get_device_status():
+    ip = device_ips.get("esp_door_01")
+    return {
+        "device_id": "esp_door_01",
+        "ip_address": ip,
+        "status": "online" if ip else "offline"
+    }
