@@ -318,6 +318,8 @@ async def root():
             "/login-face/",
             "/update-ip",
             "/check-command",
-            "/device-status"
+            "/device-status",
+            "/test-command",
+            "/debug-commands"
         ]
     }
