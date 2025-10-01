@@ -213,17 +213,21 @@ async def login_face(password: str = Form(...), image: UploadFile = File(...)):
 
     if confidence > 80:
         try:
-            door_resp = requests.post("http://10.215.215.201/door/success", timeout=5)
-            if door_resp.status_code != 200:
-                print("⚠️ Error enviando señal a la puerta:", door_resp.text)
+            requests.post("http://10.215.215.201/door/success", timeout=5)
         except Exception as e:
+            print(f"⚠️ Error enviando señal a la puerta:", door_resp.text)
             print("❌ Fallo conectando con la puerta:", e)
-
+            return {
+                "message": "Inicio de sesión facial exitoso, pero no se pudo abrir la puerta",
+                "confidence": confidence,
+                "face_token": stored_token
+            }
         return {
-            "message": "Inicio de sesión facial exitoso",
+            "message": "Inicio de sesión facial exitoso y se pudo abrir la puerta",
             "confidence": confidence,
             "face_token": stored_token
         }
+
     else:
         raise HTTPException(
             status_code=401,
