@@ -94,80 +94,49 @@ def get_face_token_from_django_by_password(password: str) -> str:
 
 @app.post("/login-face/")
 async def login_face(password: str = Form(...), image: UploadFile = File(...)):
-    # 1. Obtener face_token desde Django
-    stored_token = get_face_token_from_django_by_password(password)
-
-    if not stored_token:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado o sin face_token.")
-
-    # 2. Leer imagen recibida
-    contents = await image.read()
-    files = {"image_file": (image.filename, contents, image.content_type)}
-    data = {"api_key": API_KEY, "api_secret": API_SECRET}
-
-    # 3. Detectar rostro
-    detect_resp = requests.post(FACE_DETECT_URL, files=files, data=data)
-    detect_data = detect_resp.json()
-
-    if not detect_data.get("faces"):
-        raise HTTPException(status_code=400, detail="No se detectó ningún rostro en la imagen.")
-
-    login_face_token = detect_data["faces"][0]["face_token"]
-
-    # 4. Comparar con el token guardado
-    compare_data = {
-        "api_key": API_KEY,
-        "api_secret": API_SECRET,
-        "face_token1": stored_token,
-        "face_token2": login_face_token
-    }
-    compare_resp = requests.post(FACE_COMPARE_URL, data=compare_data)
-    compare_result = compare_resp.json()
-
-    confidence = compare_result.get("confidence", 0)
-
-    if confidence > 80:
-        # En lugar de enviar comando, almacenarlo
-        pending_commands["esp_door_01"] = "success"
-        
-        return {
-            "message": "Inicio de sesión facial exitoso",
-            "confidence": confidence,
-            "face_token": stored_token
-        }
-    else:
-        pending_commands["esp_door_01"] = "failed"
-        raise HTTPException(
-            status_code=401,
-            detail={"error": "Rostro no coincide", "confidence": confidence}
-        )
-@app.post("/face-login")
-async def face_login(password: str = Form(...), image: UploadFile = File(...)):
-    """Endpoint alternativo SIN la barra final"""
-    print(f"🎯 FACE-LOGIN LLAMADO - Password: {password}, Image: {image.filename}")
+    print("🎯 ===========================================")
+    print("🎯 LOGIN-FACE ENDPOINT INICIADO")
+    print("🎯 ===========================================")
     
     try:
+        # Debug: Verificar que los parámetros lleguen
+        print(f"📧 Password recibido: {password}")
+        print(f"📷 Imagen recibida: {image.filename}, tipo: {image.content_type}")
+        
+        # Verificar que la imagen se pueda leer
+        contents = await image.read()
+        print(f"📊 Tamaño de imagen: {len(contents)} bytes")
+        
+        # IMPORTANTE: Resetear el archivo después de leer
+        await image.seek(0)
+        
         # 1. Obtener face_token desde Django
+        print("🔍 Buscando face_token en Django...")
         stored_token = get_face_token_from_django_by_password(password)
+        print(f"📋 Face token obtenido: {stored_token}")
 
         if not stored_token:
+            print("❌ Usuario no encontrado en Django")
             raise HTTPException(status_code=404, detail="Usuario no encontrado o sin face_token.")
 
-        # 2. Leer imagen recibida
-        contents = await image.read()
+        # 2. Detectar rostro con Face++
+        print("🤖 Detectando rostro con Face++...")
         files = {"image_file": (image.filename, contents, image.content_type)}
         data = {"api_key": API_KEY, "api_secret": API_SECRET}
-
-        # 3. Detectar rostro
+        
         detect_resp = requests.post(FACE_DETECT_URL, files=files, data=data)
         detect_data = detect_resp.json()
+        print(f"🔍 Respuesta Face++ (detect): {detect_data}")
 
         if not detect_data.get("faces"):
+            print("❌ No se detectaron rostros en la imagen")
             raise HTTPException(status_code=400, detail="No se detectó ningún rostro en la imagen.")
 
         login_face_token = detect_data["faces"][0]["face_token"]
+        print(f"🎭 Face token de login: {login_face_token}")
 
-        # 4. Comparar con el token guardado
+        # 3. Comparar con el token guardado
+        print("🔎 Comparando rostros...")
         compare_data = {
             "api_key": API_KEY,
             "api_secret": API_SECRET,
@@ -176,26 +145,47 @@ async def face_login(password: str = Form(...), image: UploadFile = File(...)):
         }
         compare_resp = requests.post(FACE_COMPARE_URL, data=compare_data)
         compare_result = compare_resp.json()
+        print(f"📊 Resultado comparación: {compare_result}")
 
         confidence = compare_result.get("confidence", 0)
+        print(f"🎯 Confianza: {confidence}")
 
         if confidence > 80:
+            print("✅ Login exitoso - Activando puerta")
             pending_commands["esp_door_01"] = "success"
+            
             return {
                 "message": "Inicio de sesión facial exitoso",
                 "confidence": confidence,
-                "face_token": stored_token
+                "face_token": stored_token,
+                "door_activated": True
             }
         else:
+            print("❌ Login fallido - Rostros no coinciden")
             pending_commands["esp_door_01"] = "failed"
             raise HTTPException(
                 status_code=401,
                 detail={"error": "Rostro no coincide", "confidence": confidence}
             )
             
-    except Exception as e:
-        print(f"💥 ERROR en face-login: {e}")
+    except HTTPException:
+        # Re-lanzar excepciones HTTP
         raise
+    except Exception as e:
+        print(f"💥 ERROR CRÍTICO en login-face: {str(e)}")
+        print(f"💥 Tipo de error: {type(e).__name__}")
+        import traceback
+        print(f"💥 Traceback: {traceback.format_exc()}")
+        raise HTTPException(status_code=500, detail=f"Error interno del servidor: {str(e)}")
+
+@app.post("/test-multipart")
+async def test_multipart(password: str = Form(...), image: UploadFile = File(...)):
+    """Endpoint simple para probar multipart"""
+    return {
+        "status": "multipart funciona",
+        "password_received": password,
+        "image_received": image.filename
+    }
     
 # Agregar esto ANTES de tus otros endpoints
 @app.get("/debug-endpoints")
