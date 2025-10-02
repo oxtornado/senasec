@@ -1,4 +1,6 @@
+from fastapi import WebSocket, WebSocketDisconnect
 from fastapi.responses import Response
+import time
 from fastapi import FastAPI, File, UploadFile, Form, HTTPException
 from fastapi.middleware.cors import CORSMiddleware #evitar problemas de CORS
 from typing import List
@@ -6,6 +8,8 @@ import requests
 #--------------------------------(se remplazara una vez se vincule la bd)
 import json # para guardar los datos localmente 
 import os
+command_timestamps = {}
+webhook_clients = set()
 
 app = FastAPI()
 
@@ -90,8 +94,29 @@ def get_face_token_from_django_by_password(password: str) -> str:
         data = response.json()
         return data.get("face_token")  # Evita KeyError
     return None
+@app.websocket("/ws/door")
+async def websocket_endpoint(websocket: WebSocket):
+    await websocket.accept()
+    webhook_clients.add(websocket)
+    try:
+        while True:
+            # Mantener conexión abierta
+            await websocket.receive_text()
+    except WebSocketDisconnect:
+        webhook_clients.remove(websocket)
 
-
+# Función para notificar a todos los clientes WebSocket
+async def notify_door_activation(command: str):
+    disconnected_clients = set()
+    for client in webhook_clients:
+        try:
+            await client.send_text(command)
+        except:
+            disconnected_clients.add(client)
+    
+    # Limpiar clientes desconectados
+    for client in disconnected_clients:
+            webhook_clients.remove(client)
 @app.post("/login-face/")
 async def login_face(password: str = Form(...), image: UploadFile = File(...)):
     print("🎯 ===========================================")
@@ -143,32 +168,48 @@ async def login_face(password: str = Form(...), image: UploadFile = File(...)):
         print(f"🎯 CONFIANZA: {confidence}")
         print(f"📏 UMBRALES: {thresholds}")
 
-        # Umbral más bajo para testing
-        if confidence > 50:  # Bajé el umbral de 80 a 70
-            print("✅ LOGIN EXITOSO - Activando puerta")
+        if confidence > 50:
             pending_commands["esp_door_01"] = "success"
+            command_timestamps["esp_door_01"] = time.time()  # 🔥 Guardar timestamp
+            pending_commands["esp_door_01"] = "success"
+            
+            # 🔥 NUEVO: Notificar via WebSocket
+            await notify_door_activation("success")
             
             return {
                 "message": "Inicio de sesión facial exitoso",
                 "confidence": confidence,
-                "face_token": stored_token,
-                "door_activated": True
+                "face_token": stored_token
             }
         else:
-            print(f"❌ LOGIN FALLIDO - Confianza muy baja: {confidence}")
             pending_commands["esp_door_01"] = "failed"
+            
+            # 🔥 NUEVO: Notificar via WebSocket
+            await notify_door_activation("failed")
+            
             raise HTTPException(
                 status_code=401,
-                detail={
-                    "error": "Rostro no coincide", 
-                    "confidence": confidence,
-                    "thresholds": thresholds
-                }
+                detail={"error": "Rostro no coincide", "confidence": confidence}
             )
+
             
     except Exception as e:
         print(f"💥 ERROR: {str(e)}")
         raise
+
+# Endpoint alternativo para activación directa
+@app.post("/activate-door")
+async def activate_door(command: str = "success"):
+    """Activar puerta directamente (para webhooks)"""
+    pending_commands["esp_door_01"] = command
+    
+    # También notificar via WebSocket
+    await notify_door_activation(command)
+    
+    return {
+        "message": f"Comando {command} enviado a la puerta",
+        "pending_commands": pending_commands
+    }
 
 @app.post("/test-multipart")
 async def test_multipart(password: str = Form(...), image: UploadFile = File(...)):
@@ -357,20 +398,22 @@ def send_to_door(endpoint):
     
 
 
-# Endpoint para que el ESP8266 consulte comandos
+# Endpoint para que el ESP8266 consulte comandos - VERSIÓN MEJORADA
 @app.get("/check-command")
 async def check_command():
     command = pending_commands.get("esp_door_01")
     
+    print(f"🔍 Check-command consultado. Comando pendiente: {command}")
+    
     if command:
-        # Limpiar el comando después de enviarlo
-        pending_commands["esp_door_01"] = None
+        # ✅ NO limpiar inmediatamente - mantener por 10 segundos
+        # El comando se limpia solo cuando se confirma la recepción
         return command
     else:
         # No hay comandos pendientes
-        from fastapi.responses import Response
+        print("⏳ No hay comandos pendientes para ESP8266")
         return Response(status_code=204)
-
+        
 @app.get("/")
 async def root():
     return {
