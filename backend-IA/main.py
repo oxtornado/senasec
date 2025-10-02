@@ -144,7 +144,7 @@ async def login_face(password: str = Form(...), image: UploadFile = File(...)):
         print(f"📏 UMBRALES: {thresholds}")
 
         # Umbral más bajo para testing
-        if confidence > 70:  # Bajé el umbral de 80 a 70
+        if confidence > 50:  # Bajé el umbral de 80 a 70
             print("✅ LOGIN EXITOSO - Activando puerta")
             pending_commands["esp_door_01"] = "success"
             
